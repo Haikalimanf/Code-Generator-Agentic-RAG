@@ -1,0 +1,473 @@
+{
+  "_cached_at": 1774628627.6649678,
+  "_payload": {
+    "collection": {
+      "info": {
+        "_postman_id": "4649bef3-4e7a-4ffb-8d10-7ca4b1914599",
+        "name": "Shortlify API",
+        "description": "Complete API endpoints for Shortlify URL Shortener",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "createdAt": "2026-03-27T14:14:23.000Z",
+        "updatedAt": "2026-03-27T14:14:23.000Z",
+        "lastUpdatedBy": "37107725",
+        "uid": "37107725-4649bef3-4e7a-4ffb-8d10-7ca4b1914599"
+      },
+      "item": [
+        {
+          "name": "Health Check",
+          "item": [
+            {
+              "name": "Get Health Status",
+              "id": "2b9598ea-6402-4308-a8b8-05f2f2c86250",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/health",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "health"
+                  ]
+                },
+                "description": "Check if the API is running"
+              },
+              "response": [],
+              "createdAt": "2026-03-27T14:14:24.000Z",
+              "updatedAt": "2026-03-27T14:14:24.000Z",
+              "uid": "37107725-2b9598ea-6402-4308-a8b8-05f2f2c86250"
+            }
+          ],
+          "id": "c852d393-2ffc-4b2c-b69c-ecd85d54d709",
+          "createdAt": "2026-03-27T14:14:24.000Z",
+          "updatedAt": "2026-03-27T14:14:24.000Z",
+          "uid": "37107725-c852d393-2ffc-4b2c-b69c-ecd85d54d709"
+        },
+        {
+          "name": "Links",
+          "item": [
+            {
+              "name": "Create Short Link (Simple)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 200) {",
+                      "    const response = pm.response.json();",
+                      "    pm.collectionVariables.set('short_code', response.shortCode);",
+                      "}"
+                    ],
+                    "type": "text/javascript",
+                    "id": "6b6f2607-4141-4604-9914-c95a950725ee"
+                  }
+                }
+              ],
+              "id": "c2125f21-75b6-495d-8c14-a2c31d65a767",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"url\": \"https://example.com\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/shorten",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "shorten"
+                  ]
+                },
+                "description": "Create a short link with auto-generated code"
+              },
+              "response": [],
+              "createdAt": "2026-03-27T14:14:24.000Z",
+              "updatedAt": "2026-03-27T14:14:24.000Z",
+              "uid": "37107725-c2125f21-75b6-495d-8c14-a2c31d65a767"
+            },
+            {
+              "name": "Create Short Link (Custom Alias)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 200) {",
+                      "    const response = pm.response.json();",
+                      "    pm.collectionVariables.set('short_code', response.shortCode);",
+                      "}"
+                    ],
+                    "type": "text/javascript",
+                    "id": "8f04bf02-ba7e-4f0c-a112-01ea5b366d28"
+                  }
+                }
+              ],
+              "id": "5f80e569-a89c-4284-9f1c-662dc494e7c7",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"url\": \"https://github.com/vercel/next.js\",\n  \"customAlias\": \"nextjs\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/shorten",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "shorten"
+                  ]
+                },
+                "description": "Create a short link with custom alias"
+              },
+              "response": [],
+              "createdAt": "2026-03-27T14:14:24.000Z",
+              "updatedAt": "2026-03-27T14:14:24.000Z",
+              "uid": "37107725-5f80e569-a89c-4284-9f1c-662dc494e7c7"
+            },
+            {
+              "name": "Create Short Link (With Expiration)",
+              "id": "71e78a8d-2439-4292-b92e-bbefcb510876",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"url\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\",\n  \"customAlias\": \"rickroll\",\n  \"expiresIn\": 7\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/shorten",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "shorten"
+                  ]
+                },
+                "description": "Create a short link that expires in 7 days"
+              },
+              "response": [],
+              "createdAt": "2026-03-27T14:14:24.000Z",
+              "updatedAt": "2026-03-27T14:14:24.000Z",
+              "uid": "37107725-71e78a8d-2439-4292-b92e-bbefcb510876"
+            },
+            {
+              "name": "Create Short Link (Duplicate Alias - Should Fail)",
+              "id": "60f31a6f-bb7b-4619-b3a6-053c32514399",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"url\": \"https://example.com\",\n  \"customAlias\": \"nextjs\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/shorten",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "shorten"
+                  ]
+                },
+                "description": "Try to create a link with existing alias (should return 409)"
+              },
+              "response": [],
+              "createdAt": "2026-03-27T14:14:24.000Z",
+              "updatedAt": "2026-03-27T14:14:24.000Z",
+              "uid": "37107725-60f31a6f-bb7b-4619-b3a6-053c32514399"
+            },
+            {
+              "name": "Create Short Link (Invalid URL - Should Fail)",
+              "id": "b33246b3-7516-4e69-a62b-deac95006b34",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"url\": \"not-a-valid-url\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/shorten",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "shorten"
+                  ]
+                },
+                "description": "Try to create a link with invalid URL (should return 400)"
+              },
+              "response": [],
+              "createdAt": "2026-03-27T14:14:24.000Z",
+              "updatedAt": "2026-03-27T14:14:24.000Z",
+              "uid": "37107725-b33246b3-7516-4e69-a62b-deac95006b34"
+            },
+            {
+              "name": "Get All Links",
+              "id": "ca97e942-eb14-412f-ae17-4349813e698d",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/links?limit=100&offset=0",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "links"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "100"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    }
+                  ]
+                },
+                "description": "Get all created links with pagination"
+              },
+              "response": [],
+              "createdAt": "2026-03-27T14:14:24.000Z",
+              "updatedAt": "2026-03-27T14:14:24.000Z",
+              "uid": "37107725-ca97e942-eb14-412f-ae17-4349813e698d"
+            },
+            {
+              "name": "Get Link Statistics",
+              "id": "c2a7e902-038e-457d-a773-38e83849815a",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/stats/{{short_code}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "stats",
+                    "{{short_code}}"
+                  ]
+                },
+                "description": "Get detailed statistics for a specific short link"
+              },
+              "response": [],
+              "createdAt": "2026-03-27T14:14:24.000Z",
+              "updatedAt": "2026-03-27T14:14:24.000Z",
+              "uid": "37107725-c2a7e902-038e-457d-a773-38e83849815a"
+            },
+            {
+              "name": "Get Link Statistics (Not Found)",
+              "id": "725ea1cb-7916-4a11-a166-e5f484d3ecd7",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/stats/nonexistent",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "stats",
+                    "nonexistent"
+                  ]
+                },
+                "description": "Try to get stats for non-existent link (should return 404)"
+              },
+              "response": [],
+              "createdAt": "2026-03-27T14:14:24.000Z",
+              "updatedAt": "2026-03-27T14:14:24.000Z",
+              "uid": "37107725-725ea1cb-7916-4a11-a166-e5f484d3ecd7"
+            }
+          ],
+          "id": "4d58bcc0-c416-4a81-99f4-6c877ba1df87",
+          "createdAt": "2026-03-27T14:14:24.000Z",
+          "updatedAt": "2026-03-27T14:14:24.000Z",
+          "uid": "37107725-4d58bcc0-c416-4a81-99f4-6c877ba1df87"
+        },
+        {
+          "name": "Redirects",
+          "item": [
+            {
+              "name": "Redirect to Original URL",
+              "id": "297c681d-8389-4ca0-84bc-832d8eb1145c",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Referer",
+                    "value": "https://twitter.com"
+                  },
+                  {
+                    "key": "User-Agent",
+                    "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/{{short_code}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "{{short_code}}"
+                  ]
+                },
+                "description": "Redirect to original URL and track analytics"
+              },
+              "response": [],
+              "createdAt": "2026-03-27T14:14:24.000Z",
+              "updatedAt": "2026-03-27T14:14:24.000Z",
+              "uid": "37107725-297c681d-8389-4ca0-84bc-832d8eb1145c"
+            },
+            {
+              "name": "Redirect (Not Found)",
+              "id": "6d77da02-45a3-490c-a072-969b5b8edcf7",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/nonexistent",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "nonexistent"
+                  ]
+                },
+                "description": "Try to redirect with non-existent code (should return 404)"
+              },
+              "response": [],
+              "createdAt": "2026-03-27T14:14:24.000Z",
+              "updatedAt": "2026-03-27T14:14:24.000Z",
+              "uid": "37107725-6d77da02-45a3-490c-a072-969b5b8edcf7"
+            }
+          ],
+          "id": "4e385845-a8f2-4afb-8342-567f1d6ad8cc",
+          "createdAt": "2026-03-27T14:14:24.000Z",
+          "updatedAt": "2026-03-27T14:14:24.000Z",
+          "uid": "37107725-4e385845-a8f2-4afb-8342-567f1d6ad8cc"
+        },
+        {
+          "name": "QR Code",
+          "item": [
+            {
+              "name": "Generate QR Code",
+              "id": "cb130ad0-3df1-4386-927a-07a2d075954c",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/qr/{{short_code}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "qr",
+                    "{{short_code}}"
+                  ]
+                },
+                "description": "Generate QR code for a short link"
+              },
+              "response": [],
+              "createdAt": "2026-03-27T14:14:24.000Z",
+              "updatedAt": "2026-03-27T14:14:24.000Z",
+              "uid": "37107725-cb130ad0-3df1-4386-927a-07a2d075954c"
+            }
+          ],
+          "id": "fc5ed777-0a62-4594-8896-da4ee7461296",
+          "createdAt": "2026-03-27T14:14:24.000Z",
+          "updatedAt": "2026-03-27T14:14:24.000Z",
+          "uid": "37107725-fc5ed777-0a62-4594-8896-da4ee7461296"
+        }
+      ],
+      "variable": [
+        {
+          "key": "base_url",
+          "value": "http://localhost:5173",
+          "type": "string"
+        },
+        {
+          "key": "short_code",
+          "value": "",
+          "type": "string"
+        }
+      ]
+    }
+  }
+}
