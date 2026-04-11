@@ -15,25 +15,6 @@ BASE_URL = os.getenv("OPENROUTER_BASE_URL")
 
 print("Environment variables loaded.")
 
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-PDF_PATH = "../data/permenpan/SuitMobile Code Style [Android] - Naming - Version 2.pdf"
-
-print(f"Memuat file {PDF_PATH}...")
-loader = PyPDFLoader(PDF_PATH)
-docs = loader.load()
-
-print(f"Dokumen berhasil dimuat: {len(docs)} halaman")
-
-text_splitter = RecursiveCharacterTextSplitter(
-    chunk_size=500,
-    chunk_overlap=100
-)
-splits = text_splitter.split_documents(docs)
-
-print(f"Berhasil! Dokumen dipecah menjadi {len(splits)} potongan (chunks).")
-
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_postgres import PGVector
 
@@ -53,10 +34,6 @@ vectorstore = PGVector(
     connection=connection_string,
     use_jsonb=True,
 )
-
-print(f"Menyimpan vector ke tabel '{COLLECTION_NAME}' di Postgres...")
-vectorstore.add_documents(splits)
-print("Penyimpanan selesai!")
 
 from langchain_openai import ChatOpenAI
 from langchain_classic.chains import create_retrieval_chain
