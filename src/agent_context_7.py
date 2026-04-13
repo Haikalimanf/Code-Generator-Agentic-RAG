@@ -26,7 +26,7 @@ mcp = FastMCP(
 # ─────────────────────────────────────────────────────────────
 API_KEY    = os.getenv("OPENROUTER_API_KEY", "")
 BASE_URL   = "https://openrouter.ai/api/v1"
-MODEL_NAME = os.getenv("MODEL_NAME", "openai/gpt-4o-mini")
+MODEL_NAME = os.getenv("MODEL_NAME", "openai/gpt-4o")
 
 if not API_KEY or API_KEY == "your_openrouter_api_key_here":
     print("❌ [WARNING] OPENROUTER_API_KEY belum diset. Server mungkin gagal.", file=sys.stderr)
