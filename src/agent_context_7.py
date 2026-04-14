@@ -1,6 +1,5 @@
-import asyncio
-import sys
 import os
+import sys
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain_mcp_adapters.client import MultiServerMCPClient
@@ -9,27 +8,13 @@ from fastmcp import FastMCP
 
 load_dotenv()
 
-# ─────────────────────────────────────────────────────────────
-# Inisialisasi Server FastMCP
-# ─────────────────────────────────────────────────────────────
-mcp = FastMCP(
-    name="Context7AgentServer",
-    instructions=(
-        "Anda adalah asisten dokumentasi Kotlin. Anda memiliki "
-        "koneksi ke internet melalui Context7. Gunakan kemampuan saya "
-        "untuk mencari dokumentasi terbaru Kotlin/Android."
-    )
-)
-
-# ─────────────────────────────────────────────────────────────
-# Konfigurasi — baca dari .env
-# ─────────────────────────────────────────────────────────────
-API_KEY    = os.getenv("OPENROUTER_API_KEY", "")
-BASE_URL   = "https://openrouter.ai/api/v1"
+# 1. Konfigurasi
+API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+BASE_URL = "https://openrouter.ai/api/v1"
 MODEL_NAME = os.getenv("MODEL_NAME", "openai/gpt-4o")
 
-if not API_KEY or API_KEY == "your_openrouter_api_key_here":
-    print("❌ [WARNING] OPENROUTER_API_KEY belum diset. Server mungkin gagal.", file=sys.stderr)
+if not API_KEY:
+    print("❌ [WARNING] OPENROUTER_API_KEY belum diset.", file=sys.stderr)
 
 MCP_CONFIG = {
     "context7": {
@@ -47,54 +32,57 @@ SYSTEM_PROMPT = (
     "Provide clear explanations with code examples when available."
 )
 
-# ─────────────────────────────────────────────────────────────
-# MCP Tools
-# ─────────────────────────────────────────────────────────────
+# 2. Inisialisasi Server & LLM Instance (Di luar fungsi agar efisien)
+mcp = FastMCP(
+    name="Context7AgentServer",
+    instructions=(
+        "Gunakan tool search_kotlin_documentation untuk mencari sintaks, "
+        "library, atau arsitektur terbaru terkait Kotlin dan Android."
+    )
+)
+
+# LLM Instance dibuat sekali (Singleton pattern)
+docs_llm = ChatOpenAI(
+    model=MODEL_NAME,
+    temperature=0.0,
+    api_key=API_KEY,
+    base_url=BASE_URL,
+    default_headers={"HTTP-Referer": "https://github.com/", "X-Title": "Kotlin Doc Agent"},
+)
+
+# 3. Definisi Tool yang diekspos ke Android Studio
 @mcp.tool()
 async def search_kotlin_documentation(query: str) -> str:
     """
-    Tanyakan dokumentasi terbaru dari framework Kotlin, Android, Jetpack Compose, dll.
-    Agent AI terpisah akan meriset dan memberikan hasil bacaan dokumentasinya ke Anda.
+    Mencari dokumentasi terbaru dari framework Kotlin, Android, Jetpack Compose.
     
     Args:
-        query: Pertanyaan dokumentasi, misalnya "coroutine async await example"
+        query: Pertanyaan dokumentasi teknis (contoh: "Jetpack Compose Navigation in Kotlin")
     """
     try:
-        # Inisialisasi LLM
-        llm = ChatOpenAI(
-            model=MODEL_NAME,
-            temperature=0,
-            api_key=API_KEY,
-            base_url=BASE_URL,
-            default_headers={"HTTP-Referer": "https://github.com/", "X-Title": "Kotlin Doc Agent"},
-        )
-
-        # Menjalankan npx upstash/context7 sebentar secara background
+        # Menjalankan npx upstash/context7
         async with MultiServerMCPClient(MCP_CONFIG) as mcp_client:
             tools = await mcp_client.get_tools()
             
-            # Bangun ReAct Agent (LangGraph)
+            # Bangun ReAct Agent (The Knowledge Retriever)
             agent = create_react_agent(
-                model=llm,
+                model=docs_llm,
                 tools=tools,
                 prompt=SYSTEM_PROMPT,
             )
             
-            # Agent LangGraph memproses pertanyaan
+            # Eksekusi agen untuk mencari jawaban di internet
             response = await agent.ainvoke({
                 "messages": [{"role": "user", "content": query}]
             })
             
-            # Ekstrak hasil bacaan AI
             last_msg = response["messages"][-1]
             return last_msg.content if hasattr(last_msg, "content") else str(last_msg)
 
     except Exception as e:
-        return f"❌ Terjadi kesalahan saat Agent mencari dokumentasi: {e}"
+        return f"❌ Terjadi kesalahan saat Agent mencari dokumentasi: {str(e)}"
 
-# ─────────────────────────────────────────────────────────────
-# Entry Point
-# ─────────────────────────────────────────────────────────────
+# 4. Entry Point
 if __name__ == "__main__":
-    print("[Context7 Agent] 🚀 Memulai MCP Server (Transport STDIO)...", file=sys.stderr)
+    print("[Agent 3: Context7 Server] 🚀 Memulai MCP Server (Transport STDIO)...", file=sys.stderr)
     mcp.run(transport="stdio")
