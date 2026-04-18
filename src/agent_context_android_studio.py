@@ -125,37 +125,6 @@ def _read_file_safe(path: Path) -> str:
             continue
     return "[ERROR] Tidak bisa membaca file: encoding tidak dikenali."
 
-
-def _build_tree(directory: Path, depth: int = 0, max_depth: int = MAX_TREE_DEPTH) -> list[str]:
-    """Rekursif bangun representasi pohon direktori."""
-    if depth > max_depth:
-        return [f"{'  ' * depth}... (lebih dalam dari {max_depth} level)"]
-
-    lines = []
-    try:
-        entries = sorted(directory.iterdir(), key=lambda p: (p.is_file(), p.name.lower()))
-    except PermissionError:
-        return [f"{'  ' * depth}[AKSES DITOLAK]"]
-
-    for entry in entries:
-        indent = "  " * depth
-        if entry.is_dir():
-            if entry.name in SKIP_DIRS:
-                lines.append(f"{indent}📁 {entry.name}/ (skipped)")
-                continue
-            lines.append(f"{indent}📁 {entry.name}/")
-            lines.extend(_build_tree(entry, depth + 1, max_depth))
-        else:
-            icon = "📄"
-            if entry.suffix == ".kt":    icon = "🟣"
-            elif entry.suffix == ".java": icon = "☕"
-            elif entry.suffix == ".xml":  icon = "📋"
-            elif entry.suffix in (".gradle", ".kts"): icon = "🐘"
-            lines.append(f"{indent}{icon} {entry.name}")
-
-    return lines
-
-
 # ══════════════════════════════════════════════
 # MCP TOOLS
 # ══════════════════════════════════════════════
@@ -572,7 +541,7 @@ def analyze_manifest(module_path: Optional[str] = None) -> str:
 
     header = (
         f"🤖 Analisis AndroidManifest.xml\n"
-        f"   Ditemukan: {len(manifests) or len(manifest_files)} file manifest\n"
+        f"   Ditemukan: {len(manifests)} file manifest\n"
     )
     return header + "\n".join(output_parts)
 

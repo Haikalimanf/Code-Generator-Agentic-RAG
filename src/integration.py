@@ -35,6 +35,7 @@ def get_orchestrator_llm():
         temperature=0.0,
         api_key=API_KEY,
         base_url=BASE_URL,
+        max_tokens=2048,
     )
 
 
@@ -44,9 +45,10 @@ async def example_basic_usage():
     
     orchestrator_config = {
         "orchestrator": {
-            "command": "python.exe" if os.name == "nt" else "python3",
+            "command": sys.executable,
             "args": [ORCHESTRATOR_PATH],
             "transport": "stdio",
+            "env": {**os.environ},
         }
     }
     
@@ -65,10 +67,11 @@ async def example_basic_usage():
         # Create agent to use the tools
         print("[2] Creating agent to query orchestrator...")
         llm = get_orchestrator_llm()
+        # ✅ FIXED: Updated import
+        from langgraph.prebuilt import create_react_agent
         agent = create_react_agent(
             model=llm,
             tools=tools,
-            prompt="You are a helpful assistant that uses the orchestrator tools to get integration context."
         )
         
         print("[3] Querying orchestrator for context...")
@@ -143,9 +146,10 @@ Acceptance Criteria:
     
     orchestrator_config = {
         "orchestrator": {
-            "command": "python.exe" if os.name == "nt" else "python3",
+            "command": sys.executable,
             "args": [ORCHESTRATOR_PATH],
             "transport": "stdio",
+            "env": {**os.environ},
         }
     }
     
@@ -159,13 +163,11 @@ Acceptance Criteria:
         
         # Create agent dengan orchestrator tools
         llm = get_orchestrator_llm()
+        # ✅ FIXED: Updated import
+        from langgraph.prebuilt import create_react_agent
         agent = create_react_agent(
             model=llm,
             tools=tools,
-            prompt="""You are an intelligent orchestrator assistant.
-Your task is to fetch technical context for software requirements.
-Use get_complete_integration_context tool with appropriate parameters.
-Be concise and actionable in your response."""
         )
         
         # Build query for agent
@@ -224,9 +226,10 @@ async def example_health_check():
     
     orchestrator_config = {
         "orchestrator": {
-            "command": "python.exe" if os.name == "nt" else "python3",
+            "command": sys.executable,
             "args": [ORCHESTRATOR_PATH],
             "transport": "stdio",
+            "env": {**os.environ},
         }
     }
     
@@ -237,10 +240,11 @@ async def example_health_check():
         
         # Use health_check tool through agent
         llm = get_orchestrator_llm()
+        # ✅ FIXED: Updated import
+        from langgraph.prebuilt import create_react_agent
         agent = create_react_agent(
             model=llm,
             tools=tools,
-            prompt="Use the health_check_all_servers tool and report the results."
         )
         
         response = await agent.ainvoke({
@@ -267,9 +271,10 @@ async def example_targeted_query():
     
     orchestrator_config = {
         "orchestrator": {
-            "command": "python.exe" if os.name == "nt" else "python3",
+            "command": sys.executable,
             "args": [ORCHESTRATOR_PATH],
             "transport": "stdio",
+            "env": {**os.environ},
         }
     }
     
@@ -279,19 +284,20 @@ async def example_targeted_query():
         tools = await client.get_tools()
         
         llm = get_orchestrator_llm()
+        # ✅ FIXED: Updated import
+        from langgraph.prebuilt import create_react_agent
         agent = create_react_agent(
             model=llm,
             tools=tools,
-            prompt="Use query_specific_server tool to get specialized information."
         )
         
         response = await agent.ainvoke({
             "messages": [{
                 "role": "user",
-                "content": """Query the Context7 server with this question:
-'What are the latest updates in Kotlin 2.0 coroutines and async programming?'
+                "content": """Query the rag server directly:
+'Berikan best practices untuk Android development'
 
-Use the query_specific_server tool with server_name='context7'."""
+Use the query_specific_server tool with server_name='rag'."""
             }]
         })
         
@@ -305,24 +311,24 @@ Use the query_specific_server tool with server_name='context7'."""
 # ==================== ENTRY POINT ====================
 if __name__ == "__main__":
     print("""
-╔══════════════════════════════════════════════════════════════════════╗
-║                                                                      ║
-║    🚀 GitLab → Orchestrator Integration Examples                    ║
-║                                                                      ║
-║    Prerequisites:                                                   ║
-║    • Terminal 1: uv run src/orchestrator.py (RUNNING NOW)           ║
-║    • Terminal 2: This script                                        ║
-║                                                                      ║
-║    Choose an example to run (uncomment in __main__)                 ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
++======================================================================+
+|                                                                      |
+|    GitLab -> Orchestrator Integration Examples                       |
+|                                                                      |
+|    Prerequisites:                                                    |
+|    * Terminal 1: uv run src/orchestrator.py (RUNNING NOW)            |
+|    * Terminal 2: This script                                         |
+|                                                                      |
+|    Choose an example to run (uncomment in __main__)                  |
+|                                                                      |
++======================================================================+
 """)
     
     print("\nAvailable examples:")
     print("  1. example_basic_usage() - Simple tool discovery")
     print("  2. example_gitlab_integration() - Full GitLab → Orchestrator (RECOMMENDED)")
     print("  3. example_health_check() - Check server status")
-    print("  4. example_targeted_query() - Query specific MCP server")
+    print("  4. example_targeted_query() - Query RAG directly")
     
     print("\n🎯 Running: example_gitlab_integration()\n")
     

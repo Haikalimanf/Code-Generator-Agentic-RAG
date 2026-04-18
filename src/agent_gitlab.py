@@ -70,7 +70,8 @@ def run_gitlab_analyst_agent(project_id: str, issue_iid: int) -> str:
         model="anthropic/claude-sonnet-4.5",
         api_key=os.getenv("OPENROUTER_API_KEY"),
         base_url=os.getenv("OPENROUTER_BASE_URL"),
-        temperature=0.0
+        temperature=0.0,
+        max_tokens=2048,
     )
     
     # Daftarkan tools yang bisa digunakan agen

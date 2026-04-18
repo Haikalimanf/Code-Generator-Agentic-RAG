@@ -66,17 +66,19 @@ rag_chain = create_retrieval_chain(retriever, question_answer_chain)
 
 print("RAG Chain siap digunakan!")
 
-query = "apa inti utama dokumen ini?"
+# ==================== DEMO ONLY - Run when executed directly ====================
+if __name__ == "__main__":
+    query = "apa inti utama dokumen ini?"
 
-print(f"Pertanyaan: {query}")
-print("-" * 30)
+    print(f"\nPertanyaan: {query}")
+    print("-" * 30)
 
-response = rag_chain.invoke({"input": query})
+    response = rag_chain.invoke({"input": query})
 
-print("JAWABAN AI:")
-print(response["answer"])
+    print("JAWABAN AI:")
+    print(response["answer"])
 
-print("\n" + "-" * 30)
-print("Sumber Referensi:")
-for i, doc in enumerate(response["context"]):
-    print(f"[{i+1}] Halaman {doc.metadata.get('page', '?')}: {doc.page_content[:1000]}...")
+    print("\n" + "-" * 30)
+    print("Sumber Referensi:")
+    for i, doc in enumerate(response["context"]):
+        print(f"[{i+1}] Halaman {doc.metadata.get('page', '?')}: {doc.page_content[:1000]}...")
