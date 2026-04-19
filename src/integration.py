@@ -12,6 +12,9 @@ FIX: Menggunakan pattern yang sesuai dengan langchain-mcp-adapters 0.1.0+
 
 import asyncio
 import json
+import warnings
+warnings.filterwarnings("ignore", message=".*create_react_agent.*", category=DeprecationWarning)
+from pathlib import Path
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
@@ -25,7 +28,8 @@ API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 BASE_URL = "https://openrouter.ai/api/v1"
 MODEL_NAME = os.getenv("MODEL_NAME", "anthropic/claude-sonnet-4.5")
 
-ORCHESTRATOR_PATH = r"D:\RAG\Membuat MCP Server\src\orchestrator.py"
+PROJECT_ROOT = Path(__file__).parent.parent
+ORCHESTRATOR_PATH = str(PROJECT_ROOT / "src" / "orchestrator.py")
 
 # ==================== HELPER: Create Orchestrator LLM ====================
 def get_orchestrator_llm():
@@ -67,8 +71,6 @@ async def example_basic_usage():
         # Create agent to use the tools
         print("[2] Creating agent to query orchestrator...")
         llm = get_orchestrator_llm()
-        # ✅ FIXED: Updated import
-        from langgraph.prebuilt import create_react_agent
         agent = create_react_agent(
             model=llm,
             tools=tools,
@@ -163,8 +165,6 @@ Acceptance Criteria:
         
         # Create agent dengan orchestrator tools
         llm = get_orchestrator_llm()
-        # ✅ FIXED: Updated import
-        from langgraph.prebuilt import create_react_agent
         agent = create_react_agent(
             model=llm,
             tools=tools,
@@ -240,8 +240,6 @@ async def example_health_check():
         
         # Use health_check tool through agent
         llm = get_orchestrator_llm()
-        # ✅ FIXED: Updated import
-        from langgraph.prebuilt import create_react_agent
         agent = create_react_agent(
             model=llm,
             tools=tools,
@@ -284,8 +282,6 @@ async def example_targeted_query():
         tools = await client.get_tools()
         
         llm = get_orchestrator_llm()
-        # ✅ FIXED: Updated import
-        from langgraph.prebuilt import create_react_agent
         agent = create_react_agent(
             model=llm,
             tools=tools,

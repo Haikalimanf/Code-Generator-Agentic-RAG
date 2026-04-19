@@ -1,73 +1,102 @@
-import os
-from dotenv import load_dotenv
+"""
+agent_pdf_rag.py - RAG Chain untuk dokumen perusahaan (PDF → PostgreSQL Vector Store)
 
+Didesain untuk diimport oleh orchestrator.py secara langsung (tanpa MCP Server).
+Jika VECTOR_DATABASE_URL tidak tersedia atau DB tidak bisa diakses,
+module ini tetap bisa diimport dengan rag_chain = None (graceful degradation).
+"""
+
+import os
 import sys
+from dotenv import load_dotenv
 
 load_dotenv()
 
+# ==================== STATE VARIABLES ====================
+rag_chain = None
+RAG_AVAILABLE = False
+RAG_ERROR = None
+
+# ==================== INITIALIZATION ====================
 connection_string = os.getenv("VECTOR_DATABASE_URL")
+API_KEY = os.getenv("OPENROUTER_API_KEY")
+BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+MODEL_NAME = os.getenv("MODEL_NAME", "openai/gpt-4.1")
 
 if not connection_string:
-    raise ValueError("VECTOR_DATABASE_URL tidak ditemukan di file .env")
+    RAG_ERROR = "VECTOR_DATABASE_URL tidak dikonfigurasi di .env"
+    print(f"⚠️  [RAG] {RAG_ERROR}", file=sys.stderr)
+else:
+    try:
+        print("🔄 [RAG] Memuat model embedding...", file=sys.stderr)
+        from langchain_huggingface import HuggingFaceEmbeddings
+        from langchain_postgres import PGVector
+        from langchain_openai import ChatOpenAI
+        from langchain_classic.chains import create_retrieval_chain
+        from langchain_classic.chains.combine_documents import create_stuff_documents_chain
+        from langchain_core.prompts import ChatPromptTemplate
 
-API_KEY = os.getenv("OPENROUTER_API_KEY")
-BASE_URL = os.getenv("OPENROUTER_BASE_URL")
+        # Embedding model
+        embeddings = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2",
+            model_kwargs={'device': 'cpu'},
+            encode_kwargs={'normalize_embeddings': False}
+        )
 
-print("Environment variables loaded.")
+        COLLECTION_NAME = "company_guidelines"
 
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_postgres import PGVector
+        # Connect ke PostgreSQL Vector Store
+        print(f"🔄 [RAG] Koneksi ke vector store '{COLLECTION_NAME}'...", file=sys.stderr)
+        vectorstore = PGVector(
+            embeddings=embeddings,
+            collection_name=COLLECTION_NAME,
+            connection=connection_string,
+            use_jsonb=True,
+        )
 
-print("Memuat model embedding (akan download otomatis jika belum ada)...")
-embeddings = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",
-    model_kwargs={'device': 'cpu'},
-    encode_kwargs={'normalize_embeddings': False}
-)
+        # LLM untuk RAG
+        llm = ChatOpenAI(
+            model=MODEL_NAME,
+            api_key=API_KEY,
+            base_url=BASE_URL,
+            temperature=0
+        )
 
-# Ganti nama collection karena dimensi embedding berbeda dari sebelumnya
-COLLECTION_NAME = "permenpan_index_v3" 
+        retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 
-vectorstore = PGVector(
-    embeddings=embeddings,
-    collection_name=COLLECTION_NAME,
-    connection=connection_string,
-    use_jsonb=True,
-)
+        system_prompt = (
+            "Anda adalah asisten AI yang membantu menjawab pertanyaan berdasarkan konteks yang diberikan di bawah ini. "
+            "Jika jawaban tidak ada di dalam konteks, katakan 'Saya tidak menemukan informasi tersebut di dokumen'. "
+            "Jawablah dengan bahasa Indonesia yang jelas.\n\n"
+            "Konteks:\n{context}"
+        )
 
-from langchain_openai import ChatOpenAI
-from langchain_classic.chains import create_retrieval_chain
-from langchain_classic.chains.combine_documents import create_stuff_documents_chain
-from langchain_core.prompts import ChatPromptTemplate
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", system_prompt),
+            ("human", "{input}"),
+        ])
 
-llm = ChatOpenAI(
-    model="arcee-ai/trinity-large-preview:free", 
-    api_key=API_KEY,
-    base_url=BASE_URL,
-    temperature=0
-)
+        question_answer_chain = create_stuff_documents_chain(llm, prompt)
+        rag_chain = create_retrieval_chain(retriever, question_answer_chain)
 
-retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+        RAG_AVAILABLE = True
+        print("✅ [RAG] RAG Chain siap digunakan!", file=sys.stderr)
 
-system_prompt = (
-    "Anda adalah asisten AI yang membantu menjawab pertanyaan berdasarkan konteks yang diberikan di bawah ini. "
-    "Jika jawaban tidak ada di dalam konteks, katakan 'Saya tidak menemukan informasi tersebut di dokumen'. "
-    "Jawablah dengan bahasa Indonesia yang jelas.\n\n"
-    "Konteks:\n{context}"
-)
+    except Exception as e:
+        RAG_ERROR = str(e)
+        RAG_AVAILABLE = False
+        rag_chain = None
+        print(f"❌ [RAG] Gagal menginisialisasi RAG Chain: {e}", file=sys.stderr)
+        import traceback
+        print(traceback.format_exc(), file=sys.stderr)
 
-prompt = ChatPromptTemplate.from_messages([
-    ("system", system_prompt),
-    ("human", "{input}"),
-])
-
-question_answer_chain = create_stuff_documents_chain(llm, prompt)
-rag_chain = create_retrieval_chain(retriever, question_answer_chain)
-
-print("RAG Chain siap digunakan!")
 
 # ==================== DEMO ONLY - Run when executed directly ====================
 if __name__ == "__main__":
+    if not RAG_AVAILABLE:
+        print(f"❌ RAG Chain tidak tersedia: {RAG_ERROR}")
+        sys.exit(1)
+
     query = "apa inti utama dokumen ini?"
 
     print(f"\nPertanyaan: {query}")

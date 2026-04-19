@@ -1,4 +1,6 @@
 import os
+import warnings
+warnings.filterwarnings("ignore", message=".*create_react_agent.*", category=DeprecationWarning)
 from dotenv import load_dotenv
 import gitlab
 from typing import List, Dict
@@ -67,7 +69,7 @@ def extract_gitlab_issue_specs(project_id: str, issue_iid: int) -> str:
 def run_gitlab_analyst_agent(project_id: str, issue_iid: int) -> str:
     # Menggunakan model Instruct yang optimal untuk task ini
     llm = ChatOpenAI(
-        model="anthropic/claude-sonnet-4.5",
+        model=os.getenv("MODEL_NAME"),
         api_key=os.getenv("OPENROUTER_API_KEY"),
         base_url=os.getenv("OPENROUTER_BASE_URL"),
         temperature=0.0,

@@ -2,6 +2,8 @@ import os
 import sys
 import asyncio
 import json
+import warnings
+warnings.filterwarnings("ignore", message=".*create_react_agent.*", category=DeprecationWarning)
 from typing import Dict, List, Optional
 from pathlib import Path
 from dotenv import load_dotenv
@@ -13,16 +15,21 @@ from fastmcp import FastMCP
 # ==================== LOAD RAG CHAIN LANGSUNG ====================
 RAG_ERROR_DETAIL = None
 try:
-    from agent_pdf_rag import rag_chain
-    RAG_AVAILABLE = True
-    print("✅ RAG Chain loaded successfully", file=sys.stderr)
+    from agent_pdf_rag import rag_chain, RAG_AVAILABLE, RAG_ERROR
+    RAG_ERROR_DETAIL = RAG_ERROR
+    if RAG_AVAILABLE and rag_chain is not None:
+        print("✅ RAG Chain loaded successfully", file=sys.stderr)
+    else:
+        print(f"⚠️  RAG Chain not available: {RAG_ERROR}", file=sys.stderr)
 except ImportError as e:
+    rag_chain = None
     RAG_AVAILABLE = False
     RAG_ERROR_DETAIL = str(e)
-    print(f"⚠️  RAG Chain not available: {e}", file=sys.stderr)
+    print(f"⚠️  RAG Chain import failed: {e}", file=sys.stderr)
     import traceback
     print(traceback.format_exc(), file=sys.stderr)
 except Exception as e:
+    rag_chain = None
     RAG_AVAILABLE = False
     RAG_ERROR_DETAIL = f"Initialization error: {str(e)}"
     print(f"⚠️  RAG Chain initialization failed: {e}", file=sys.stderr)
@@ -106,11 +113,13 @@ print(f"🔧 [Orchestrator] ANDROID_PROJECT_ROOT: {ANDROID_PROJECT_ROOT if ANDRO
 ORCHESTRATOR_PROMPT = """
 You are an Integration Orchestrator for Android development code generation.
 
-Your role is to intelligently coordinate multiple sources:
-1. **Postman MCP**: Fetch API endpoints, schemas, and request/response contracts
-2. **Android Studio MCP**: Get current code structure, open files, and project context
-3. **Context7 MCP**: Retrieve latest Kotlin/Android documentation updates
-4. **PDF RAG**: Access company documents, internal guidelines, and best practices (direct access)
+Your role is to intelligently coordinate multiple context sources provided via TOOLS.
+
+STRICT CONTEXT RULE:
+- ONLY use information provided by the tools (Postman, Android Studio, Context7, RAG).
+- DO NOT use your own general training knowledge to fill in missing information.
+- If a tool returns no data or an error, state it clearly as: "No specific information found for [source name]".
+- DO NOT provide "best practices" or "security guidelines" unless they are explicitly found in the PDF RAG or Context7 docs.
 
 WORKFLOW RULES:
 - Always start with Android Studio context to understand current code structure
@@ -128,7 +137,7 @@ OUTPUT FORMAT:
   "recommendations": [...]
 }
 
-Be concise, technical, and actionable.
+Be concise, technical, and actionable. Stick to the provided evidence.
 """
 
 # ==================== LLM INSTANCE ====================
@@ -265,8 +274,8 @@ async def get_complete_integration_context(
             print("⏭️  [Orchestrator] Skipping RAG (not needed)", file=sys.stderr)
             return
             
-        if not RAG_AVAILABLE:
-            error_msg = "RAG Chain tidak tersedia - pastikan VECTOR_DATABASE_URL dan credentials sudah diset"
+        if not RAG_AVAILABLE or rag_chain is None:
+            error_msg = f"RAG Chain tidak tersedia: {RAG_ERROR_DETAIL or 'Pastikan VECTOR_DATABASE_URL diset dan PostgreSQL berjalan'}"
             results["errors"].append(error_msg)
             print(f"❌ {error_msg}", file=sys.stderr)
             return
@@ -320,8 +329,8 @@ async def query_rag_directly(query: str) -> str:
     Returns:
         Jawaban dari RAG chain dengan referensi sumber
     """
-    if not RAG_AVAILABLE:
-        return "❌ RAG Chain tidak tersedia"
+    if not RAG_AVAILABLE or rag_chain is None:
+        return f"❌ RAG Chain tidak tersedia: {RAG_ERROR_DETAIL or 'VECTOR_DATABASE_URL tidak diset atau PostgreSQL tidak berjalan'}"
     
     try:
         print(f"📚 [Orchestrator] Direct RAG Query: {query}", file=sys.stderr)
@@ -429,11 +438,12 @@ async def health_check_all_servers() -> str:
             }
 
     # ==================== CHECK RAG ====================
+    rag_status = "✅ AVAILABLE" if (RAG_AVAILABLE and rag_chain is not None) else "❌ UNAVAILABLE"
     results["rag"] = {
-        "status": "✅ AVAILABLE" if RAG_AVAILABLE else "❌ UNAVAILABLE",
+        "status": rag_status,
         "direct_access": True,
         "notes": "Direct import from agent_pdf_rag.py (no MCP Server needed)",
-        "diagnostic": RAG_ERROR_DETAIL if not RAG_AVAILABLE else None,
+        "diagnostic": RAG_ERROR_DETAIL if not RAG_AVAILABLE or rag_chain is None else None,
         "env_check": {
             "VECTOR_DATABASE_URL": "✅ Set" if os.getenv("VECTOR_DATABASE_URL") else "❌ Not set"
         }
