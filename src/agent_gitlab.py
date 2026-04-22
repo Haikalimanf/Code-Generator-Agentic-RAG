@@ -1,21 +1,61 @@
 import os
+import sys
 import warnings
-warnings.filterwarnings("ignore", message=".*create_react_agent.*", category=DeprecationWarning)
-from dotenv import load_dotenv
+import functools
+import traceback
 import gitlab
+import gitlab.exceptions
 from typing import List, Dict
+from dotenv import load_dotenv
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
+from langchain_core.prompts import ChatPromptTemplate
+
+# Abaikan warning jika masih muncul dari versi langchain yang berbeda
+warnings.filterwarnings("ignore", message=".*create_react_agent.*", category=DeprecationWarning)
 
 load_dotenv()
 
-# 1. Konfigurasi Client GitLab
+# Dekorator kustom untuk menangkap error pada level tool
+def wrap_tool_call(func):
+    """
+    Menangkap semua exception pada tool dan mengembalikannya sebagai string.
+    Hal ini mencegah agen dari crash dan memungkinkan LLM untuk mendiagnosis masalah.
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            error_msg = f"Error executing tool '{func.__name__}': {str(e)}"
+            print(f"[Tool Error] {error_msg}", file=sys.stderr)
+            # Opsional: Sertakan traceback jika dalam mode debug
+            # return f"{error_msg}\n{traceback.format_exc()}"
+            return error_msg
+    return wrapper
+
+# 1. Konfigurasi & Inisialisasi GitLab
 GITLAB_URL = os.getenv("GITLAB_URL", "https://gitlab.com")
-GITLAB_TOKEN = os.getenv("GITLAB_TOKEN") # Gunakan Personal Access Token GitLab
+GITLAB_TOKEN = os.getenv("GITLAB_TOKEN")
+
+def get_gitlab_client():
+    """Menginisialisasi dan memvalidasi client GitLab."""
+    if not GITLAB_TOKEN:
+        raise ValueError("GITLAB_TOKEN tidak ditemukan di environment variable.")
+    
+    gl = gitlab.Gitlab(GITLAB_URL, private_token=GITLAB_TOKEN)
+    try:
+        gl.auth()  # Validasi token segera
+        return gl
+    except gitlab.exceptions.GitlabAuthenticationError:
+        raise ConnectionError("Gagal autentikasi ke GitLab. Periksa GITLAB_TOKEN Anda.")
+    except Exception as e:
+        raise ConnectionError(f"Gagal terhubung ke GitLab: {str(e)}")
 
 @tool
+@wrap_tool_call
 def extract_gitlab_issue_specs(project_id: str, issue_iid: int) -> str:
     """
     Mengambil deskripsi issue, label, dan komentar pengguna dari GitLab.
@@ -25,10 +65,16 @@ def extract_gitlab_issue_specs(project_id: str, issue_iid: int) -> str:
         project_id: ID dari project GitLab (contoh: '12345678')
         issue_iid: Internal ID dari issue (contoh: 1, 2, 3)
     """
+    print(f"[GitLab] Connecting to project {project_id}, issue #{issue_iid}...", file=sys.stderr)
+    
+    gl = get_gitlab_client()
+    
     try:
-        gl = gitlab.Gitlab(GITLAB_URL, private_token=GITLAB_TOKEN)
         project = gl.projects.get(project_id)
         issue = project.issues.get(issue_iid)
+        
+        desc_size = len(issue.description) if issue.description else 0
+        print(f"[GitLab] Fetching issue: '{issue.title}' (Desc size: {desc_size} chars)", file=sys.stderr)
         
         # Ekstraksi Data Utama
         spec_data = {
@@ -47,6 +93,10 @@ def extract_gitlab_issue_specs(project_id: str, issue_iid: int) -> str:
                     "author": note.author['username'],
                     "body": note.body
                 })
+        
+        comments_count = len(spec_data["comments"])
+        comments_size = sum(len(c['body']) for c in spec_data["comments"])
+        print(f"[GitLab] Found {comments_count} human comments (Total size: {comments_size} chars)", file=sys.stderr)
                 
         # Format ke string agar mudah dibaca oleh LLM
         formatted_spec = (
@@ -60,10 +110,13 @@ def extract_gitlab_issue_specs(project_id: str, issue_iid: int) -> str:
         for c in spec_data["comments"]:
             formatted_spec += f"- {c['author']}: {c['body']}\n"
             
+        print(f"[GitLab] Total Context Size: {len(formatted_spec)} chars", file=sys.stderr)
         return formatted_spec
 
+    except gitlab.exceptions.GitlabGetError as e:
+        return f"Error: Project atau Issue tidak ditemukan (HTTP {e.response_code})."
     except Exception as e:
-        return f"Error fetching GitLab issue: {str(e)}"
+        return f"Terjadi kesalahan tak terduga saat mengambil data GitLab: {str(e)}"
 
 # 2. Inisialisasi Agen (The Analyst)
 def run_gitlab_analyst_agent(project_id: str, issue_iid: int) -> str:
@@ -79,30 +132,44 @@ def run_gitlab_analyst_agent(project_id: str, issue_iid: int) -> str:
     # Daftarkan tools yang bisa digunakan agen
     tools = [extract_gitlab_issue_specs]
     
-    # Buat agen reaktif
-    agent_executor = create_react_agent(llm, tools)
-    
-    # Prompt instruksi spesifik untuk Agen 1
-    system_prompt = (
-        "Anda adalah 'The Analyst', agen ahli dalam menganalisis kebutuhan perangkat lunak. "
+    # Instruksi sistem yang lebih grounded (mencegah halusinasi)
+    system_instructions = (
+        "Anda adalah 'The Analyst', agen ahli dalam mengekstraksi dan merangkum kebutuhan perangkat lunak dari GitLab.\n"
         "Tugas Anda adalah memanggil tool extract_gitlab_issue_specs, membaca hasilnya, dan "
-        "merangkumnya menjadi 'Requirement Specs' yang bersih dan terstruktur untuk tim developer. "
-        "Fokus pada acceptance criteria, constraint arsitektur, dan perubahan yang diminta dalam komentar."
+        "merangkumnya menjadi 'Functional Requirements' yang berbasis fakta.\n\n"
+        "ATURAN KETAT:\n"
+        "1. JANGAN MENGADA-NGADA (Hallucination). Hanya gunakan informasi yang ada di teks issue/komentar.\n"
+        "2. Jangan menebak arsitektur teknis, nama class, atau direktori jika tidak disebutkan secara eksplisit.\n"
+        "3. Jika ada informasi yang hilang namun krusial, tuliskan pada bagian 'Questions/Ambiguities'.\n\n"
+        "Output Anda WAJIB memiliki struktur berikut:\n"
+        "1. **Feature Goal**: Penjelasan singkat tujuan fitur berdasarkan issue.\n"
+        "2. **Acceptance Criteria**: Daftar poin kriteria keberhasilan yang disebutkan.\n"
+        "3. **Explicit Technical Details**: Library, versi, atau teknologi yang disebutkan langsung (Isi 'None' jika tidak ada).\n"
+        "4. **Functional Scope**: Bagian aplikasi atau alur kerja yang terdampak secara fungsional.\n"
+        "5. **Questions/Ambiguities**: Daftar ketidakjelasan atau informasi yang kurang untuk implementasi.\n\n"
+        "Berikan output yang objektif dan berbasis data."
     )
     
-    user_prompt = f"Tolong analisis issue #{issue_iid} pada project {project_id} dan buatkan Requirement Specs."
+    # Buat agen reaktif
+    # Set an optional name for the agent. This is used as the node identifier 
+    # when adding the agent as a subgraph in multi-agent systems:
+    agent_executor = create_agent(llm, tools, system_prompt=system_instructions, name="GitLabAnalyst")
     
-    # Eksekusi agen
-    messages = [
-        {"role": "system", "content": system_prompt},
-        HumanMessage(content=user_prompt)
-    ]
+    print(f"\n[Analyst Agent] Starting analysis for issue #{issue_iid}...", file=sys.stderr)
     
-    response = agent_executor.invoke({"messages": messages})
+    # Eksekusi agen dengan input string langsung
+    user_input = f"Tolong analisis issue #{issue_iid} pada project {project_id} dan buatkan Requirement Specs."
+    response = agent_executor.invoke({"messages": [("human", user_input)]})
     
-    # Mengembalikan pesan terakhir (hasil analisis)
-    return response["messages"][-1].content
+    # Mengambil pesan terakhir (hasil analisis)
+    final_output = response["messages"][-1].content
+    print(f"[Analyst Agent] Analysis complete. Output size: {len(final_output)} chars", file=sys.stderr)
+    return final_output
 
 if __name__ == "__main__":
-    result = run_gitlab_analyst_agent(project_id="81209841", issue_iid=1)
-    print(result)
+    # Contoh penggunaan
+    try:
+        result = run_gitlab_analyst_agent(project_id="81209841", issue_iid=1)
+        print(result)
+    except Exception as e:
+        print(f"[Fatal Error] {str(e)}", file=sys.stderr)

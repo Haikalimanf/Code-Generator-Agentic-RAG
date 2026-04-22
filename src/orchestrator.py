@@ -12,29 +12,15 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.prebuilt import create_react_agent
 from fastmcp import FastMCP
 
-# ==================== LOAD RAG CHAIN LANGSUNG ====================
-RAG_ERROR_DETAIL = None
-try:
-    from agent_pdf_rag import rag_chain, RAG_AVAILABLE, RAG_ERROR
-    RAG_ERROR_DETAIL = RAG_ERROR
-    if RAG_AVAILABLE and rag_chain is not None:
-        print("✅ RAG Chain loaded successfully", file=sys.stderr)
-    else:
-        print(f"⚠️  RAG Chain not available: {RAG_ERROR}", file=sys.stderr)
-except ImportError as e:
-    rag_chain = None
-    RAG_AVAILABLE = False
-    RAG_ERROR_DETAIL = str(e)
-    print(f"⚠️  RAG Chain import failed: {e}", file=sys.stderr)
-    import traceback
-    print(traceback.format_exc(), file=sys.stderr)
-except Exception as e:
-    rag_chain = None
-    RAG_AVAILABLE = False
-    RAG_ERROR_DETAIL = f"Initialization error: {str(e)}"
-    print(f"⚠️  RAG Chain initialization failed: {e}", file=sys.stderr)
-    import traceback
-    print(traceback.format_exc(), file=sys.stderr)
+# ==================== RAG DISABLED (MENERIMA PERMINTAAN USER) ====================
+# try:
+#     from agent_pdf_rag import rag_chain, RAG_AVAILABLE, RAG_ERROR
+#     ... (RAG dinonaktifkan sementara untuk stabilitas)
+# except: pass
+rag_chain = None
+RAG_AVAILABLE = False
+RAG_ERROR_DETAIL = "RAG disabled by user focus request"
+
 
 load_dotenv()
 
@@ -47,8 +33,9 @@ print(f"    CONTEXT7_API_KEY: {'✅ Set' if os.getenv('CONTEXT7_API_KEY') else '
 
 # ==================== KONFIGURASI ====================
 API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-BASE_URL = "https://openrouter.ai/api/v1"
+BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "openai/gpt-4o")
+WORKER_MODEL_NAME = os.getenv("WORKER_MODEL_NAME", "openai/gpt-4o-mini")
 
 if not API_KEY:
     print("❌ [WARNING] OPENROUTER_API_KEY belum diset.", file=sys.stderr)
@@ -62,6 +49,9 @@ POSTMAN_WORKSPACE_ID = os.getenv("POSTMAN_WORKSPACE_ID", "").strip()
 ANDROID_PROJECT_ROOT = os.getenv("ANDROID_PROJECT_ROOT", "").strip()
 CONTEXT7_API_KEY = os.getenv("CONTEXT7_API_KEY", "").strip()
 
+print(f"[Orchestrator] Debug Path: {ANDROID_PROJECT_ROOT}", file=sys.stderr)
+
+
 # Path to Python executable - MUST use sys.executable to get uv-managed Python
 # Using plain "python" would fail because packages are installed in uv's venv
 PYTHON_CMD = sys.executable
@@ -69,41 +59,20 @@ PYTHON_CMD = sys.executable
 # Konfigurasi Multi-MCP Servers (TANPA PDF RAG - sekarang direct access)
 MCP_SERVERS_CONFIG = {}
 
-# Only configure Postman if API key is present
-if POSTMAN_API_KEY:
-    MCP_SERVERS_CONFIG["postman"] = {
-        "command": PYTHON_CMD,
-        "args": [str(PROJECT_ROOT / "src" / "postman_context_server.py")],
-        "transport": "stdio",
-        "env": {
-            **os.environ,  # Pass semua env vars agar .env terbaca
-            "POSTMAN_API_KEY": POSTMAN_API_KEY,
-            "POSTMAN_WORKSPACE_ID": POSTMAN_WORKSPACE_ID,
-        }
-    }
-
-# Only configure Android Studio if project root is present
+# Only configure Android Studio (FOCUS MODE)
 if ANDROID_PROJECT_ROOT and Path(ANDROID_PROJECT_ROOT).exists():
     MCP_SERVERS_CONFIG["android_studio"] = {
         "command": PYTHON_CMD,
         "args": [str(PROJECT_ROOT / "src" / "agent_context_android_studio.py")],
         "transport": "stdio",
         "env": {
-            **os.environ,  # Pass semua env vars
+            **os.environ,
             "ANDROID_PROJECT_ROOT": ANDROID_PROJECT_ROOT,
         }
     }
+else:
+    print(f"[Orchestrator] ANDROID_PROJECT_ROOT not found or invalid: {ANDROID_PROJECT_ROOT}", file=sys.stderr)
 
-# Context7 doesn't require API key but we'll pass it if available
-MCP_SERVERS_CONFIG["context7"] = {
-    "command": "npx.cmd" if os.name == "nt" else "npx",
-    "args": ["-y", "@upstash/context7-mcp@latest"],
-    "transport": "stdio",
-    "env": {
-        **os.environ,  # Pass semua env vars termasuk PATH
-        "CONTEXT7_API_KEY": CONTEXT7_API_KEY,
-    }
-}
 
 # Debug: Show configured servers
 print(f"🔧 [Orchestrator] Configured MCP servers: {list(MCP_SERVERS_CONFIG.keys())}", file=sys.stderr)
@@ -141,6 +110,7 @@ Be concise, technical, and actionable. Stick to the provided evidence.
 """
 
 # ==================== LLM INSTANCE ====================
+# Brain Model (High-reasoning)
 orchestrator_llm = ChatOpenAI(
     model=MODEL_NAME,
     temperature=0.0,
@@ -149,9 +119,33 @@ orchestrator_llm = ChatOpenAI(
     max_tokens=2048,
     default_headers={
         "HTTP-Referer": "https://github.com/",
-        "X-Title": "Integration Orchestrator"
+        "X-Title": "Integration Orchestrator (Brain)"
     },
 )
+
+# Worker Model (Fast, Cheap Context Retrieval)
+worker_llm = ChatOpenAI(
+    model=WORKER_MODEL_NAME,
+    temperature=0.0,
+    api_key=API_KEY,
+    base_url=BASE_URL,
+    max_tokens=1024,
+    default_headers={
+        "HTTP-Referer": "https://github.com/",
+        "X-Title": "Integration Orchestrator (Worker)"
+    },
+)
+
+# System Prompt untuk Worker (Concise)
+WORKER_SYSTEM_PROMPT = """
+You are a data retriever and summarizer. 
+Your ONLY goal is to find relevant technical information using the provided tools.
+- DO NOT explain your thought process.
+- DO NOT provide recommendations.
+- DO NOT provide general context outside of tool output.
+- Return ONLY facts, code snippets, or API details found.
+- Be extremely brief.
+"""
 
 # ==================== MCP SERVER ORCHESTRATOR ====================
 mcp = FastMCP(
@@ -200,12 +194,26 @@ async def get_complete_integration_context(
             print("📱 [Orchestrator] Fetching Android Studio context...", file=sys.stderr)
             client = MultiServerMCPClient({"android_studio": MCP_SERVERS_CONFIG["android_studio"]})
             tools = await client.get_tools()
-            agent = create_react_agent(orchestrator_llm, tools)
             
+            # FIX: Gunakan argumen 'state_modifier' sesuai versi langgraph-prebuilt 0.1.0+
+            agent = create_react_agent(worker_llm, tools, state_modifier=WORKER_SYSTEM_PROMPT)
+            
+            # Mintalah data spesifik agar worker menggunakan tool analyze_manifest & get_gradle_dependencies
+            search_query = (
+                f"Analyze this requirement: {requirement}\n"
+                "You MUST provide: Architecture style, Package Name, Min/Target SDK, "
+                "Primary Stack (dependencies), Relevant Modules, and Key Files.\n"
+                "Search in the project and use analyze_manifest(), get_gradle_dependencies(), and list_android_modules()."
+            )
+            
+            print(f"📱 [Orchestrator] Invoking Android Worker Agent with query: {search_query[:50]}...", file=sys.stderr)
             response = await agent.ainvoke({
-                "messages": [{"role": "user", "content": f"Analyze project context for: {requirement}"}]
+                "messages": [{"role": "user", "content": search_query}]
             })
-            results["code_structure"] = response["messages"][-1].content
+            
+            output = response["messages"][-1].content
+            print(f"📱 [Orchestrator] Android Worker Response Length: {len(output)}", file=sys.stderr)
+            results["code_structure"] = output
             print("✅ [Orchestrator] Android Studio context retrieved", file=sys.stderr)
         except Exception as e:
             error_msg = f"Android Studio MCP error: {str(e)}"
@@ -225,7 +233,9 @@ async def get_complete_integration_context(
             print("🌐 [Orchestrator] Fetching Postman API contracts...", file=sys.stderr)
             client = MultiServerMCPClient({"postman": MCP_SERVERS_CONFIG["postman"]})
             tools = await client.get_tools()
-            agent = create_react_agent(orchestrator_llm, tools)
+            
+            # Gunakan worker_llm dan state_modifier
+            agent = create_react_agent(worker_llm, tools, state_modifier=WORKER_SYSTEM_PROMPT)
 
             # Kirim requirement dari GitLab ke Postman agent secara eksplisit
             # agar tool get_api_context_for_feature() bisa mencari endpoint yang relevan
@@ -255,10 +265,12 @@ async def get_complete_integration_context(
             print("📚 [Orchestrator] Checking latest Kotlin documentation...", file=sys.stderr)
             client = MultiServerMCPClient({"context7": MCP_SERVERS_CONFIG["context7"]})
             tools = await client.get_tools()
-            agent = create_react_agent(orchestrator_llm, tools)
+            
+            # Gunakan worker_llm dan state_modifier
+            agent = create_react_agent(worker_llm, tools, state_modifier=WORKER_SYSTEM_PROMPT)
             
             response = await agent.ainvoke({
-                "messages": [{"role": "user", "content": f"Check Kotlin syntax updates for: {requirement}"}]
+                "messages": [{"role": "user", "content": f"Check Kotlin syntax/library updates for: {requirement}"}]
             })
             results["kotlin_updates"] = response["messages"][-1].content
             print("✅ [Orchestrator] Kotlin docs retrieved", file=sys.stderr)
@@ -308,9 +320,6 @@ async def get_complete_integration_context(
     # ==================== PARALLEL EXECUTION ====================
     await asyncio.gather(
         fetch_android_studio_context(),
-        fetch_postman_api(),
-        fetch_kotlin_docs(),
-        fetch_company_guidelines(),
         return_exceptions=True
     )
     

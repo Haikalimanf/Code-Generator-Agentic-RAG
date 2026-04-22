@@ -115,15 +115,30 @@ def _is_text_readable(path: Path) -> bool:
         return False
     return True
 
-
 def _read_file_safe(path: Path) -> str:
-    """Baca file dengan penanganan error encoding."""
-    for encoding in ("utf-8", "utf-8-sig", "latin-1"):
+    """Membaca file dengan mencoba berbagai encoding."""
+    for encoding in ["utf-8", "cp1252", "latin-1"]:
         try:
             return path.read_text(encoding=encoding)
-        except UnicodeDecodeError:
+        except (UnicodeDecodeError, PermissionError) as e:
+            if isinstance(e, PermissionError):
+                return f"[ERROR] Akses ditolak: {e}"
             continue
     return "[ERROR] Tidak bisa membaca file: encoding tidak dikenali."
+
+
+def _log_usage(tool_name: str, output: str):
+    """Log output size and estimated tokens to stderr for monitoring."""
+    if not output:
+        return
+    char_count = len(output)
+    # Heuristik: 4 karakter per token untuk bahasa Inggris/Kode
+    est_tokens = char_count // 4
+    print(
+        f"📊 [AndroidContextAgent] Tool '{tool_name}' output: "
+        f"{char_count} chars (~{est_tokens} tokens)",
+        file=sys.stderr
+    )
 
 # ══════════════════════════════════════════════
 # MCP TOOLS
@@ -171,20 +186,18 @@ def list_android_modules() -> str:
         )
 
     lines = [
-        f"🤖 Android Context Agent — Root: {ROOT_DIR}",
-        f"📦 Ditemukan {len(modules)} modul:\n",
+        f"🤖 Android Modules — Root: {ROOT_DIR.name}",
+        f"📦 Ditemukan {len(modules)} modul:",
+        f"{'─' * 60}",
     ]
     for m in modules:
-        src_icon      = "✅" if m["has_src"]      else "❌"
-        manifest_icon = "✅" if m["has_manifest"] else "❌"
-        lines.append(
-            f"  • [{m['type'].upper()}] {m['name']}\n"
-            f"    Path     : {m['path']}\n"
-            f"    Gradle   : {m['gradle_file']}\n"
-            f"    src/     : {src_icon}   AndroidManifest: {manifest_icon}\n"
-        )
+        src = "src+" if m["has_src"] else "src-"
+        mnf = "mnf+" if m["has_manifest"] else "mnf-"
+        lines.append(f"  • [{m['type'][:1].upper()}] {m['name']:<15} | {src} | {mnf} | {m['path']}")
 
-    return "\n".join(lines)
+    result = "\n".join(lines)
+    _log_usage("list_android_modules", result)
+    return result
 
 
 @mcp.tool()
@@ -249,7 +262,9 @@ def read_source_file(path: str) -> str:
         f"   Ukuran : {size:,} bytes  |  Baris: {line_count:,}\n"
         f"{'─' * 60}\n"
     )
-    return header + content
+    result = header + content
+    _log_usage("read_source_file", result)
+    return result
 
 
 @mcp.tool()
@@ -348,11 +363,13 @@ def search_code(query: str, use_regex: bool = False, file_extension: Optional[st
     if not results:
         return header + "\n\n✅ Tidak ada hasil yang cocok."
 
-    return header + "".join(results)
+    result = header + "".join(results)
+    _log_usage("search_code", result)
+    return result
 
 
 @mcp.tool()
-def get_project_structure(max_depth: int = 4, show_all: bool = False) -> str:
+def get_project_structure(max_depth: int = 3, show_all: bool = False) -> str:
     """
     Memberikan gambaran pohon struktur folder proyek Android.
     Membantu AI memahami letak res/, manifests/, java/, kotlin/.
@@ -417,7 +434,9 @@ def get_project_structure(max_depth: int = 4, show_all: bool = False) -> str:
         f"📁 {ROOT_DIR.name}/  ← ROOT\n"
     )
 
-    return header + "\n".join(tree_lines) + legend
+    result = header + "\n".join(tree_lines) + legend
+    _log_usage("get_project_structure", result)
+    return result
 
 
 @mcp.tool()
@@ -530,20 +549,11 @@ def analyze_manifest(module_path: Optional[str] = None) -> str:
             for feat in features:
                 summary.append(f"     • {feat}")
 
-        summary.extend([
-            f"\n{'─' * 60}",
-            "📄 ISI FILE LENGKAP:",
-            f"{'─' * 60}",
-            content,
-        ])
-
         output_parts.append("\n".join(summary))
 
-    header = (
-        f"🤖 Analisis AndroidManifest.xml\n"
-        f"   Ditemukan: {len(manifests)} file manifest\n"
-    )
-    return header + "\n".join(output_parts)
+    result = "\n".join(output_parts)
+    _log_usage("analyze_manifest", result)
+    return result
 
 
 @mcp.tool()
@@ -612,7 +622,9 @@ def list_files_in_module(module_path: str, extension: Optional[str] = None) -> s
             lines.append(f"   {f}")
         lines.append("")
 
-    return "\n".join(lines)
+    result = "\n".join(lines)
+    _log_usage("list_files_in_module", result)
+    return result
 
 
 @mcp.tool()
@@ -698,7 +710,9 @@ def get_gradle_dependencies(module_path: str = "app") -> str:
             lines.append(f"   • {dep}")
         lines.append("")
 
-    return "\n".join(lines)
+    result = "\n".join(lines)
+    _log_usage("get_gradle_dependencies", result)
+    return result
 
 
 # ══════════════════════════════════════════════
