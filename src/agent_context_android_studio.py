@@ -2,10 +2,35 @@ import sys
 import os
 import re
 import argparse
+import functools
+import traceback
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List, Dict
 
 from fastmcp import FastMCP
+from dotenv import load_dotenv
+from langchain_core.tools import tool
+from langchain_openai import ChatOpenAI
+from langchain.agents import create_agent
+from langchain_core.prompts import ChatPromptTemplate
+
+load_dotenv()
+
+# Dekorator kustom untuk menangkap error pada level tool
+def wrap_tool_call(func):
+    """
+    Menangkap semua exception pada tool dan mengembalikannya sebagai string.
+    Hal ini mencegah agen dari crash dan memungkinkan LLM untuk mendiagnosis masalah.
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            error_msg = f"Error executing tool '{func.__name__}': {str(e)}"
+            print(f"❌ [Android Tool Error] {error_msg}", file=sys.stderr)
+            return error_msg
+    return wrapper
 
 # ──────────────────────────────────────────────
 # Inisialisasi argumen & root directory
@@ -144,7 +169,9 @@ def _log_usage(tool_name: str, output: str):
 # MCP TOOLS
 # ══════════════════════════════════════════════
 
+@tool
 @mcp.tool()
+@wrap_tool_call
 def list_android_modules() -> str:
     """
     Menelusuri seluruh direktori proyek untuk menemukan modul Android.
@@ -200,7 +227,9 @@ def list_android_modules() -> str:
     return result
 
 
+@tool
 @mcp.tool()
+@wrap_tool_call
 def read_source_file(path: str) -> str:
     """
     Membaca isi file source code Android secara aman.
@@ -267,7 +296,9 @@ def read_source_file(path: str) -> str:
     return result
 
 
+@tool
 @mcp.tool()
+@wrap_tool_call
 def search_code(query: str, use_regex: bool = False, file_extension: Optional[str] = None) -> str:
     """
     Mencari string atau pola regex di seluruh folder src/ proyek.
@@ -368,7 +399,9 @@ def search_code(query: str, use_regex: bool = False, file_extension: Optional[st
     return result
 
 
+@tool
 @mcp.tool()
+@wrap_tool_call
 def get_project_structure(max_depth: int = 3, show_all: bool = False) -> str:
     """
     Memberikan gambaran pohon struktur folder proyek Android.
@@ -439,7 +472,9 @@ def get_project_structure(max_depth: int = 3, show_all: bool = False) -> str:
     return result
 
 
+@tool
 @mcp.tool()
+@wrap_tool_call
 def analyze_manifest(module_path: Optional[str] = None) -> str:
     """
     Membaca dan menganalisis AndroidManifest.xml secara otomatis.
@@ -556,7 +591,9 @@ def analyze_manifest(module_path: Optional[str] = None) -> str:
     return result
 
 
+@tool
 @mcp.tool()
+@wrap_tool_call
 def list_files_in_module(module_path: str, extension: Optional[str] = None) -> str:
     """
     Menampilkan semua file source dalam satu modul Android.
@@ -627,7 +664,9 @@ def list_files_in_module(module_path: str, extension: Optional[str] = None) -> s
     return result
 
 
+@tool
 @mcp.tool()
+@wrap_tool_call
 def get_gradle_dependencies(module_path: str = "app") -> str:
     """
     Membaca dan mengekstrak daftar dependencies dari file build.gradle
@@ -714,6 +753,79 @@ def get_gradle_dependencies(module_path: str = "app") -> str:
     _log_usage("get_gradle_dependencies", result)
     return result
 
+
+# ──────────────────────────────────────────────
+# 2. Inisialisasi Agen (The Architect)
+# ──────────────────────────────────────────────
+def run_android_architect_agent(user_query: str) -> str:
+    """
+    Menjalankan agen kompeten yang mengerti arsitektur Android untuk menganalisis proyek.
+    """
+    from langgraph.checkpoint.memory import MemorySaver
+
+    llm = ChatOpenAI(
+        model=os.getenv("MODEL_NAME"),
+        api_key=os.getenv("OPENROUTER_API_KEY"),
+        base_url=os.getenv("OPENROUTER_BASE_URL"),
+        temperature=0.0,
+    )
+    
+    # Daftar tools yang sudah direfaktor ke standar LangChain
+    tools = [
+        list_android_modules,
+        read_source_file,
+        search_code,
+        get_project_structure,
+        analyze_manifest,
+        list_files_in_module,
+        get_gradle_dependencies
+    ]
+    
+    # Instruksi sistem untuk Sang Arsitek
+    system_instructions = (
+        "Anda adalah 'The Architect', ahli arsitektur Android senior.\n"
+        f"Anda memiliki akses ke proyek Android yang berlokasi di: {ROOT_DIR}\n\n"
+        "Tugas Anda adalah membantu developer memahami struktur, alur data, dan "
+        "arsitektur kode dalam proyek ini menggunakan tools yang tersedia.\n"
+        "Berikan jawaban yang mendalam, tunjukkan file yang relevan, dan jelaskan "
+        "bagaimana komponen saling berinteraksi.\n\n"
+        "Gunakan tools secara efisien. Jangan membaca terlalu banyak file sekaligus jika tidak perlu."
+    )
+    
+    # Setup Memory
+    memory = MemorySaver()
+    
+    # Buat agen
+    agent_executor = create_agent(
+        llm, 
+        tools, 
+        system_prompt=system_instructions, 
+        name="AndroidArchitect",
+        checkpointer=memory
+    )
+    
+    print(f"\n[Architect Agent] Analyzing query: '{user_query}'...", file=sys.stderr)
+    
+    final_output = ""
+    
+    # Eksekusi dengan streaming untuk transparansi
+    # thread_id diperlukan untuk MemorySaver
+    config = {"configurable": {"thread_id": "architect_session_1"}}
+    
+    for chunk in agent_executor.stream(
+        {"messages": [("human", user_query)]}, 
+        config=config,
+        stream_mode="updates"
+    ):
+        for node_name, node_update in chunk.items():
+            print(f"📍 [Node: {node_name}] is processing...", file=sys.stderr)
+            if "messages" in node_update:
+                last_msg = node_update["messages"][-1]
+                if hasattr(last_msg, 'content') and last_msg.content:
+                    final_output = last_msg.content
+                    
+    print(f"✅ [Architect Agent] Analysis complete.", file=sys.stderr)
+    return final_output
 
 # ══════════════════════════════════════════════
 # ENTRY POINT

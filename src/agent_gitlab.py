@@ -159,11 +159,26 @@ def run_gitlab_analyst_agent(project_id: str, issue_iid: int) -> str:
     
     # Eksekusi agen dengan input string langsung
     user_input = f"Tolong analisis issue #{issue_iid} pada project {project_id} dan buatkan Requirement Specs."
-    response = agent_executor.invoke({"messages": [("human", user_input)]})
     
-    # Mengambil pesan terakhir (hasil analisis)
-    final_output = response["messages"][-1].content
-    print(f"[Analyst Agent] Analysis complete. Output size: {len(final_output)} chars", file=sys.stderr)
+    final_output = ""
+    
+    # Streaming updates memungkinkan kita melihat status setiap 'node' (langkah) agen secara real-time
+    for chunk in agent_executor.stream(
+        {"messages": [("human", user_input)]}, 
+        stream_mode="updates"
+    ):
+        for node_name, node_update in chunk.items():
+            print(f"📍 [Node: {node_name}] is processing...", file=sys.stderr)
+            
+            # Jika node memberikan output pesan (biasanya dari 'agent' atau 'tools')
+            if "messages" in node_update:
+                last_message = node_update["messages"][-1]
+                
+                # Jika pesan adalah hasil akhir dari asisten
+                if hasattr(last_message, 'content') and last_message.content:
+                    final_output = last_message.content
+                    
+    print(f"✅ [Analyst Agent] Analysis complete. Output size: {len(final_output)} chars", file=sys.stderr)
     return final_output
 
 if __name__ == "__main__":
