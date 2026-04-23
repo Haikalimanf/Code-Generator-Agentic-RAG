@@ -5,7 +5,8 @@ import functools
 import traceback
 import gitlab
 import gitlab.exceptions
-from typing import List, Dict
+from typing import List, Dict, Optional, Any
+from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
@@ -17,6 +18,17 @@ from langchain_core.prompts import ChatPromptTemplate
 warnings.filterwarnings("ignore", message=".*create_react_agent.*", category=DeprecationWarning)
 
 load_dotenv()
+
+# ──────────────────────────────────────────────
+# 1. Structured Output Schema
+# ──────────────────────────────────────────────
+class GitLabAnalysis(BaseModel):
+    """Skema hasil analisis requirement dari GitLab issue."""
+    feature_goal: str = Field(description="Penjelasan singkat tujuan fitur berdasarkan issue.")
+    acceptance_criteria: List[str] = Field(description="Daftar poin kriteria keberhasilan yang disebutkan.")
+    functional_scope: List[str] = Field(description="Bagian aplikasi atau alur kerja yang terdampak secara fungsional.")
+    technical_details: Optional[str] = Field(description="Library, versi, atau teknologi yang disebutkan langsung. Isi 'None' jika tidak ada.")
+    questions_ambiguities: List[str] = Field(description="Daftar ketidakjelasan atau informasi yang kurang untuk implementasi.")
 
 # Dekorator kustom untuk menangkap error pada level tool
 def wrap_tool_call(func):
@@ -119,7 +131,7 @@ def extract_gitlab_issue_specs(project_id: str, issue_iid: int) -> str:
         return f"Terjadi kesalahan tak terduga saat mengambil data GitLab: {str(e)}"
 
 # 2. Inisialisasi Agen (The Analyst)
-def run_gitlab_analyst_agent(project_id: str, issue_iid: int) -> str:
+def run_gitlab_analyst_agent(project_id: str, issue_iid: int) -> GitLabAnalysis:
     # Menggunakan model Instruct yang optimal untuk task ini
     llm = ChatOpenAI(
         model=os.getenv("MODEL_NAME"),
@@ -151,8 +163,6 @@ def run_gitlab_analyst_agent(project_id: str, issue_iid: int) -> str:
     )
     
     # Buat agen reaktif
-    # Set an optional name for the agent. This is used as the node identifier 
-    # when adding the agent as a subgraph in multi-agent systems:
     agent_executor = create_agent(llm, tools, system_prompt=system_instructions, name="GitLabAnalyst")
     
     print(f"\n[Analyst Agent] Starting analysis for issue #{issue_iid}...", file=sys.stderr)
@@ -168,7 +178,7 @@ def run_gitlab_analyst_agent(project_id: str, issue_iid: int) -> str:
         stream_mode="updates"
     ):
         for node_name, node_update in chunk.items():
-            print(f"📍 [Node: {node_name}] is processing...", file=sys.stderr)
+            print(f"[Node: {node_name}] is processing...", file=sys.stderr)
             
             # Jika node memberikan output pesan (biasanya dari 'agent' atau 'tools')
             if "messages" in node_update:
@@ -178,13 +188,28 @@ def run_gitlab_analyst_agent(project_id: str, issue_iid: int) -> str:
                 if hasattr(last_message, 'content') and last_message.content:
                     final_output = last_message.content
                     
-    print(f"✅ [Analyst Agent] Analysis complete. Output size: {len(final_output)} chars", file=sys.stderr)
-    return final_output
+    print(f"[Analyst Agent] Analysis complete.", file=sys.stderr)
+    
+    # Konversi output Markdown dari agen ke Structured Output (Pydantic)
+    print(f"[Analyst Agent] Structuring output...", file=sys.stderr)
+    llm_structured = llm.with_structured_output(GitLabAnalysis)
+    structured_result = llm_structured.invoke(final_output)
+    
+    return structured_result
 
 if __name__ == "__main__":
     # Contoh penggunaan
     try:
+        # Gunakan project_id dan issue_iid yang sesuai
         result = run_gitlab_analyst_agent(project_id="81209841", issue_iid=1)
-        print(result)
+        
+        # Cetak hasil secara rapi (Pretty Print)
+        print("\n" + "="*60)
+        print("FINAL STRUCTURED ANALYSIS RESULT")
+        print("="*60)
+        print(result.model_dump_json(indent=4))
+        print("="*60)
+        
     except Exception as e:
-        print(f"[Fatal Error] {str(e)}", file=sys.stderr)
+        print(f"\n[Fatal Error] {str(e)}", file=sys.stderr)
+        traceback.print_exc()

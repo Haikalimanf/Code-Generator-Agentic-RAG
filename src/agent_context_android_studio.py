@@ -5,7 +5,8 @@ import argparse
 import functools
 import traceback
 from pathlib import Path
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
+from pydantic import BaseModel, Field
 
 from fastmcp import FastMCP
 from dotenv import load_dotenv
@@ -757,7 +758,18 @@ def get_gradle_dependencies(module_path: str = "app") -> str:
 # ──────────────────────────────────────────────
 # 2. Inisialisasi Agen (The Architect)
 # ──────────────────────────────────────────────
-def run_android_architect_agent(user_query: str) -> str:
+
+class AndroidArchitectureAnalysis(BaseModel):
+    """Skema hasil analisis arsitektur proyek Android."""
+    overview: str = Field(description="Ringkasan struktur proyek secara umum.")
+    key_components: List[Dict[str, str]] = Field(description="Daftar komponen utama (Activity, ViewModel, dll) dan perannya.")
+    data_flow: str = Field(description="Penjelasan bagaimana data mengalir antar komponen.")
+    relevant_files: List[str] = Field(description="Daftar path file yang krusial untuk dipahami.")
+    architectural_patterns: List[str] = Field(description="Pola arsitektur yang terdeteksi (misal: MVVM, Clean Architecture).")
+    recommendations: Optional[str] = Field(description="Saran atau rekomendasi arsitektur jika ada.")
+
+@mcp.tool()
+def run_android_architect_agent(user_query: str) -> AndroidArchitectureAnalysis:
     """
     Menjalankan agen kompeten yang mengerti arsitektur Android untuk menganalisis proyek.
     """
@@ -825,7 +837,13 @@ def run_android_architect_agent(user_query: str) -> str:
                     final_output = last_msg.content
                     
     print(f"✅ [Architect Agent] Analysis complete.", file=sys.stderr)
-    return final_output
+    
+    # Konversi output Markdown dari agen ke Structured Output (Pydantic)
+    print(f"📝 [Architect Agent] Structuring architectural analysis...", file=sys.stderr)
+    llm_structured = llm.with_structured_output(AndroidArchitectureAnalysis)
+    structured_result = llm_structured.invoke(final_output)
+    
+    return structured_result
 
 # ══════════════════════════════════════════════
 # ENTRY POINT

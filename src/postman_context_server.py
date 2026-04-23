@@ -31,7 +31,35 @@ from typing import Optional, Any
 from datetime import datetime
 
 import httpx
+import functools
+import traceback
+from typing import List, Optional, Dict, Any
+from pydantic import BaseModel, Field
+
 from fastmcp import FastMCP
+from dotenv import load_dotenv
+from langchain_core.tools import tool
+from langchain_openai import ChatOpenAI
+from langchain.agents import create_agent
+from langchain_core.prompts import ChatPromptTemplate
+
+load_dotenv()
+
+# Dekorator kustom untuk menangkap error pada level tool
+def wrap_tool_call(func):
+    """
+    Menangkap semua exception pada tool dan mengembalikannya sebagai string.
+    Hal ini mencegah agen dari crash dan memungkinkan LLM untuk mendiagnosis masalah.
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            error_msg = f"Error executing tool '{func.__name__}': {str(e)}"
+            print(f"❌ [Postman Tool Error] {error_msg}", file=sys.stderr)
+            return error_msg
+    return wrapper
 
 # ──────────────────────────────────────────────
 # Konfigurasi
@@ -287,7 +315,9 @@ def _load_all_endpoints() -> tuple[bool, list[dict], str]:
 # MCP TOOLS
 # ══════════════════════════════════════════════
 
+@tool
 @mcp.tool()
+@wrap_tool_call
 def get_api_context_for_feature(
     feature_description: str,
     keywords: Optional[str] = None,
@@ -444,7 +474,9 @@ def get_api_context_for_feature(
     return "\n".join(lines)
 
 
+@tool
 @mcp.tool()
+@wrap_tool_call
 def list_all_endpoints(folder_filter: Optional[str] = None) -> str:
     """
     Menampilkan semua endpoint yang tersedia dalam collection.
@@ -495,7 +527,9 @@ def list_all_endpoints(folder_filter: Optional[str] = None) -> str:
     return "\n".join(lines)
 
 
+@tool
 @mcp.tool()
+@wrap_tool_call
 def get_endpoint_detail(endpoint_name: str, collection_id: Optional[str] = None) -> str:
     """
     Menampilkan detail lengkap sebuah endpoint: method, URL, headers, body, response, path params.
@@ -590,7 +624,9 @@ def get_endpoint_detail(endpoint_name: str, collection_id: Optional[str] = None)
     return "\n\n".join(output_parts)
 
 
+@tool
 @mcp.tool()
+@wrap_tool_call
 def search_endpoint(query: str) -> str:
     """
     Mencari endpoint berdasarkan nama, URL, method, atau folder.
@@ -633,6 +669,89 @@ def search_endpoint(query: str) -> str:
 
     return "\n".join(lines)
 
+
+# ──────────────────────────────────────────────
+# 2. Inisialisasi Agen (The API Analyst)
+# ──────────────────────────────────────────────
+
+class PostmanAPIAnalysis(BaseModel):
+    """Skema hasil analisis API dari Postman Collection."""
+    feature_summary: str = Field(description="Ringkasan fitur yang dianalisis.")
+    relevant_endpoints: List[Dict[str, Any]] = Field(description="Daftar endpoint yang relevan (method, url, purpose).")
+    api_contracts: List[Dict[str, Any]] = Field(description="Detail contract untuk setiap endpoint (headers, body schema, response).")
+    missing_endpoints: List[str] = Field(description="Daftar fitur yang tidak ditemukan endpointnya di collection.")
+    recommendations: Optional[str] = Field(description="Rekomendasi integrasi atau catatan tambahan.")
+
+@mcp.tool()
+def run_postman_analyst_agent(user_query: str) -> PostmanAPIAnalysis:
+    """
+    Menjalankan agen kompeten yang mengerti API Postman untuk memberikan contract yang tepat.
+    """
+    from langgraph.checkpoint.memory import MemorySaver
+
+    llm = ChatOpenAI(
+        model=os.getenv("MODEL_NAME"),
+        api_key=os.getenv("OPENROUTER_API_KEY"),
+        base_url=os.getenv("OPENROUTER_BASE_URL"),
+        temperature=0.0,
+    )
+    
+    # Daftar tools yang sudah direfaktor ke standar LangChain
+    tools = [
+        get_api_context_for_feature,
+        list_all_endpoints,
+        get_endpoint_detail,
+        search_endpoint
+    ]
+    
+    # Instruksi sistem untuk Sang Analis API
+    system_instructions = (
+        "Anda adalah 'The API Analyst', spesialis dalam mendesain dan mendokumentasikan API contract.\n"
+        "Tugas Anda adalah membantu developer menemukan endpoint yang paling sesuai dengan "
+        "kebutuhan fitur mereka menggunakan Postman Collections.\n\n"
+        "Berikan output yang teknis, mencakup URL, method, body, dan contoh response "
+        "yang harus diikuti oleh tim developer."
+    )
+    
+    # Setup Memory
+    memory = MemorySaver()
+    
+    # Buat agen
+    agent_executor = create_agent(
+        llm, 
+        tools, 
+        system_prompt=system_instructions, 
+        name="PostmanAnalyst",
+        checkpointer=memory
+    )
+    
+    print(f"\n📡 [Postman Agent] Analyzing API needs for: '{user_query}'...", file=sys.stderr)
+    
+    final_output = ""
+    
+    # Eksekusi dengan streaming
+    config = {"configurable": {"thread_id": "postman_session_1"}}
+    
+    for chunk in agent_executor.stream(
+        {"messages": [("human", user_query)]}, 
+        config=config,
+        stream_mode="updates"
+    ):
+        for node_name, node_update in chunk.items():
+            print(f"📍 [Node: {node_name}] is processing...", file=sys.stderr)
+            if "messages" in node_update:
+                last_msg = node_update["messages"][-1]
+                if hasattr(last_msg, 'content') and last_msg.content:
+                    final_output = last_msg.content
+                    
+    print(f"✅ [Postman Agent] Analysis complete.", file=sys.stderr)
+    
+    # Konversi output Markdown dari agen ke Structured Output (Pydantic)
+    print(f"📝 [Postman Agent] Structuring API analysis...", file=sys.stderr)
+    llm_structured = llm.with_structured_output(PostmanAPIAnalysis)
+    structured_result = llm_structured.invoke(final_output)
+    
+    return structured_result
 
 # ══════════════════════════════════════════════
 # ENTRY POINT

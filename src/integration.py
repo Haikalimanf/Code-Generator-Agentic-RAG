@@ -53,7 +53,10 @@ async def run_full_integration_flow(project_id: str, issue_iid: int):
     print("[Step 1] Fetching & Analyzing GitLab Issue...")
     try:
         from agent_gitlab import run_gitlab_analyst_agent
-        requirement_spec = run_gitlab_analyst_agent(project_id, issue_iid)
+        requirement_obj = run_gitlab_analyst_agent(project_id, issue_iid)
+        
+        # Konversi ke string agar bisa dikirim ke Orchestrator dan dihitung panjangnya
+        requirement_spec = requirement_obj.model_dump_json(indent=2)
         print(f"DONE: Requirement Spec Generated ({len(requirement_spec)} chars)")
     except Exception as e:
         print(f"ERR: GitLab Stage Error: {e}")
