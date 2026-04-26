@@ -1,87 +1,123 @@
 # Technical Context for Issue #1
 
-Berikut adalah laporan teknis komprehensif berdasarkan requirement sistem autentikasi pengguna yang Anda berikan, dengan mengacu pada struktur project Android, integrasi backend (API), dan pedoman best practices perusahaan (RAG):
+Berikut adalah laporan teknis komprehensif berdasarkan requirement sistem autentikasi pengguna yang Anda berikan, dengan hasil pencarian dari berbagai sumber teknis (Android Studio, Postman, Figma, dan pedoman perusahaan):
 
 ---
 
-## 1. Struktur Project & File Relevan (Android Studio)
+## 1. Struktur Project & File Terkait (Android Studio)
 
-### a. Struktur Project
-- **Folder utama autentikasi:**
-  - `app/src/main/java/com/mp/basemvvm/ui/login/` (logic login)
-  - `app/src/main/java/com/mp/basemvvm/ui/register/` (logic registrasi)
-- **Komponen pendukung:**
-  - `BaseEditText.kt` (input password, reset, dsb)
-  - `BaseDialog.kt`, `BaseDialogInterface.kt` (dialog konfirmasi/error)
-  - `BaseActivity.kt`, `BaseFragment.kt` (base logic, kemungkinan integrasi third party)
-- **Resource:**
-  - `app/src/main/AndroidManifest.xml` (daftar activity, permission, integrasi third party)
-  - File konfigurasi seperti `google-services.json` (untuk Firebase/Google Sign-In)
+### Struktur Proyek
+- **Modul utama:** `app`
+- **Folder penting:**
+  - `app/src/main/java/com/mp/basemvvm/ui/login/` (Login)
+  - `app/src/main/java/com/mp/basemvvm/ui/register/` (Register)
+  - `app/src/main/res/layout/` (Layout XML)
+  - `app/src/main/AndroidManifest.xml` (Manifest)
+- **Firebase:** Ada integrasi Firebase (`google-services.json`, import Firebase di kode, meta-data di manifest).
 
-### b. AndroidManifest.xml
-- Activity terkait autentikasi:
-  - `com.mp.basemvvm.ui.register.RegisterActivity`
-  - `com.mp.basemvvm.ui.login.LoginActivity`
-- Integrasi third party:
-  - Google Sign-In: `com.google.android.gms.auth.api.signin.internal.SignInHubActivity`
-  - Facebook Login: `com.facebook.FacebookActivity`
-  - Firebase Auth: meta-data dan permission terkait
+### File Manifest
+- **Lokasi:** `app/src/main/AndroidManifest.xml`
+- **Aktivitas terkait autentikasi:**
+  - `.ui.login.LoginActivity`
+  - `.ui.register.RegisterActivity`
+- **Firebase:** Ada meta-data untuk Crashlytics dan Performance.
+- **Permissions:** INTERNET, ACCESS_NETWORK_STATE, dll.
 
----
-
-## 2. Integrasi Backend (API Contracts)
-
-- **Tidak ditemukan API contract autentikasi** (registrasi, login, logout, reset password, verifikasi email, OAuth) pada koleksi API yang tersedia saat ini.
-- Semua endpoint yang ada hanya terkait dengan fitur link shortener, redirect, statistik link, dan QR code.
-- **Kesimpulan:** Jika fitur autentikasi membutuhkan backend, endpoint baru harus dibuat atau gunakan koleksi API lain yang memang menyediakan fitur autentikasi.
-
----
-
-## 3. Pedoman Coding Perusahaan & Best Practices (RAG)
-
-- **RAG tidak tersedia** saat ini, sehingga tidak ada pedoman coding perusahaan yang bisa diambil secara otomatis.
-- **Rekomendasi best practices umum:**
-  - Gunakan enkripsi untuk penyimpanan password (hash + salt, misal bcrypt/argon2).
-  - Implementasikan rate limiting pada endpoint login/reset password.
-  - Gunakan token berbasis JWT untuk sesi autentikasi.
-  - Untuk verifikasi email, gunakan link unik dengan token yang kadaluarsa.
-  - OAuth: gunakan library resmi Google/Facebook, pastikan validasi token di backend.
-  - Jangan pernah menyimpan credential OAuth di client.
-  - Terapkan password policy (minimal panjang, kombinasi karakter).
-  - Pastikan semua komunikasi dengan backend menggunakan HTTPS.
+### File/Kode Terkait Autentikasi
+- **Login:**  
+  - `LoginActivity` di manifest dan di folder login.
+- **Register:**  
+  - `RegisterActivity` di manifest dan di folder register.
+- **Reset Password:**  
+  - Ada variabel/fungsi terkait "reset" di `BaseEditText.kt` (fitur input password/reset field).
+- **OAuth:**  
+  - Tidak ditemukan file spesifik, namun ada penggunaan Firebase (bisa digunakan untuk autentikasi OAuth).
+- **Verifikasi Email:**  
+  - Tidak ditemukan secara eksplisit, perlu cek lebih lanjut di folder login/register.
+- **Logout:**  
+  - Tidak muncul eksplisit, biasanya ada di MainActivity atau utilitas user session.
 
 ---
 
-## 4. Rangkuman & Rekomendasi Implementasi
+## 2. API Contracts (Postman)
 
-### a. Android (Client)
-- Implementasi logic autentikasi di folder `login` dan `register`.
-- Gunakan activity yang sudah terdaftar di manifest.
-- Integrasi Google/Facebook Sign-In menggunakan SDK resmi.
-- Untuk reset password dan verifikasi email, siapkan UI/UX di activity/fragment terkait.
-- Pastikan semua data sensitif (token, credential) disimpan dengan aman (misal: EncryptedSharedPreferences).
-
-### b. Backend (API)
-- Karena belum ada API contract, perlu:
-  - Mendesain endpoint: `/register`, `/login`, `/logout`, `/reset-password`, `/verify-email`, `/oauth/google`, `/oauth/facebook`.
-  - Mendefinisikan response dan error handling yang konsisten.
-  - Menyediakan dokumentasi API untuk integrasi dengan mobile app.
-
-### c. Keamanan & Best Practices
-- Terapkan best practices keamanan seperti di atas.
-- Pastikan ada mekanisme verifikasi email sebelum akun aktif.
-- OAuth hanya digunakan untuk login (atau registrasi jika user baru).
-- Audit dan review kode secara berkala.
+### Endpoint yang Ditemukan
+- **Login:**  
+  - `[POST] {{baseUrl}}/login`
+  - Headers: Accept: application/json, Content-Type: application/json
+  - Body:
+    ```json
+    {
+      "email": "adminkj@gmail.com",
+      "password": "Kerjajepang12$"
+    }
+    ```
+- **Registrasi, Logout, Reset Password, Verifikasi Email, OAuth:**  
+  - Tidak ditemukan endpoint khusus untuk fitur-fitur ini pada collection yang tersedia.
+  - Untuk login OAuth, tidak ditemukan endpoint khusus (hanya ada akses ke Google Calendar, bukan autentikasi OAuth).
 
 ---
 
-## 5. Catatan Ambiguitas
-- Tidak ada detail framework/library yang wajib.
-- Alur verifikasi email (link/OTP) perlu diputuskan.
-- Password policy dan rate limiting perlu ditentukan.
-- OAuth: perlu kejelasan apakah hanya untuk login atau juga registrasi.
-- UI/UX perlu didesain sesuai kebutuhan.
+## 3. Desain UI & Metadata XML (Figma)
+
+- **Status:**  
+  - Tidak dapat diakses karena kendala teknis pada integrasi Figma MCP.
+  - Solusi: Pastikan aplikasi Figma Desktop dan Dev Mode aktif, atau berikan akses/tautan ke file Figma yang ingin dianalisis.
 
 ---
 
-**Jika Anda membutuhkan detail kode, contoh API contract, atau pedoman spesifik dari perusahaan, silakan aktifkan akses RAG atau sediakan referensi tambahan.**
+## 4. Pedoman Coding Perusahaan & Best Practices (RAG)
+
+- **Status:**  
+  - Tidak dapat diakses karena RAG Agent tidak tersedia atau belum dikonfigurasi.
+  - Solusi: Pastikan RAG Agent aktif atau minta akses ke dokumen pedoman perusahaan secara manual.
+
+---
+
+## 5. Analisis & Rekomendasi
+
+### Ketersediaan Fitur
+- **Login:** Tersedia baik di sisi Android (LoginActivity) maupun backend (endpoint `/login`).
+- **Registrasi, Reset Password, Verifikasi Email, Logout, OAuth:**  
+  - Belum ditemukan endpoint backend maupun file Android yang eksplisit.
+  - Kemungkinan perlu implementasi tambahan di backend dan frontend.
+
+### Integrasi Firebase
+- Firebase sudah terintegrasi, sehingga fitur seperti login/register, reset password, verifikasi email, dan OAuth bisa diimplementasikan menggunakan Firebase Authentication jika backend belum mendukung.
+
+### Kekurangan Informasi
+- Tidak ada detail tentang password policy, rate limiting, role user, atau flow verifikasi email/reset password.
+- Tidak ada akses ke desain UI/UX dan pedoman coding perusahaan.
+
+---
+
+## 6. Saran Implementasi
+
+1. **Backend:**
+   - Tambahkan endpoint untuk registrasi, reset password, verifikasi email, dan logout.
+   - Implementasikan OAuth login (Google/Facebook) jika belum ada.
+   - Pastikan ada dokumentasi API yang jelas.
+
+2. **Frontend (Android):**
+   - Implementasikan/cek ulang aktivitas: Login, Register, Reset Password, Verifikasi Email, Logout, dan OAuth.
+   - Gunakan Firebase Authentication jika backend belum mendukung fitur-fitur di atas.
+
+3. **Desain UI:**
+   - Koordinasikan dengan tim desain untuk mendapatkan file Figma dan metadata XML terkait autentikasi.
+
+4. **Pedoman Coding:**
+   - Pastikan mengikuti best practices keamanan (password policy, rate limiting, validasi input, dsb).
+   - Konsultasikan dengan tim terkait pedoman perusahaan.
+
+---
+
+## 7. Tindak Lanjut
+
+- Konfirmasi kebutuhan endpoint baru ke tim backend.
+- Minta akses ke file Figma dan dokumen pedoman perusahaan.
+- Jika ingin detail kode atau endpoint, sebutkan file/endpoint spesifik yang ingin dieksplorasi.
+
+---
+
+**Catatan:**  
+Jika Anda ingin saya menampilkan isi file Login/Register, mencari file lain terkait autentikasi, atau mendalami endpoint login, silakan konfirmasi instruksi berikutnya.

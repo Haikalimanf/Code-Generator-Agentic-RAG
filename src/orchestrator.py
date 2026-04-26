@@ -91,6 +91,16 @@ if POSTMAN_API_KEY:
 else:
     print("[Orchestrator] POSTMAN_API_KEY not found. Postman agent disabled.", file=sys.stderr)
 
+# Configure Figma Agent
+MCP_SERVERS_CONFIG["figma"] = {
+    "command": PYTHON_CMD,
+    "args": [str(PROJECT_ROOT / "src" / "figma_context_server.py")],
+    "transport": "stdio",
+    "env": {
+        **os.environ,
+    }
+}
+
 
 # Debug: Show configured servers
 print(f"[Orchestrator] Configured MCP servers: {list(MCP_SERVERS_CONFIG.keys())}", file=sys.stderr)
@@ -103,7 +113,7 @@ You are an Integration Orchestrator for Android development code generation.
 Your role is to intelligently coordinate multiple context sources provided via TOOLS.
 
 STRICT CONTEXT RULE:
-- ONLY use information provided by the tools (Postman, Android Studio, Context7, RAG).
+- ONLY use information provided by the tools (Postman, Android Studio, Context7, Figma, RAG).
 - DO NOT use your own general training knowledge to fill in missing information.
 - If a tool returns no data or an error, state it clearly as: "No specific information found for [source name]".
 - DO NOT provide "best practices" or "security guidelines" unless they are explicitly found in the PDF RAG or Context7 docs.
@@ -111,6 +121,7 @@ STRICT CONTEXT RULE:
 WORKFLOW RULES:
 - Always start with Android Studio context to understand current code structure
 - Query Postman ONLY if API integration is mentioned in requirements
+- Query Figma ONLY if UI/UX implementation is mentioned in requirements
 - Query Context7 ONLY if there's uncertainty about Kotlin syntax or new features
 - Query RAG for company-specific guidelines, coding standards, and best practices
 - Provide structured output in JSON format with clear sections
@@ -118,6 +129,7 @@ WORKFLOW RULES:
 OUTPUT FORMAT:
 {
   "api_contracts": {...},        // From Postman (if applicable)
+  "design_context": {...},       // From Figma (if applicable)
   "code_structure": {...},       // From Android Studio
   "kotlin_updates": {...},       // From Context7 (if needed)
   "company_guidelines": {...},   // From PDF RAG (company docs, standards, practices)
@@ -176,6 +188,7 @@ mcp = FastMCP(
 async def get_complete_integration_context(
     requirement: str,
     include_api: bool = True,
+    include_design: bool = True,
     include_kotlin_docs: bool = False,
     include_company_guidelines: bool = True
 ) -> str:
@@ -185,6 +198,7 @@ async def get_complete_integration_context(
     Args:
         requirement: Requirement dari GitLab issue (e.g., "Implement user login with JWT")
         include_api: Query Postman untuk API contracts
+        include_design: Query Figma untuk design context & XML
         include_kotlin_docs: Query Context7 untuk Kotlin updates
         include_company_guidelines: Query RAG langsung untuk company guidelines
     
@@ -196,6 +210,7 @@ async def get_complete_integration_context(
     results = {
         "requirement": requirement,
         "api_contracts": None,
+        "design_context": None,
         "code_structure": None,
         "kotlin_updates": None,
         "company_guidelines": None,
@@ -265,6 +280,38 @@ async def get_complete_integration_context(
             results["errors"].append(error_msg)
             print(f"{error_msg}", file=sys.stderr)
     
+    # ==================== TASK 2.5: Figma Design ====================
+    async def fetch_figma_context():
+        """Conditional - hanya jika include_design=True"""
+        if not include_design:
+            print("[Orchestrator] Skipping Figma (not needed)", file=sys.stderr)
+            return
+        if "figma" not in MCP_SERVERS_CONFIG:
+            results["errors"].append("Figma tidak dikonfigurasi")
+            return
+        try:
+            print("[Orchestrator] Fetching Figma design context...", file=sys.stderr)
+            client = MultiServerMCPClient({"figma": MCP_SERVERS_CONFIG["figma"]})
+            tools = await client.get_tools()
+            
+            # Gunakan worker_llm dan state_modifier
+            agent = create_agent(worker_llm, tools, state_modifier=WORKER_SYSTEM_PROMPT)
+
+            # PANGGIL AGEN SPESIALIS: The Figma Analyst
+            analyst_query = f"Analisis desain Figma yang relevan untuk fitur ini: {requirement}"
+            
+            print(f"[Orchestrator] Invoking Specialized Figma Analyst Agent...", file=sys.stderr)
+            response = await agent.ainvoke({
+                "messages": [{"role": "user", "content": f"Call run_figma_analyst_agent with query: {analyst_query}"}]
+            })
+            
+            results["design_context"] = response["messages"][-1].content
+            print("[Orchestrator] Structured Figma design context retrieved", file=sys.stderr)
+        except Exception as e:
+            error_msg = f"Figma MCP error: {str(e)}"
+            results["errors"].append(error_msg)
+            print(f"{error_msg}", file=sys.stderr)
+    
     # ==================== TASK 3: Kotlin Docs ====================
     async def fetch_kotlin_docs():
         """Conditional - hanya jika include_kotlin_docs=True"""
@@ -291,36 +338,21 @@ async def get_complete_integration_context(
 
     # ==================== TASK 4: Company Guidelines (Direct RAG) ====================
     async def fetch_company_guidelines():
-        """Query RAG chain langsung - TANPA MCP Server"""
+        """Memanggil Compliance Expert Agent secara langsung"""
         if not include_company_guidelines:
             print("[Orchestrator] Skipping RAG (not needed)", file=sys.stderr)
             return
             
-        if not RAG_AVAILABLE or rag_chain is None:
-            error_msg = f"RAG Chain tidak tersedia: {RAG_ERROR_DETAIL or 'Pastikan VECTOR_DATABASE_URL diset dan PostgreSQL berjalan'}"
-            results["errors"].append(error_msg)
-            print(f"{error_msg}", file=sys.stderr)
-            return
-            
         try:
-            print("[Orchestrator] Querying company documents via RAG...", file=sys.stderr)
+            from agent_pdf_rag import run_compliance_expert_agent
+            print("[Orchestrator] Consulting The Compliance Expert...", file=sys.stderr)
             
-            # Query RAG chain LANGSUNG (bukan via MCP)
-            query_text = f"Berikan standar, best practices, dan guidelines untuk: {requirement}"
-            response = rag_chain.invoke({"input": query_text})
+            # Query agen spesialis RAG
+            result = run_compliance_expert_agent(requirement)
             
-            # Format hasil
-            company_guidelines = response.get("answer", "No answer found")
-            
-            # Tambahkan referensi sumber jika ada
-            if response.get("context"):
-                company_guidelines += "\n\nSumber Referensi:\n"
-                for i, doc in enumerate(response["context"], 1):
-                    page = doc.metadata.get("page", "?")
-                    company_guidelines += f"[{i}] Halaman {page}\n"
-            
-            results["company_guidelines"] = company_guidelines
-            print("[Orchestrator] Company guidelines retrieved via RAG", file=sys.stderr)
+            # Konversi Structured Output ke string JSON agar bisa digabung
+            results["company_guidelines"] = result.model_dump_json(indent=2)
+            print("[Orchestrator] Company guidelines retrieved and structured", file=sys.stderr)
             
         except Exception as e:
             error_msg = f"RAG Query error: {str(e)}"
@@ -329,8 +361,7 @@ async def get_complete_integration_context(
     
     # ==================== PARALLEL EXECUTION ====================
     await asyncio.gather(
-        fetch_android_studio_context(),
-        fetch_postman_api(),
+        fetch_figma_context(),
         return_exceptions=True
     )
     
@@ -349,26 +380,15 @@ async def query_rag_directly(query: str) -> str:
     Returns:
         Jawaban dari RAG chain dengan referensi sumber
     """
-    if not RAG_AVAILABLE or rag_chain is None:
-        return f"RAG Chain tidak tersedia: {RAG_ERROR_DETAIL or 'VECTOR_DATABASE_URL tidak diset atau PostgreSQL tidak berjalan'}"
+    if not RAG_AVAILABLE:
+        return "RAG Agent tidak tersedia atau belum dikonfigurasi."
     
     try:
-        print(f"[Orchestrator] Direct RAG Query: {query}", file=sys.stderr)
+        from agent_pdf_rag import run_compliance_expert_agent
+        print(f"[Orchestrator] Direct Compliance Query: {query}", file=sys.stderr)
         
-        response = rag_chain.invoke({"input": query})
-        
-        # Format output
-        answer = response.get("answer", "No answer found")
-        
-        # Tambahkan sumber referensi
-        if response.get("context"):
-            answer += "\n\nSumber:\n"
-            for i, doc in enumerate(response["context"], 1):
-                page = doc.metadata.get("page", "?")
-                answer += f"[{i}] Halaman {page}\n"
-        
-        return answer
-        
+        result = run_compliance_expert_agent(query)
+        return result.model_dump_json(indent=2)
     except Exception as e:
         return f"RAG Query error: {str(e)}"
 
@@ -418,7 +438,8 @@ async def health_check_all_servers() -> str:
     expected_servers = {
         "postman": ("POSTMAN_API_KEY", POSTMAN_API_KEY),
         "android_studio": ("ANDROID_PROJECT_ROOT", ANDROID_PROJECT_ROOT),
-        "context7": (None, True)  # Context7 doesn't require env var
+        "figma": (None, True),
+        "context7": (None, True)
     }
 
     # ==================== CHECK MCP SERVERS ====================

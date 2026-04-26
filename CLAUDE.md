@@ -15,6 +15,7 @@ The system uses a multi-agent orchestration pattern with 4 main context sources:
    - Postman MCP (`postman_context_server.py`) - API contracts and endpoint schemas
    - Android Studio MCP (`agent_context_android_studio.py`) - Project structure and source code
    - Context7 MCP (`agent_context_7.py`) - Kotlin/Android documentation via Upstash Context7
+   - Figma MCP (`figma_context_server.py`) - Design specifications and XML metadata
    - PDF RAG (`agent_pdf_rag.py`) - Company documents and coding standards (direct import, not MCP)
 
 3. **Integration Example** (`integration.py`) - Demonstrates full workflow: GitLab → Orchestrator → Code Generator
@@ -34,6 +35,7 @@ uv run src/integration.py
 # Run with arguments
 uv run src/postman_context_server.py --api-key $POSTMAN_API_KEY
 uv run src/agent_context_android_studio.py --root /path/to/android/project
+uv run src/figma_context_server.py
 
 # Ingest PDF documents
 uv run src/ingest_pdf.py
@@ -48,6 +50,7 @@ uv run src/ingest_pdf.py
 | `src/agent_gitlab.py` | Standalone agent to extract requirements from GitLab issues |
 | `src/postman_context_server.py` | MCP server for Postman API collections (cloud or local JSON) |
 | `src/agent_context_android_studio.py` | MCP server to read Android project files, structure, manifests |
+| `src/figma_context_server.py` | MCP server for Figma design context and XML metadata |
 | `src/agent_context_7.py` | MCP server for Kotlin documentation via Context7 |
 | `src/agent_pdf_rag.py` | Direct RAG chain for company PDFs (imported by orchestrator) |
 | `src/ingest_pdf.py` | Utility to ingest PDFs into PostgreSQL vector store |
@@ -102,6 +105,9 @@ uv run src/postman_context_server.py --api-key $POSTMAN_API_KEY
 
 # Android Studio context
 uv run src/agent_context_android_studio.py --root /path/to/android/project
+
+# Figma design context
+uv run src/figma_context_server.py
 ```
 
 ## Important Implementation Details

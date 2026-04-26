@@ -3,7 +3,7 @@ CONTOH PRODUKSI: Integrasi GitLab Agent dengan Integration Orchestrator
 
 Flow:
 1. GitLab Agent: Menganalisis issue dan membuat technical requirement spec.
-2. Integration Orchestrator: Mengambil spec tersebut dan mencari context di Android Studio, Postman, dan RAG.
+2. Integration Orchestrator: Mengambil spec tersebut dan mencari context di Android Studio, Postman, Figma, dan RAG.
 3. Output: Dokumen context teknis lengkap untuk proses coding selanjutnya.
 """
 
@@ -87,8 +87,9 @@ async def run_full_integration_flow(project_id: str, issue_iid: int):
             f"Instruksi Khusus:\n"
             f"1. Gunakan 'android_studio' untuk mencari file, manifest, dan struktur project.\n"
             f"2. Gunakan 'postman' untuk mencari API contracts jika fitur ini membutuhkan integrasi backend.\n"
-            f"3. Gunakan 'rag' untuk mencari pedoman coding perusahaan atau best practices.\n"
-            f"4. Gabungkan semua informasi tersebut menjadi satu laporan teknis yang komprehensif."
+            f"3. Gunakan 'figma' untuk mengambil desain UI dan XML metadata jika fitur ini memiliki komponen antarmuka.\n"
+            f"4. Gunakan 'rag' untuk mencari pedoman coding perusahaan atau best practices.\n"
+            f"5. Gabungkan semua informasi tersebut menjadi satu laporan teknis yang komprehensif."
         )
         
         print("   (Memanggil Brain Orchestrator, harap tunggu...)")
