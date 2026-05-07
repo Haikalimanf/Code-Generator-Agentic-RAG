@@ -1,82 +1,77 @@
+"""
+Integration Orchestrator — Full Predefined Workflow
+
+Arsitektur: ZERO LLM di layer orchestrator.
+Setiap task memanggil satu tool spesifik secara langsung (direct tool call).
+LLM hanya ada di dalam masing-masing specialist MCP server.
+
+Flow:
+  fetch_android_studio_context  → tool: run_android_architect_agent(user_query)
+  fetch_postman_api             → tool: run_postman_analyst_agent(user_query)
+  fetch_figma_context           → tool: get_figma_xml_metadata(node_id)
+  fetch_company_guidelines      → langsung: run_compliance_expert_agent() via asyncio.to_thread
+"""
+
 import os
 import sys
 import asyncio
 import json
-import warnings
-warnings.filterwarnings("ignore", message=".*create_agent.*", category=DeprecationWarning)
-from typing import Dict, List, Optional
+import traceback
+from typing import Dict, List, Optional, Any
 from pathlib import Path
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
 from langchain_mcp_adapters.client import MultiServerMCPClient
-from langchain.agents import create_agent
-from langchain_core.messages import HumanMessage
-from langchain_core.prompts import ChatPromptTemplate
-from pydantic import BaseModel, Field
 from fastmcp import FastMCP
 
-# ==================== RAG DISABLED (MENERIMA PERMINTAAN USER) ====================
-# try:
-#     from agent_pdf_rag import rag_chain, RAG_AVAILABLE, RAG_ERROR
-#     ... (RAG dinonaktifkan sementara untuk stabilitas)
-# except: pass
-rag_chain = None
-RAG_AVAILABLE = False
-RAG_ERROR_DETAIL = "RAG disabled by user focus request"
-
+# ==================== RAG ENABLED ====================
+try:
+    from agent_pdf_rag import run_compliance_expert_agent
+    RAG_AVAILABLE = True
+    RAG_ERROR_DETAIL = None
+except Exception as e:
+    RAG_AVAILABLE = False
+    RAG_ERROR_DETAIL = str(e)
 
 load_dotenv()
-
-# ==================== DIAGNOSIS ENV VARIABLES ====================
-print("[Orchestrator] Environment variables loaded:", file=sys.stderr)
-print(f"    POSTMAN_API_KEY: {'Set' if os.getenv('POSTMAN_API_KEY') else 'Not set'}", file=sys.stderr)
-print(f"    POSTMAN_WORKSPACE_ID: {'Set' if os.getenv('POSTMAN_WORKSPACE_ID') else 'Not set'}", file=sys.stderr)
-print(f"    ANDROID_PROJECT_ROOT: {'Set' if os.getenv('ANDROID_PROJECT_ROOT') else 'Not set'}", file=sys.stderr)
-print(f"    CONTEXT7_API_KEY: {'Set' if os.getenv('CONTEXT7_API_KEY') else 'Not set'}", file=sys.stderr)
 
 # ==================== KONFIGURASI ====================
 API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
 MODEL_NAME = os.getenv("MODEL_NAME", "openai/gpt-4o")
-WORKER_MODEL_NAME = os.getenv("WORKER_MODEL_NAME", "openai/gpt-4o-mini")
 
 if not API_KEY:
     print("[WARNING] OPENROUTER_API_KEY belum diset.", file=sys.stderr)
 
-# Get project root dynamically from this file's location
 PROJECT_ROOT = Path(__file__).parent.parent
 
-# Get environment variables with validation
-POSTMAN_API_KEY = os.getenv("POSTMAN_API_KEY", "").strip()
-POSTMAN_WORKSPACE_ID = os.getenv("POSTMAN_WORKSPACE_ID", "").strip()
-ANDROID_PROJECT_ROOT = os.getenv("ANDROID_PROJECT_ROOT", "").strip()
-CONTEXT7_API_KEY = os.getenv("CONTEXT7_API_KEY", "").strip()
+POSTMAN_API_KEY       = os.getenv("POSTMAN_API_KEY", "").strip()
+POSTMAN_WORKSPACE_ID  = os.getenv("POSTMAN_WORKSPACE_ID", "").strip()
+ANDROID_PROJECT_ROOT  = os.getenv("ANDROID_PROJECT_ROOT", "").strip()
 
-print(f"[Orchestrator] Debug Path: {ANDROID_PROJECT_ROOT}", file=sys.stderr)
-
-
-# Path to Python executable - MUST use sys.executable to get uv-managed Python
-# Using plain "python" would fail because packages are installed in uv's venv
 PYTHON_CMD = sys.executable
 
-# Konfigurasi Multi-MCP Servers (TANPA PDF RAG - sekarang direct access)
-MCP_SERVERS_CONFIG = {}
+# ==================== DIAGNOSIS ====================
+print("[Orchestrator] Environment variables loaded:", file=sys.stderr)
+print(f"    POSTMAN_API_KEY      : {'Set' if POSTMAN_API_KEY else 'Not set'}", file=sys.stderr)
+print(f"    POSTMAN_WORKSPACE_ID : {'Set' if POSTMAN_WORKSPACE_ID else 'Not set'}", file=sys.stderr)
+print(f"    ANDROID_PROJECT_ROOT : {'Set' if ANDROID_PROJECT_ROOT else 'Not set'}", file=sys.stderr)
+print(f"    RAG_AVAILABLE        : {RAG_AVAILABLE}", file=sys.stderr)
+if not RAG_AVAILABLE:
+    print(f"    RAG_ERROR            : {RAG_ERROR_DETAIL}", file=sys.stderr)
 
-# Configure Android Studio
+# ==================== MCP SERVER CONFIGS ====================
+MCP_SERVERS_CONFIG: Dict[str, Any] = {}
+
 if ANDROID_PROJECT_ROOT and Path(ANDROID_PROJECT_ROOT).exists():
     MCP_SERVERS_CONFIG["android_studio"] = {
         "command": PYTHON_CMD,
         "args": [str(PROJECT_ROOT / "src" / "agent_context_android_studio.py")],
         "transport": "stdio",
-        "env": {
-            **os.environ,
-            "ANDROID_PROJECT_ROOT": ANDROID_PROJECT_ROOT,
-        }
+        "env": {**os.environ, "ANDROID_PROJECT_ROOT": ANDROID_PROJECT_ROOT},
     }
 else:
-    print(f"[Orchestrator] ANDROID_PROJECT_ROOT not found or invalid: {ANDROID_PROJECT_ROOT}", file=sys.stderr)
+    print(f"[Orchestrator] ANDROID_PROJECT_ROOT tidak valid: {ANDROID_PROJECT_ROOT}", file=sys.stderr)
 
-# Configure Postman Agent
 if POSTMAN_API_KEY:
     MCP_SERVERS_CONFIG["postman"] = {
         "command": PYTHON_CMD,
@@ -86,101 +81,63 @@ if POSTMAN_API_KEY:
             **os.environ,
             "POSTMAN_API_KEY": POSTMAN_API_KEY,
             "POSTMAN_WORKSPACE_ID": POSTMAN_WORKSPACE_ID,
-        }
+        },
     }
 else:
-    print("[Orchestrator] POSTMAN_API_KEY not found. Postman agent disabled.", file=sys.stderr)
+    print("[Orchestrator] POSTMAN_API_KEY tidak ada. Postman agent dinonaktifkan.", file=sys.stderr)
 
-# Configure Figma Agent
 MCP_SERVERS_CONFIG["figma"] = {
     "command": PYTHON_CMD,
-    "args": [str(PROJECT_ROOT / "src" / "figma_context_server.py")],
+    "args": [str(PROJECT_ROOT / "src" / "figma_context_server.py"), "--server"],
     "transport": "stdio",
-    "env": {
-        **os.environ,
-    }
+    "env": {**os.environ},
 }
 
+print(f"[Orchestrator] MCP servers aktif: {list(MCP_SERVERS_CONFIG.keys())}", file=sys.stderr)
 
-# Debug: Show configured servers
-print(f"[Orchestrator] Configured MCP servers: {list(MCP_SERVERS_CONFIG.keys())}", file=sys.stderr)
-print(f"[Orchestrator] POSTMAN_API_KEY: {'Set' if POSTMAN_API_KEY else 'NOT SET'}", file=sys.stderr)
-print(f"[Orchestrator] ANDROID_PROJECT_ROOT: {ANDROID_PROJECT_ROOT if ANDROID_PROJECT_ROOT else 'NOT SET'}", file=sys.stderr)
+# ==================== HELPER ====================
 
-ORCHESTRATOR_PROMPT = """
-You are an Integration Orchestrator for Android development code generation.
+async def _call_tool(server_key: str, tool_name: str, tool_args: Dict) -> Optional[str]:
+    """
+    Helper predefined: buka koneksi MCP, cari tool berdasarkan nama, panggil langsung.
+    Tidak ada LLM. Tidak ada reasoning. Satu tool call, satu result.
+    """
+    config = MCP_SERVERS_CONFIG.get(server_key)
+    if not config:
+        return None
 
-Your role is to intelligently coordinate multiple context sources provided via TOOLS.
+    try:
+        client = MultiServerMCPClient({server_key: config})
+        tools = await client.get_tools()
 
-STRICT CONTEXT RULE:
-- ONLY use information provided by the tools (Postman, Android Studio, Context7, Figma, RAG).
-- DO NOT use your own general training knowledge to fill in missing information.
-- If a tool returns no data or an error, state it clearly as: "No specific information found for [source name]".
-- DO NOT provide "best practices" or "security guidelines" unless they are explicitly found in the PDF RAG or Context7 docs.
+        # Cari tool berdasarkan nama (partial match)
+        target = next((t for t in tools if tool_name in t.name), None)
+        if not target:
+            available = [t.name for t in tools]
+            print(
+                f"[Orchestrator] Tool '{tool_name}' tidak ditemukan di '{server_key}'. "
+                f"Tersedia: {available}",
+                file=sys.stderr,
+            )
+            return None
 
-WORKFLOW RULES:
-- Always start with Android Studio context to understand current code structure
-- Query Postman ONLY if API integration is mentioned in requirements
-- Query Figma ONLY if UI/UX implementation is mentioned in requirements
-- Query Context7 ONLY if there's uncertainty about Kotlin syntax or new features
-- Query RAG for company-specific guidelines, coding standards, and best practices
-- Provide structured output in JSON format with clear sections
+        print(f"[Orchestrator] Calling {server_key}/{target.name} ...", file=sys.stderr)
+        result = await target.ainvoke(tool_args)
+        return str(result)
 
-OUTPUT FORMAT:
-{
-  "api_contracts": {...},        // From Postman (if applicable)
-  "design_context": {...},       // From Figma (if applicable)
-  "code_structure": {...},       // From Android Studio
-  "kotlin_updates": {...},       // From Context7 (if needed)
-  "company_guidelines": {...},   // From PDF RAG (company docs, standards, practices)
-  "recommendations": [...]
-}
+    except Exception as e:
+        print(f"[Orchestrator] Error calling {server_key}/{tool_name}: {e}", file=sys.stderr)
+        return None
 
-Be concise, technical, and actionable. Stick to the provided evidence.
-"""
-
-# ==================== LLM INSTANCE ====================
-# Brain Model (High-reasoning)
-orchestrator_llm = ChatOpenAI(
-    model=MODEL_NAME,
-    temperature=0.0,
-    api_key=API_KEY,
-    base_url=BASE_URL,
-    max_tokens=2048,
-    default_headers={
-        "HTTP-Referer": "https://github.com/",
-        "X-Title": "Integration Orchestrator (Brain)"
-    },
-)
-
-# Worker Model (Fast, Cheap Context Retrieval)
-worker_llm = ChatOpenAI(
-    model=WORKER_MODEL_NAME,
-    temperature=0.0,
-    api_key=API_KEY,
-    base_url=BASE_URL,
-    max_tokens=1024,
-    default_headers={
-        "HTTP-Referer": "https://github.com/",
-        "X-Title": "Integration Orchestrator (Worker)"
-    },
-)
-
-# System Prompt untuk Worker (Concise)
-WORKER_SYSTEM_PROMPT = """
-You are a data retriever and summarizer. 
-Your ONLY goal is to find relevant technical information using the provided tools.
-- DO NOT explain your thought process.
-- DO NOT provide recommendations.
-- DO NOT provide general context outside of tool output.
-- Return ONLY facts, code snippets, or API details found.
-- Be extremely brief.
-"""
 
 # ==================== MCP SERVER ORCHESTRATOR ====================
 mcp = FastMCP(
     name="IntegrationOrchestrator",
-    instructions="Orchestrates Postman, Android Studio, Context7 MCP servers + direct RAG access for code generation"
+    instructions=(
+        "Predefined workflow orchestrator. "
+        "Koordinasi Android Studio, Postman, Figma, dan RAG "
+        "dengan direct tool calls — tanpa LLM reasoning di layer ini."
+    ),
 )
 
 
@@ -188,275 +145,181 @@ mcp = FastMCP(
 async def get_complete_integration_context(
     requirement: str,
     include_api: bool = True,
-    include_design: bool = True,
+    include_design: bool = False,
     include_kotlin_docs: bool = False,
-    include_company_guidelines: bool = True
+    include_company_guidelines: bool = True,
 ) -> str:
     """
-    Mengambil konteks lengkap dari MCP servers + direct RAG access.
-    
+    [PREDEFINED WORKFLOW] Mengambil konteks teknis lengkap secara paralel.
+
+    Setiap sumber dipanggil dengan direct tool call — tidak ada LLM di layer ini.
+
     Args:
-        requirement: Requirement dari GitLab issue (e.g., "Implement user login with JWT")
+        requirement: Requirement dari GitLab issue
         include_api: Query Postman untuk API contracts
-        include_design: Query Figma untuk design context & XML
-        include_kotlin_docs: Query Context7 untuk Kotlin updates
-        include_company_guidelines: Query RAG langsung untuk company guidelines
-    
+        include_design: Query Figma untuk design XML (butuh Figma Desktop aktif)
+        include_kotlin_docs: Dinonaktifkan (gunakan Context7 secara langsung jika perlu)
+        include_company_guidelines: Query RAG untuk pedoman coding perusahaan
+
     Returns:
-        JSON string dengan aggregated context dari semua sources
+        JSON string dengan aggregated context dari semua sumber
     """
-    print(f"\n[Orchestrator] Processing requirement: {requirement}", file=sys.stderr)
-    
-    results = {
+    print(f"\n[Orchestrator] ===== START PREDEFINED WORKFLOW =====", file=sys.stderr)
+    print(f"[Orchestrator] Requirement (first 100 chars): {requirement[:100]}", file=sys.stderr)
+
+    results: Dict[str, Any] = {
         "requirement": requirement,
+        "code_structure": None,
         "api_contracts": None,
         "design_context": None,
-        "code_structure": None,
-        "kotlin_updates": None,
         "company_guidelines": None,
-        "errors": []
+        "errors": [],
     }
-    
-    # ==================== TASK 1: Android Studio Context ====================
+
+    # ── TASK 1: Android Studio ───────────────────────────────────────────────
     async def fetch_android_studio_context():
-        """Selalu dijalankan - core context"""
         if "android_studio" not in MCP_SERVERS_CONFIG:
-            results["errors"].append("Android Studio tidak dikonfigurasi (ANDROID_PROJECT_ROOT tidak ada)")
+            results["errors"].append("Android Studio tidak dikonfigurasi (ANDROID_PROJECT_ROOT tidak valid)")
             return
-        try:
-            print("[Orchestrator] Fetching Android Studio context...", file=sys.stderr)
-            client = MultiServerMCPClient({"android_studio": MCP_SERVERS_CONFIG["android_studio"]})
-            tools = await client.get_tools()
-            
-            # FIX: Gunakan argumen 'state_modifier' sesuai versi langgraph-prebuilt 0.1.0+
-            agent = create_agent(worker_llm, tools, state_modifier=WORKER_SYSTEM_PROMPT)
-            
-            # PANGGIL AGEN SPESIALIS: The Architect
-            # Alih-alih memanggil tool mentah, kita panggil agen yang sudah 'pintar'
-            architect_query = f"Analisis kebutuhan ini secara mendalam dalam konteks proyek Android: {requirement}"
-            
-            print(f"[Orchestrator] Invoking Specialized Android Architect Agent...", file=sys.stderr)
-            response = await agent.ainvoke({
-                "messages": [{"role": "user", "content": f"Call run_android_architect_agent with query: {architect_query}"}]
-            })
-            
-            output = response["messages"][-1].content
+        print("[Orchestrator] [1/4] Android Studio context ...", file=sys.stderr)
+        output = await _call_tool(
+            server_key="android_studio",
+            tool_name="run_android_architect_agent",
+            tool_args={"user_query": requirement},
+        )
+        if output:
             results["code_structure"] = output
-            print("[Orchestrator] Structured Android context retrieved", file=sys.stderr)
-        except Exception as e:
-            error_msg = f"Android Studio MCP error: {str(e)}"
-            results["errors"].append(error_msg)
-            print(f"{error_msg}", file=sys.stderr)
-    
-    # ==================== TASK 2: Postman API ====================
+            print("[Orchestrator] [1/4] Android Studio DONE.", file=sys.stderr)
+        else:
+            results["errors"].append("Android Studio: tidak ada data yang dikembalikan.")
+
+    # ── TASK 2: Postman API ──────────────────────────────────────────────────
     async def fetch_postman_api():
-        """Conditional - hanya jika include_api=True"""
         if not include_api:
-            print("[Orchestrator] Skipping Postman (not needed)", file=sys.stderr)
+            print("[Orchestrator] [2/4] Postman SKIPPED (include_api=False).", file=sys.stderr)
             return
         if "postman" not in MCP_SERVERS_CONFIG:
             results["errors"].append("Postman tidak dikonfigurasi (POSTMAN_API_KEY tidak ada)")
             return
-        try:
-            print("[Orchestrator] Fetching Postman API contracts...", file=sys.stderr)
-            client = MultiServerMCPClient({"postman": MCP_SERVERS_CONFIG["postman"]})
-            tools = await client.get_tools()
-            
-            # Gunakan worker_llm dan state_modifier
-            agent = create_agent(worker_llm, tools, state_modifier=WORKER_SYSTEM_PROMPT)
+        print("[Orchestrator] [2/4] Postman API contracts ...", file=sys.stderr)
+        output = await _call_tool(
+            server_key="postman",
+            tool_name="run_postman_analyst_agent",
+            tool_args={"user_query": requirement},
+        )
+        if output:
+            results["api_contracts"] = output
+            print("[Orchestrator] [2/4] Postman DONE.", file=sys.stderr)
+        else:
+            results["errors"].append("Postman: tidak ada data yang dikembalikan.")
 
-            # PANGGIL AGEN SPESIALIS: The API Analyst
-            analyst_query = f"Cari API contract yang relevan untuk fitur ini: {requirement}"
-            
-            print(f"[Orchestrator] Invoking Specialized Postman Analyst Agent...", file=sys.stderr)
-            response = await agent.ainvoke({
-                "messages": [{"role": "user", "content": f"Call run_postman_analyst_agent with query: {analyst_query}"}]
-            })
-            
-            results["api_contracts"] = response["messages"][-1].content
-            print("[Orchestrator] Structured Postman API contracts retrieved", file=sys.stderr)
-        except Exception as e:
-            error_msg = f"Postman MCP error: {str(e)}"
-            results["errors"].append(error_msg)
-            print(f"{error_msg}", file=sys.stderr)
-    
-    # ==================== TASK 2.5: Figma Design ====================
+    # ── TASK 3: Figma Design ─────────────────────────────────────────────────
+    # Mapping kata kunci dari requirement → node ID Figma yang sudah diketahui
+    FIGMA_NODE_MAP = {
+        "login"    : "2335:6376",
+        "register" : "2335:6404",
+        "chat"     : "2335:5716",
+        "home"     : "2335:5799",
+    }
+
     async def fetch_figma_context():
-        """Conditional - hanya jika include_design=True"""
         if not include_design:
-            print("[Orchestrator] Skipping Figma (not needed)", file=sys.stderr)
+            print("[Orchestrator] [3/4] Figma SKIPPED (include_design=False).", file=sys.stderr)
             return
         if "figma" not in MCP_SERVERS_CONFIG:
             results["errors"].append("Figma tidak dikonfigurasi")
             return
-        try:
-            print("[Orchestrator] Fetching Figma design context...", file=sys.stderr)
-            client = MultiServerMCPClient({"figma": MCP_SERVERS_CONFIG["figma"]})
-            tools = await client.get_tools()
-            
-            # Gunakan worker_llm dan state_modifier
-            agent = create_agent(worker_llm, tools, state_modifier=WORKER_SYSTEM_PROMPT)
 
-            # PANGGIL AGEN SPESIALIS: The Figma Analyst
-            analyst_query = f"Analisis desain Figma yang relevan untuk fitur ini: {requirement}"
-            
-            print(f"[Orchestrator] Invoking Specialized Figma Analyst Agent...", file=sys.stderr)
-            response = await agent.ainvoke({
-                "messages": [{"role": "user", "content": f"Call run_figma_analyst_agent with query: {analyst_query}"}]
-            })
-            
-            results["design_context"] = response["messages"][-1].content
-            print("[Orchestrator] Structured Figma design context retrieved", file=sys.stderr)
-        except Exception as e:
-            error_msg = f"Figma MCP error: {str(e)}"
-            results["errors"].append(error_msg)
-            print(f"{error_msg}", file=sys.stderr)
-    
-    # ==================== TASK 3: Kotlin Docs ====================
-    async def fetch_kotlin_docs():
-        """Conditional - hanya jika include_kotlin_docs=True"""
-        if not include_kotlin_docs:
-            print("[Orchestrator] Skipping Context7 (no Kotlin updates needed)", file=sys.stderr)
-            return
-        try:
-            print("[Orchestrator] Checking latest Kotlin documentation...", file=sys.stderr)
-            client = MultiServerMCPClient({"context7": MCP_SERVERS_CONFIG["context7"]})
-            tools = await client.get_tools()
-            
-            # Gunakan worker_llm dan state_modifier
-            agent = create_agent(worker_llm, tools, state_modifier=WORKER_SYSTEM_PROMPT)
-            
-            response = await agent.ainvoke({
-                "messages": [{"role": "user", "content": f"Check Kotlin syntax/library updates for: {requirement}"}]
-            })
-            results["kotlin_updates"] = response["messages"][-1].content
-            print("[Orchestrator] Kotlin docs retrieved", file=sys.stderr)
-        except Exception as e:
-            error_msg = f"Context7 MCP error: {str(e)}"
-            results["errors"].append(error_msg)
-            print(f"{error_msg}", file=sys.stderr)
+        # Tentukan node ID berdasarkan kata kunci dalam requirement (predefined mapping)
+        req_lower = requirement.lower()
+        node_id = next(
+            (nid for kw, nid in FIGMA_NODE_MAP.items() if kw in req_lower),
+            "2335:6376",  # default ke halaman Login
+        )
 
-    # ==================== TASK 4: Company Guidelines (Direct RAG) ====================
+        print(f"[Orchestrator] [3/4] Figma XML untuk node {node_id} ...", file=sys.stderr)
+        output = await _call_tool(
+            server_key="figma",
+            tool_name="get_figma_xml_metadata",
+            tool_args={"node_id": node_id},
+        )
+        if output:
+            results["design_context"] = output
+            print("[Orchestrator] [3/4] Figma DONE.", file=sys.stderr)
+        else:
+            results["errors"].append(f"Figma: tidak ada data untuk node {node_id}. Pastikan Figma Desktop aktif.")
+
+    # ── TASK 4: Company Guidelines via RAG ──────────────────────────────────
     async def fetch_company_guidelines():
-        """Memanggil Compliance Expert Agent secara langsung"""
         if not include_company_guidelines:
-            print("[Orchestrator] Skipping RAG (not needed)", file=sys.stderr)
+            print("[Orchestrator] [4/4] RAG SKIPPED (include_company_guidelines=False).", file=sys.stderr)
             return
-            
+        if not RAG_AVAILABLE:
+            results["errors"].append(f"RAG tidak tersedia: {RAG_ERROR_DETAIL}")
+            print(f"[Orchestrator] [4/4] RAG UNAVAILABLE: {RAG_ERROR_DETAIL}", file=sys.stderr)
+            return
+
+        print("[Orchestrator] [4/4] Company guidelines via RAG (thread) ...", file=sys.stderr)
         try:
-            from agent_pdf_rag import run_compliance_expert_agent
-            print("[Orchestrator] Consulting The Compliance Expert...", file=sys.stderr)
-            
-            # Query agen spesialis RAG
-            result = run_compliance_expert_agent(requirement)
-            
-            # Konversi Structured Output ke string JSON agar bisa digabung
+            # run_compliance_expert_agent adalah sync — jalankan di thread agar tidak blokir event loop
+            result = await asyncio.to_thread(run_compliance_expert_agent, requirement)
             results["company_guidelines"] = result.model_dump_json(indent=2)
-            print("[Orchestrator] Company guidelines retrieved and structured", file=sys.stderr)
-            
+            print("[Orchestrator] [4/4] RAG DONE.", file=sys.stderr)
         except Exception as e:
-            error_msg = f"RAG Query error: {str(e)}"
+            error_msg = f"RAG error: {str(e)}"
             results["errors"].append(error_msg)
-            print(f"{error_msg}", file=sys.stderr)
-    
-    # ==================== PARALLEL EXECUTION ====================
+            print(f"[Orchestrator] [4/4] {error_msg}", file=sys.stderr)
+
+    # ── PARALLEL EXECUTION ───────────────────────────────────────────────────
     await asyncio.gather(
+        fetch_android_studio_context(),
+        fetch_postman_api(),
         fetch_figma_context(),
-        return_exceptions=True
+        fetch_company_guidelines(),
+        return_exceptions=True,
     )
-    
-    # Format final output
+
+    # Hitung statistik
+    filled = sum(1 for k in ["code_structure", "api_contracts", "design_context", "company_guidelines"]
+                 if results[k] is not None)
+    print(f"[Orchestrator] ===== DONE ({filled}/4 sources filled, {len(results['errors'])} errors) =====", file=sys.stderr)
+
     return json.dumps(results, indent=2, ensure_ascii=False)
 
 
 @mcp.tool()
 async def query_rag_directly(query: str) -> str:
     """
-    Query RAG chain langsung untuk company documents.
-    
+    Query RAG secara langsung untuk dokumen perusahaan.
+
     Args:
-        query: Pertanyaan mengenai company documents
-    
+        query: Pertanyaan mengenai standar coding perusahaan
+
     Returns:
-        Jawaban dari RAG chain dengan referensi sumber
+        JSON string hasil analisis ComplianceAnalysis
     """
     if not RAG_AVAILABLE:
-        return "RAG Agent tidak tersedia atau belum dikonfigurasi."
-    
+        return f"RAG tidak tersedia: {RAG_ERROR_DETAIL}"
+
     try:
-        from agent_pdf_rag import run_compliance_expert_agent
-        print(f"[Orchestrator] Direct Compliance Query: {query}", file=sys.stderr)
-        
-        result = run_compliance_expert_agent(query)
+        print(f"[Orchestrator] Direct RAG query: {query[:80]}", file=sys.stderr)
+        result = await asyncio.to_thread(run_compliance_expert_agent, query)
         return result.model_dump_json(indent=2)
     except Exception as e:
         return f"RAG Query error: {str(e)}"
 
 
 @mcp.tool()
-async def query_specific_server(
-    server_name: str,
-    query: str
-) -> str:
-    """
-    Query satu MCP server spesifik.
-    
-    Args:
-        server_name: Pilih dari 'postman', 'android_studio', atau 'context7'
-        query: Pertanyaan spesifik untuk server tersebut
-    """
-    valid_servers = list(MCP_SERVERS_CONFIG.keys()) + ["rag"]
-    
-    if server_name == "rag":
-        return await query_rag_directly(query)
-    
-    if server_name not in MCP_SERVERS_CONFIG:
-        return f"Invalid server name. Choose from: {valid_servers}"
-    
-    try:
-        print(f"[Orchestrator] Querying {server_name}...", file=sys.stderr)
-        client = MultiServerMCPClient({server_name: MCP_SERVERS_CONFIG[server_name]})
-        tools = await client.get_tools()
-        agent = create_agent(orchestrator_llm, tools)
-        
-        response = await agent.ainvoke({
-            "messages": [{"role": "user", "content": query}]
-        })
-        return response["messages"][-1].content
-    except Exception as e:
-        return f"Error querying {server_name}: {str(e)}"
-
-
-@mcp.tool()
 async def health_check_all_servers() -> str:
     """
-    Health check untuk MCP servers dan RAG availability.
+    Health check untuk semua MCP servers dan RAG.
+
+    Returns:
+        JSON string status setiap server
     """
-    results = {}
+    results: Dict[str, Any] = {}
 
-    # Define expected servers and their config requirements
-    expected_servers = {
-        "postman": ("POSTMAN_API_KEY", POSTMAN_API_KEY),
-        "android_studio": ("ANDROID_PROJECT_ROOT", ANDROID_PROJECT_ROOT),
-        "figma": (None, True),
-        "context7": (None, True)
-    }
-
-    # ==================== CHECK MCP SERVERS ====================
-    for server_name in expected_servers.keys():
-        env_var, env_value = expected_servers[server_name]
-
-        # Check if server is configured
-        if server_name not in MCP_SERVERS_CONFIG:
-            results[server_name] = {
-                "status": "NOT CONFIGURED",
-                "reason": f"Environment variable {env_var} not set" if env_var else "Configuration missing",
-                "env_var": env_var,
-                "current_value": env_value[:20] + "..." if env_value and len(str(env_value)) > 20 else env_value
-            }
-            continue
-
-        config = MCP_SERVERS_CONFIG[server_name]
+    for server_name, config in MCP_SERVERS_CONFIG.items():
         try:
             print(f"[Health Check] Testing {server_name}...", file=sys.stderr)
             client = MultiServerMCPClient({server_name: config})
@@ -464,30 +327,24 @@ async def health_check_all_servers() -> str:
             results[server_name] = {
                 "status": "ONLINE",
                 "tools_count": len(tools),
-                "available_tools": [tool.name for tool in tools]
+                "available_tools": [t.name for t in tools],
             }
         except Exception as e:
-            import traceback
-            error_detail = str(e)
-            print(f"[Health Check] {server_name} error: {error_detail}", file=sys.stderr)
-            print(traceback.format_exc(), file=sys.stderr)
             results[server_name] = {
                 "status": "OFFLINE",
-                "error": error_detail,
+                "error": str(e),
                 "command": config.get("command"),
-                "args": config.get("args")
+                "args": config.get("args"),
             }
 
-    # ==================== CHECK RAG ====================
-    rag_status = "AVAILABLE" if (RAG_AVAILABLE and rag_chain is not None) else "UNAVAILABLE"
     results["rag"] = {
-        "status": rag_status,
+        "status": "AVAILABLE" if RAG_AVAILABLE else "UNAVAILABLE",
         "direct_access": True,
-        "notes": "Direct import from agent_pdf_rag.py (no MCP Server needed)",
-        "diagnostic": RAG_ERROR_DETAIL if not RAG_AVAILABLE or rag_chain is None else None,
+        "notes": "Direct import dari agent_pdf_rag.py (tanpa MCP)",
+        "error": RAG_ERROR_DETAIL,
         "env_check": {
             "VECTOR_DATABASE_URL": "Set" if os.getenv("VECTOR_DATABASE_URL") else "Not set"
-        }
+        },
     }
 
     return json.dumps(results, indent=2, ensure_ascii=False)
@@ -495,20 +352,19 @@ async def health_check_all_servers() -> str:
 
 # ==================== ENTRY POINT ====================
 if __name__ == "__main__":
-    print("""
-    ╔═════════════════════════════════════════════════════════╗
-    ║   INTEGRATION ORCHESTRATOR - MCP Multi-Server Agent     ║
-    ║                                                         ║
-    ║   Architecture:                                         ║
-    ║   • 3 MCP Servers (Postman, Android Studio, Context7)   ║
-    ║   • Direct RAG Access (agent_pdf_rag.py - No MCP)       ║
-    ║                                                         ║
-    ║   Features:                                             ║
-    ║   • get_complete_integration_context() → Aggregates all ║
-    ║   • query_specific_server() → Query single source       ║
-    ║   • query_rag_directly() → Direct RAG queries           ║
-    ║   • health_check_all_servers() → System status          ║
-    ╚═════════════════════════════════════════════════════════╝
-    """, file=sys.stderr)
-    
+    print(
+        "\n"
+        "╔═════════════════════════════════════════════════════════╗\n"
+        "║   INTEGRATION ORCHESTRATOR — Predefined Workflow        ║\n"
+        "║                                                         ║\n"
+        "║   Mode: ZERO LLM di layer orchestrator                  ║\n"
+        "║   Direct tool calls ke specialist MCP servers           ║\n"
+        "║                                                         ║\n"
+        "║   Tools:                                                ║\n"
+        "║   • get_complete_integration_context() — main flow      ║\n"
+        "║   • query_rag_directly()              — RAG query       ║\n"
+        "║   • health_check_all_servers()        — status check    ║\n"
+        "╚═════════════════════════════════════════════════════════╝\n",
+        file=sys.stderr,
+    )
     mcp.run(transport="stdio")

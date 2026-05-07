@@ -761,12 +761,13 @@ def get_gradle_dependencies(module_path: str = "app") -> str:
 
 class AndroidArchitectureAnalysis(BaseModel):
     """Skema hasil analisis arsitektur proyek Android."""
+    model_config = {"json_schema_extra": {"additionalProperties": False}}
     overview: str = Field(description="Ringkasan struktur proyek secara umum.")
-    key_components: List[Dict[str, str]] = Field(description="Daftar komponen utama (Activity, ViewModel, dll) dan perannya.")
+    key_components: List[str] = Field(description="Daftar komponen utama (Activity, ViewModel, dll) dan perannya dalam format 'NamaKomponen: peran'.")
     data_flow: str = Field(description="Penjelasan bagaimana data mengalir antar komponen.")
     relevant_files: List[str] = Field(description="Daftar path file yang krusial untuk dipahami.")
     architectural_patterns: List[str] = Field(description="Pola arsitektur yang terdeteksi (misal: MVVM, Clean Architecture).")
-    recommendations: Optional[str] = Field(description="Saran atau rekomendasi arsitektur jika ada.")
+    recommendations: Optional[str] = Field(default=None, description="Saran atau rekomendasi arsitektur jika ada.")
 
 @mcp.tool()
 def run_android_architect_agent(user_query: str) -> AndroidArchitectureAnalysis:

@@ -19,8 +19,6 @@ from dotenv import load_dotenv
 warnings.filterwarnings("ignore", message=".*create_react_agent.*", category=DeprecationWarning)
 
 from langchain_mcp_adapters.client import MultiServerMCPClient
-from langchain_openai import ChatOpenAI
-from langgraph.prebuilt import create_react_agent
 
 load_dotenv()
 
@@ -32,14 +30,6 @@ MODEL_NAME = os.getenv("MODEL_NAME")
 PROJECT_ROOT = Path(__file__).parent.parent
 ORCHESTRATOR_PATH = str(PROJECT_ROOT / "src" / "orchestrator.py")
 
-def get_llm():
-    return ChatOpenAI(
-        model=MODEL_NAME,
-        temperature=0.0,
-        api_key=API_KEY,
-        base_url=BASE_URL,
-        max_tokens=4096,
-    )
 
 async def run_full_integration_flow(project_id: str, issue_iid: int):
     """
@@ -75,27 +65,62 @@ async def run_full_integration_flow(project_id: str, issue_iid: int):
     }
     
     try:
+        print("   Menginisialisasi koneksi ke Orchestrator...")
         client = MultiServerMCPClient(orchestrator_config)
         tools = await client.get_tools()
-        llm = get_llm()
-        agent = create_react_agent(model=llm, tools=tools)
-            
-        # Buat prompt yang sangat detail untuk Orchestrator
-        orchestrator_query = (
-            f"Tolong kumpulkan semua konteks teknis yang diperlukan untuk implementasi requirement berikut:\n\n"
-            f"{requirement_spec}\n\n"
-            f"Instruksi Khusus:\n"
-            f"1. Gunakan 'android_studio' untuk mencari file, manifest, dan struktur project.\n"
-            f"2. Gunakan 'postman' untuk mencari API contracts jika fitur ini membutuhkan integrasi backend.\n"
-            f"3. Gunakan 'figma' untuk mengambil desain UI dan XML metadata jika fitur ini memiliki komponen antarmuka.\n"
-            f"4. Gunakan 'rag' untuk mencari pedoman coding perusahaan atau best practices.\n"
-            f"5. Gabungkan semua informasi tersebut menjadi satu laporan teknis yang komprehensif."
+        
+        if not tools:
+            print("ERR: Orchestrator tidak mengembalikan tools. Periksa orchestrator.py.")
+            return
+
+        print(f"   Tools tersedia: {[t.name for t in tools]}")
+        
+        # Temukan tool utama secara langsung — TANPA ReAct agent loop
+        # create_react_agent tidak perlu di sini karena kita tahu persis tool yang akan dipanggil.
+        # Menggunakan agent hanya akan memboroskan token untuk "reasoning" yang tidak perlu.
+        integration_tool = next(
+            (t for t in tools if t.name == "get_complete_integration_context"), None
         )
         
-        print("   (Memanggil Brain Orchestrator, harap tunggu...)")
-        response = await agent.ainvoke({"messages": [{"role": "user", "content": orchestrator_query}]})
+        if not integration_tool:
+            print("ERR: Tool 'get_complete_integration_context' tidak ditemukan di Orchestrator.")
+            return
         
-        final_context = response["messages"][-1].content
+        print("   Memanggil Orchestrator tool secara langsung (no agent loop)...")
+        print("   [Android Studio + Postman + RAG berjalan paralel, harap tunggu...]")
+        
+        # Panggil tool langsung dengan timeout 10 menit
+        try:
+            async with asyncio.timeout(600):
+                raw_result = await integration_tool.ainvoke({
+                    "requirement": requirement_spec,
+                    "include_api": True,
+                    "include_design": False,      # Figma dinonaktifkan sementara (butuh Desktop App)
+                    "include_kotlin_docs": False,
+                    "include_company_guidelines": True,
+                })
+        except asyncio.TimeoutError:
+            print("ERR: Orchestrator timeout (>10 menit). Periksa koneksi ke sub-agents.")
+            return
+        
+        # raw_result bisa berupa string JSON atau string biasa
+        try:
+            parsed = json.loads(raw_result) if isinstance(raw_result, str) else raw_result
+            # Buat final context yang rapi dari JSON
+            sections = []
+            if parsed.get("code_structure"):
+                sections.append(f"## 1. Struktur & File Project (Android Studio)\n\n{parsed['code_structure']}")
+            if parsed.get("api_contracts"):
+                sections.append(f"## 2. API Contracts (Postman)\n\n{parsed['api_contracts']}")
+            if parsed.get("design_context"):
+                sections.append(f"## 3. Desain UI & XML (Figma)\n\n{parsed['design_context']}")
+            if parsed.get("company_guidelines"):
+                sections.append(f"## 4. Pedoman Coding & Best Practices (RAG)\n\n{parsed['company_guidelines']}")
+            if parsed.get("errors"):
+                sections.append(f"## ⚠ Errors & Peringatan\n\n" + "\n".join(f"- {e}" for e in parsed["errors"]))
+            final_context = "\n\n---\n\n".join(sections) if sections else str(raw_result)
+        except (json.JSONDecodeError, AttributeError):
+            final_context = str(raw_result)
         
         # --- STEP 3: Save to Markdown ---
         output_dir = PROJECT_ROOT / "outputs"

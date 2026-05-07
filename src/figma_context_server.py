@@ -5,14 +5,15 @@ import functools
 import re
 from pathlib import Path
 from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 from fastmcp import FastMCP
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain.agents import create_agent
-from langchain_core.tools import tool
+from langgraph.checkpoint.memory import MemorySaver
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from langchain_core.tools import tool as lc_tool
 
 load_dotenv()
 
@@ -62,6 +63,23 @@ def wrap_tool_call(func):
             return error_msg
     return wrapper
 
+def _parse_mcp_result(result: Any) -> str:
+    """
+    Mengekstrak teks dari respon MCP (biasanya list of CallContent).
+    """
+    if isinstance(result, list):
+        parts = []
+        for item in result:
+            # Handle CallContent objects or dictionaries
+            if hasattr(item, "text"):
+                parts.append(item.text)
+            elif isinstance(item, dict) and "text" in item:
+                parts.append(item["text"])
+            else:
+                parts.append(str(item))
+        return "\n\n".join(parts)
+    return str(result)
+
 # ══════════════════════════════════════════════
 # MCP TOOLS
 # ══════════════════════════════════════════════
@@ -84,7 +102,7 @@ async def get_figma_xml_metadata(node_id: str) -> str:
         return "❌ Tool 'get_metadata' tidak ditemukan di Figma MCP Server."
     
     result = await metadata_tool.ainvoke({"nodeId": node_id})
-    return str(result)
+    return _parse_mcp_result(result)
 
 @mcp.tool()
 @wrap_tool_call
@@ -103,13 +121,11 @@ async def get_figma_design_context(node_id: str) -> str:
         return "❌ Tool 'get_design_context' tidak ditemukan di Figma MCP Server."
     
     result = await context_tool.ainvoke({"nodeId": node_id})
-    return str(result)
+    return _parse_mcp_result(result)
 
 # ──────────────────────────────────────────────
 # 2. Inisialisasi Agen (The Figma Analyst)
 # ──────────────────────────────────────────────
-
-from pydantic import BaseModel, Field, ConfigDict
 
 class FigmaDesignAnalysis(BaseModel):
     """Skema hasil analisis desain Figma."""
@@ -161,36 +177,39 @@ async def run_figma_analyst_agent(user_query: str) -> FigmaDesignAnalysis:
                 design_notes="Figma MCP source returned no tools."
             )
         
-        # NORMALISASI: Hapus prefix 'figma_source__' agar LLM bisa memanggil tool dengan nama aslinya
-        from langchain_core.tools import Tool
+        # NORMALISASI: Hapus prefix 'figma_source__'
         figma_tools = []
         for t in raw_tools:
-            # Jika nama tool mengandung prefix (misal 'figma_source__get_metadata')
             clean_name = t.name.split("__")[-1] if "__" in t.name else t.name
             
-            # Buat tool baru dengan nama bersih
-            new_tool = tool(clean_name)(t._run if hasattr(t, '_run') else t.func)
+            # Buat fungsi pembungkus agar tool bisa dipanggil
+            def create_tool_func(target_tool):
+                async def tool_func(nodeId: str = ""):
+                    return await target_tool.ainvoke({"nodeId": nodeId})
+                return tool_func
+
+            new_tool = lc_tool(create_tool_func(t))
+            new_tool.name = clean_name
             new_tool.description = t.description
             figma_tools.append(new_tool)
         
-        # Buat ReAct Agent
-        from langgraph.prebuilt import create_react_agent
-        from langgraph.checkpoint.memory import MemorySaver
-        
+        # Buat Agent (Sesuai pola Postman Agent)
         memory = MemorySaver()
-        agent_executor = create_react_agent(
+        agent_executor = create_agent(
             llm, 
             figma_tools, 
-            state_modifier=system_instructions,
+            system_prompt=system_instructions, 
+            name="FigmaAnalyst",
             checkpointer=memory
         )
         
         print(f"\n🎨 [Figma Agent] Analyzing design for: '{user_query}'...", file=sys.stderr)
         
-        config = {"configurable": {"thread_id": "figma_session_1"}}
         final_output = ""
+        config = {"configurable": {"thread_id": "figma_session_1"}}
         
-        async for chunk in agent_executor.astream(
+        # Eksekusi dengan streaming (Sesuai pola Postman Agent)
+        for chunk in agent_executor.stream(
             {"messages": [("human", user_query)]}, 
             config=config,
             stream_mode="updates"
@@ -243,12 +262,58 @@ async def run_figma_analyst_agent(user_query: str) -> FigmaDesignAnalysis:
 # ══════════════════════════════════════════════
 
 if __name__ == "__main__":
-    print(
-        f"[Figma Context Agent] 🚀 Memulai MCP Server...\n"
-        f"   Figma Source: {FIGMA_MCP_URL}\n"
-        f"   Tools       : get_figma_xml_metadata\n"
-        f"                 get_figma_design_context\n"
-        f"                 run_figma_analyst_agent [AGENT]\n",
-        file=sys.stderr
-    )
-    mcp.run(transport="stdio")
+    import asyncio
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Figma Context Agent")
+    parser.add_argument("query", nargs="?", default="login", help="Nama layar (login/register) atau node ID")
+    parser.add_argument("--node", type=str, default=None, help="Override Node ID langsung (e.g. '2335:6376')")
+    parser.add_argument("--server", action="store_true", help="Jalankan sebagai MCP Server")
+    args, _ = parser.parse_known_args()
+
+    # Auto-detect: jika stdin bukan TTY (dipanggil sebagai subprocess/pipe), langsung server mode
+    is_piped = not sys.stdin.isatty()
+
+    if args.server or is_piped:
+        # Jalankan sebagai MCP Server standar
+        print(
+            "[Figma Context Agent] Starting MCP Server...\n"
+            f"   Figma Source: {FIGMA_MCP_URL}\n"
+            "   Tools       : get_figma_xml_metadata\n"
+            "                 get_figma_design_context\n"
+            "                 run_figma_analyst_agent [AGENT]\n",
+            file=sys.stderr
+        )
+        mcp.run(transport="stdio")
+    else:
+        # === MODE TES CEPAT: Langsung panggil Figma tool tanpa LLM Agent ===
+        # Node ID yang sudah diketahui (dari canvas "Wise On Waste")
+        KNOWN_NODES = {
+            "login"    : "2335:6376",
+            "register" : "2335:6404",
+            "chat"     : "2335:5716",
+            "home"     : "2335:5799",
+        }
+
+        query_lower = args.query.lower()
+        node_id = args.node or KNOWN_NODES.get(query_lower, query_lower)
+
+        print(f"\n🧪 [Test Mode] Mengambil XML untuk node: '{node_id}' (query: '{args.query}')", file=sys.stderr)
+        print(f"   Menghubungi Figma Dev Mode di {FIGMA_MCP_URL}...", file=sys.stderr)
+
+        async def fast_test():
+            result_xml = await get_figma_xml_metadata(node_id)
+            
+            print("\n" + "═"*60, file=sys.stderr)
+            print(f" 📐  FIGMA XML METADATA", file=sys.stderr)
+            print(f"    Node ID: {node_id}", file=sys.stderr)
+            print("═"*60 + "\n", file=sys.stderr)
+            
+            # Print the actual content to stdout so it can be captured if needed
+            print(result_xml)
+            
+            print("\n" + "═"*60, file=sys.stderr)
+            print(f" ✅  Proses Selesai", file=sys.stderr)
+            print("═"*60, file=sys.stderr)
+
+        asyncio.run(fast_test())

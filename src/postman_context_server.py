@@ -676,11 +676,12 @@ def search_endpoint(query: str) -> str:
 
 class PostmanAPIAnalysis(BaseModel):
     """Skema hasil analisis API dari Postman Collection."""
+    model_config = {"json_schema_extra": {"additionalProperties": False}}
     feature_summary: str = Field(description="Ringkasan fitur yang dianalisis.")
-    relevant_endpoints: List[Dict[str, Any]] = Field(description="Daftar endpoint yang relevan (method, url, purpose).")
-    api_contracts: List[Dict[str, Any]] = Field(description="Detail contract untuk setiap endpoint (headers, body schema, response).")
+    relevant_endpoints: List[str] = Field(description="Daftar endpoint yang relevan dalam format 'METHOD /path — deskripsi singkat'.")
+    api_contracts: List[str] = Field(description="Detail contract untuk setiap endpoint dalam format teks (headers, body schema, response example).")
     missing_endpoints: List[str] = Field(description="Daftar fitur yang tidak ditemukan endpointnya di collection.")
-    recommendations: Optional[str] = Field(description="Rekomendasi integrasi atau catatan tambahan.")
+    recommendations: Optional[str] = Field(default=None, description="Rekomendasi integrasi atau catatan tambahan.")
 
 @mcp.tool()
 def run_postman_analyst_agent(user_query: str) -> PostmanAPIAnalysis:

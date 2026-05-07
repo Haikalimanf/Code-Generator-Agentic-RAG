@@ -1,0 +1,502 @@
+[
+    {
+        "test_case_id": 1,
+        "category": "Ideal",
+        "temperature": 0.5,
+        "latency": 5.896220922470093,
+        "is_valid_format": true,
+        "error": null,
+        "ground_truth": {
+            "feature_goal": "Implementasi fitur pencarian dan filter multi-kriteria untuk produk.",
+            "acceptance_criteria": [
+                "Input text search",
+                "Price range filter",
+                "Brand filter",
+                "Empty state handling"
+            ],
+            "functional_scope": [
+                "Product Module",
+                "Search Engine API"
+            ],
+            "technical_details": "ElasticSearch (opsional), REST API",
+            "questions_ambiguities": []
+        },
+        "prediction": {
+            "feature_goal": "Memungkinkan pengguna mencari produk elektronik berdasarkan nama serta menyaring hasil pencarian dengan filter tertentu, dan menampilkan halaman khusus ketika tidak ada hasil.",
+            "acceptance_criteria": [
+                "Tersedia input teks untuk pencarian produk berdasarkan nama.",
+                "Pengguna dapat memfilter produk berdasarkan rentang harga.",
+                "Pengguna dapat memfilter produk berdasarkan merk (contoh: Samsung, Sony).",
+                "Jika hasil pencarian/filter kosong, sistem menampilkan halaman 'Produk Tidak Ditemukan'."
+            ],
+            "functional_scope": [
+                "Halaman/fitur pencarian produk elektronik berdasarkan nama.",
+                "Fitur filter produk berdasarkan rentang harga.",
+                "Fitur filter produk berdasarkan merk.",
+                "Penanganan kondisi hasil kosong dengan menampilkan halaman 'Produk Tidak Ditemukan'."
+            ],
+            "technical_details": "None",
+            "questions_ambiguities": [
+                "Apakah pencarian berdasarkan nama bersifat partial match, exact match, atau mendukung typo/fuzzy search?",
+                "Format dan batasan rentang harga: apakah input min-max, slider, atau pilihan preset; serta apakah harga termasuk batas (inclusive/exclusive).",
+                "Apakah filter merk mendukung multi-select atau hanya satu merk; dan apakah daftar merk bersifat statis atau dinamis dari data produk.",
+                "Perilaku ketika kombinasi pencarian + filter diterapkan: apakah semua kriteria digabung dengan AND (default) atau ada opsi lain.",
+                "Di mana dan bagaimana halaman 'Produk Tidak Ditemukan' ditampilkan: halaman terpisah, komponen dalam halaman hasil, atau redirect; serta apakah tetap menampilkan kontrol pencarian/filter di halaman tersebut."
+            ]
+        },
+        "metrics": {
+            "jaccard_similarity_criteria": 0.0
+        }
+    },
+    {
+        "test_case_id": 2,
+        "category": "Ideal",
+        "temperature": 0.5,
+        "latency": 6.448211193084717,
+        "is_valid_format": true,
+        "error": null,
+        "ground_truth": {
+            "feature_goal": "Integrasi sistem pembayaran Midtrans Core API.",
+            "acceptance_criteria": [
+                "Dukungan VA (BCA, BNI, Mandiri)",
+                "Webhook status listener",
+                "Otomasi status order"
+            ],
+            "functional_scope": [
+                "Backend Payment",
+                "Order Status Management"
+            ],
+            "technical_details": "Midtrans Core API",
+            "questions_ambiguities": []
+        },
+        "prediction": {
+            "feature_goal": "Memungkinkan pengguna membayar pesanan menggunakan berbagai metode pembayaran melalui integrasi Midtrans, serta memperbarui status pesanan secara otomatis saat pembayaran berhasil.",
+            "acceptance_criteria": [
+                "Terintegrasi dengan API Midtrans Core.",
+                "Mendukung metode pembayaran Virtual Account: BCA, BNI, dan Mandiri.",
+                "Tersedia webhook listener yang dapat meng-update status pesanan otomatis menjadi 'PAID'."
+            ],
+            "functional_scope": [
+                "Proses pembayaran pesanan (checkout/pembayaran).",
+                "Pemilihan dan penggunaan metode pembayaran Virtual Account (BCA, BNI, Mandiri).",
+                "Penerimaan webhook dari Midtrans untuk pembaruan status pesanan otomatis menjadi 'PAID'."
+            ],
+            "technical_details": "Midtrans Core API",
+            "questions_ambiguities": [
+                "Event/status webhook Midtrans apa saja yang harus dipetakan untuk mengubah status pesanan menjadi 'PAID' (mis. settlement/capture) selain disebutkan secara umum 'update status pesanan'?.",
+                "Apakah hanya status 'PAID' yang perlu ditangani, atau juga status lain (mis. pending, failed, expired, canceled) untuk sinkronisasi pesanan?.",
+                "Apakah ada kebutuhan untuk menyimpan detail transaksi Midtrans (mis. transaction_id, order_id, payment_type, va_number) dan menampilkannya ke pengguna?.",
+                "Apakah sistem perlu menyediakan instruksi pembayaran/nomor VA ke pengguna setelah membuat transaksi Midtrans?.",
+                "Apakah ada requirement terkait keamanan webhook (mis. verifikasi signature/key) dan lingkungan (sandbox vs production) yang harus digunakan?."
+            ]
+        },
+        "metrics": {
+            "jaccard_similarity_criteria": 0.0
+        }
+    },
+    {
+        "test_case_id": 3,
+        "category": "Ideal",
+        "temperature": 0.5,
+        "latency": 4.792726278305054,
+        "is_valid_format": true,
+        "error": null,
+        "ground_truth": {
+            "feature_goal": "Memperbaiki bug kalkulasi ongkos kirim yang tidak dinamis.",
+            "acceptance_criteria": [
+                "Recalculate on address change",
+                "Valid API RajaOngkir response"
+            ],
+            "functional_scope": [
+                "Checkout Page",
+                "Shipping Service"
+            ],
+            "technical_details": "RajaOngkir API",
+            "questions_ambiguities": []
+        },
+        "prediction": {
+            "feature_goal": "Memperbaiki bug di halaman checkout agar ongkos kirim ter-update dan dihitung ulang ketika pengguna mengganti kota tujuan.",
+            "acceptance_criteria": [
+                "Saat kota tujuan diubah (contoh: dari Jakarta ke Bandung) di halaman checkout, harga ongkos kirim ter-update sesuai perhitungan terbaru.",
+                "Perhitungan ulang ongkos kirim menggunakan API RajaOngkir."
+            ],
+            "functional_scope": [
+                "Halaman checkout",
+                "Alur perubahan alamat/kota tujuan pada checkout",
+                "Perhitungan dan tampilan ongkos kirim"
+            ],
+            "technical_details": "API RajaOngkir",
+            "questions_ambiguities": [
+                "Pada bagian alamat mana perubahan terjadi (kota tujuan saja atau termasuk provinsi/kecamatan) yang harus memicu recalculation?",
+                "Apakah ongkos kirim harus otomatis ter-update saat kota berubah, atau perlu aksi tambahan (mis. tombol refresh/submit)?",
+                "Bagaimana perilaku yang diharapkan jika API RajaOngkir gagal/timeout (fallback, pesan error, atau tetap menampilkan nilai lama)?",
+                "Apakah ada komponen lain yang bergantung pada ongkos kirim (mis. total pembayaran) yang juga harus ikut ter-update?",
+                "Kurir/layanan pengiriman apa saja yang terpengaruh (jika ada pilihan kurir), dan apakah pilihan tersebut harus di-reset saat kota berubah?"
+            ]
+        },
+        "metrics": {
+            "jaccard_similarity_criteria": 0.0
+        }
+    },
+    {
+        "test_case_id": 10,
+        "category": "Standard",
+        "temperature": 0.5,
+        "latency": 7.205224990844727,
+        "is_valid_format": true,
+        "error": null,
+        "ground_truth": {
+            "feature_goal": "Fix masalah loading image pada produk kulkas LG.",
+            "acceptance_criteria": [
+                "Gambar muncul normal",
+                "Handle broken URL"
+            ],
+            "functional_scope": [
+                "Product Gallery",
+                "AWS S3/CDN"
+            ],
+            "technical_details": "None",
+            "questions_ambiguities": [
+                "Beberapa informasi teknis tidak detail."
+            ]
+        },
+        "prediction": {
+            "feature_goal": "Memperbaiki masalah gambar produk untuk kategori kulkas merk LG yang tidak muncul (hanya blank putih dengan loading terus) pada halaman produk.",
+            "acceptance_criteria": [
+                "Pada halaman produk kategori kulkas merk LG, gambar produk tampil normal (tidak blank putih/loading terus).",
+                "URL gambar untuk produk kulkas LG tidak broken dan dapat diakses."
+            ],
+            "functional_scope": [
+                "Halaman produk untuk kategori kulkas merk LG",
+                "Pemanggilan/penyajian gambar produk (image URL) pada halaman produk"
+            ],
+            "technical_details": "AWS S3 (disebut sebagai path S3/AWS)",
+            "questions_ambiguities": [
+                "Apakah masalah terjadi untuk semua produk kulkas LG atau hanya produk tertentu?",
+                "Apakah terjadi di semua environment (production/staging) dan semua device/browser?",
+                "Contoh URL gambar yang broken atau contoh SKU/produk yang terdampak untuk reproduksi?",
+                "Apakah sumber gambar memang dari AWS S3 untuk semua gambar kategori ini, atau ada CDN/transformasi lain yang terlibat (tidak disebutkan)?",
+                "Apakah ada error spesifik (HTTP status code, console/network log) saat gambar gagal dimuat?"
+            ]
+        },
+        "metrics": {
+            "jaccard_similarity_criteria": 0.0
+        }
+    },
+    {
+        "test_case_id": 11,
+        "category": "Standard",
+        "temperature": 0.5,
+        "latency": 5.622222661972046,
+        "is_valid_format": true,
+        "error": null,
+        "ground_truth": {
+            "feature_goal": "Penyesuaian layout tombol checkout untuk layar kecil.",
+            "acceptance_criteria": [
+                "Sticky button",
+                "Full width",
+                "Safe area padding"
+            ],
+            "functional_scope": [
+                "Checkout UI"
+            ],
+            "technical_details": "None",
+            "questions_ambiguities": [
+                "Beberapa informasi teknis tidak detail."
+            ]
+        },
+        "prediction": {
+            "feature_goal": "Memperbaiki bug pada iPhone SE dimana tombol checkout tertutup oleh safe area bawah dengan membuat tombol checkout menjadi sticky dan full width agar mudah di-tap.",
+            "acceptance_criteria": [
+                "Pada device iPhone SE, tombol checkout tidak tertutup oleh safe area bawah.",
+                "Tombol checkout dibuat sticky (tetap terlihat/menempel) di bagian bawah saat diperlukan.",
+                "Tombol checkout memiliki lebar penuh (full width) agar lebih mudah di-tap."
+            ],
+            "functional_scope": [
+                "Halaman/layar checkout (bagian tombol checkout di area bawah layar).",
+                "Perilaku tampilan tombol checkout pada perangkat iOS yang memiliki safe area bawah (terutama iPhone SE)."
+            ],
+            "technical_details": "None",
+            "questions_ambiguities": [
+                "Apakah perubahan sticky + full width berlaku untuk semua device atau hanya iPhone SE/iOS tertentu?",
+                "Sticky dimaksud selalu tampil saat scroll, atau hanya pada kondisi/section tertentu di halaman checkout?",
+                "Apakah ada desain/spacing khusus terkait padding safe area (mis. jarak dari bottom) yang diinginkan?"
+            ]
+        },
+        "metrics": {
+            "jaccard_similarity_criteria": 0.0
+        }
+    },
+    {
+        "test_case_id": 12,
+        "category": "Standard",
+        "temperature": 0.5,
+        "latency": 5.7640907764434814,
+        "is_valid_format": true,
+        "error": null,
+        "ground_truth": {
+            "feature_goal": "Memperbaiki crash (NPE) pada fitur pencarian.",
+            "acceptance_criteria": [
+                "No more force close on search",
+                "Fix NPE in SearchViewModel"
+            ],
+            "functional_scope": [
+                "Search Feature",
+                "Android SearchViewModel"
+            ],
+            "technical_details": "None",
+            "questions_ambiguities": [
+                "Beberapa informasi teknis tidak detail."
+            ]
+        },
+        "prediction": {
+            "feature_goal": "Memperbaiki bug force close saat pengguna melakukan pencarian dengan kata kunci 'laptop gaming' (tekan enter), yang diduga disebabkan Null Pointer Exception pada SearchViewModel.",
+            "acceptance_criteria": [
+                "Aplikasi tidak force close saat user mengetik 'laptop gaming' lalu menekan enter.",
+                "Null Pointer Exception yang terjadi di SearchViewModel tidak terjadi lagi untuk skenario tersebut."
+            ],
+            "functional_scope": [
+                "Fitur pencarian (search) ketika user memasukkan query dan menekan enter.",
+                "SearchViewModel (bagian yang terlibat dalam proses search yang memicu crash)."
+            ],
+            "technical_details": "Crashlytics disebut sebagai sumber pengecekan crash; Null Pointer Exception (NPE) disebut terjadi di SearchViewModel.",
+            "questions_ambiguities": [
+                "Apakah crash hanya terjadi untuk query 'laptop gaming' atau juga query lain?",
+                "Langkah reproduksi detail selain 'ketik lalu enter' (mis. dari halaman mana, kondisi login, koneksi, dsb.) belum disebutkan.",
+                "Bagian/field mana di SearchViewModel yang null (stack trace detail dari Crashlytics) tidak disertakan.",
+                "Perilaku yang diharapkan jika data/response kosong atau null saat search belum dijelaskan (mis. tampil empty state vs error message)."
+            ]
+        },
+        "metrics": {
+            "jaccard_similarity_criteria": 0.0
+        }
+    },
+    {
+        "test_case_id": 13,
+        "category": "Standard",
+        "temperature": 0.5,
+        "latency": 5.942641735076904,
+        "is_valid_format": true,
+        "error": null,
+        "ground_truth": {
+            "feature_goal": "Menambahkan opsi pembayaran menggunakan poin.",
+            "acceptance_criteria": [
+                "Checkbox 'Use Points'",
+                "Auto deduct from total",
+                "Point balance validation"
+            ],
+            "functional_scope": [
+                "Payment Page",
+                "Points API"
+            ],
+            "technical_details": "None",
+            "questions_ambiguities": [
+                "Beberapa informasi teknis tidak detail."
+            ]
+        },
+        "prediction": {
+            "feature_goal": "Menambahkan opsi pembayaran menggunakan koin/poin pada halaman payment melalui checkbox 'Pake Poin' sehingga total tagihan dapat dikurangi dengan saldo poin user.",
+            "acceptance_criteria": [
+                "Terdapat checkbox 'Pake Poin' di halaman payment.",
+                "Jika checkbox 'Pake Poin' dicentang, total tagihan dikurangi dengan saldo poin user.",
+                "UI untuk opsi ini dibuat sederhana terlebih dahulu."
+            ],
+            "functional_scope": [
+                "Halaman payment",
+                "Perhitungan total tagihan saat opsi 'Pake Poin' diaktifkan",
+                "Penggunaan saldo poin user untuk mengurangi tagihan"
+            ],
+            "technical_details": "None",
+            "questions_ambiguities": [
+                "Definisi aturan pengurangan: apakah pengurangan maksimal sebesar total tagihan (tidak boleh negatif) atau boleh menghasilkan total negatif?",
+                "Jika saldo poin lebih besar dari total tagihan, apakah sisa poin tetap tersimpan dan total menjadi 0?",
+                "Bagaimana jika saldo poin user tidak mencukupi: apakah tetap mengurangi sebagian atau menolak?",
+                "Apakah checkbox default-nya tidak dicentang atau mengikuti preferensi tertentu?",
+                "Apakah perlu menampilkan informasi saldo poin user dan/atau jumlah poin yang dipakai di UI?",
+                "Apakah perubahan total tagihan harus terjadi secara real-time (langsung saat dicentang) atau setelah submit?",
+                "Apakah ada konfirmasi/validasi tambahan saat checkout terkait penggunaan poin?"
+            ]
+        },
+        "metrics": {
+            "jaccard_similarity_criteria": 0.0
+        }
+    },
+    {
+        "test_case_id": 22,
+        "category": "Complex",
+        "temperature": 0.5,
+        "latency": 8.601115226745605,
+        "is_valid_format": true,
+        "error": null,
+        "ground_truth": {
+            "feature_goal": "Modernisasi infrastruktur checkout untuk menangani lonjakan traffic flash sale.",
+            "acceptance_criteria": [
+                "Queue system implementation",
+                "Inventory locking (15m)",
+                "Redis TTL optimization"
+            ],
+            "functional_scope": [
+                "Core Infrastructure",
+                "Inventory Management",
+                "Cache Layer"
+            ],
+            "technical_details": "RabbitMQ/Kafka, Redis",
+            "questions_ambiguities": [
+                "Pilihan messaging technology masih diperdebatkan (SQS vs Kafka vs Redis Streams).",
+                "Mekanisme locking di level DB atau Cache belum diputuskan."
+            ]
+        },
+        "prediction": {
+            "feature_goal": "Meningkatkan ketahanan (high availability) dan kemampuan menangani lonjakan traffic pada event flash sale (mis. 12.12) dengan merombak cara pemrosesan request/checkout agar tidak terjadi downtime seperti pada event 11.11 (down 15 menit), termasuk penggunaan sistem antrean untuk checkout dan mekanisme inventory locking/reservation yang konsisten dengan cache.",
+            "acceptance_criteria": [
+                "Backend melakukan riset dan menentukan/mengevaluasi sistem antrean untuk memproses checkout (opsi yang disebut: RabbitMQ, Kafka; diskusi: SQS, Redis Streams).",
+                "Tersedia mekanisme inventory locking/reservation: saat user masuk proses checkout, stok barang di-reserve selama 15 menit.",
+                "Jika user tidak melakukan pembayaran, stok reservation dilepas setelah 15 menit.",
+                "Redis cache untuk data stok disetel TTL yang sesuai.",
+                "Sistem mencegah data stok basi (stale) tampil dari cache."
+            ],
+            "functional_scope": [
+                "Alur checkout pada flash sale (pemrosesan checkout melalui sistem antrean).",
+                "Manajemen stok/inventory saat checkout (reserve, release setelah timeout jika tidak bayar).",
+                "Caching stok menggunakan Redis (pengaturan TTL dan konsistensi agar tidak stale).",
+                "Kesiapan infrastruktur untuk high availability saat event traffic tinggi (12.12)."
+            ],
+            "technical_details": "Teknologi yang disebut: RabbitMQ, Kafka, Amazon SQS, Redis Streams, Redis (cache/TTL).",
+            "questions_ambiguities": [
+                "Sistem antrean mana yang dipilih untuk implementasi final (RabbitMQ vs Kafka vs SQS vs Redis Streams) dan kriteria pemilihannya belum diputuskan.",
+                "Definisi tepat momen \"user masuk checkout\" (kapan reservation dibuat) belum dijelaskan.",
+                "Apa yang dianggap sebagai \"tidak bayar\" (timeout saja vs status pembayaran tertentu) belum dirinci.",
+                "Bagaimana mekanisme pelepasan stok: otomatis via TTL/timeout atau proses terjadwal/consumer queue belum disebutkan.",
+                "Data stok apa saja yang dicache di Redis dan TTL target/aturan invalidasinya belum ditentukan.",
+                "Apakah target high availability memiliki metrik/SLO spesifik (mis. maksimum downtime, target RPS) belum disebutkan."
+            ]
+        },
+        "metrics": {
+            "jaccard_similarity_criteria": 0.0
+        }
+    },
+    {
+        "test_case_id": 23,
+        "category": "Complex",
+        "temperature": 0.5,
+        "latency": 9.426237106323242,
+        "is_valid_format": true,
+        "error": null,
+        "ground_truth": {
+            "feature_goal": "Implementasi sistem manajemen retur barang otomatis end-to-end.",
+            "acceptance_criteria": [
+                "Complaint button (48h window)",
+                "Evidence upload (video/photo)",
+                "Refund/Replace options",
+                "Admin SLA 3 days",
+                "Auto-generate JNE return label"
+            ],
+            "functional_scope": [
+                "Order Module",
+                "Admin Dashboard",
+                "JNE API Integration"
+            ],
+            "technical_details": "JNE API",
+            "questions_ambiguities": [
+                "Apakah 'Tukar Unit' benar-benar dihapus dari scope awal?",
+                "Regulasi OJK terkait refund ke wallet belum didetailkan."
+            ]
+        },
+        "prediction": {
+            "feature_goal": "Mengotomasi proses retur/komplain barang yang saat ini manual via WhatsApp menjadi alur di aplikasi, termasuk pengajuan komplain, pengumpulan bukti, SLA respons admin, pembuatan resi balik otomatis, dan notifikasi perubahan status.",
+            "acceptance_criteria": [
+                "Tombol \"Ajukan Komplain\" muncul 2x24 jam setelah barang diterima.",
+                "User dapat mengisi form pengajuan komplain.",
+                "User dapat upload bukti video unboxing.",
+                "Terdapat pilihan penyelesaian: refund saldo atau tukar unit.",
+                "Admin harus merespons pengajuan dalam 3 hari.",
+                "Jika komplain diterima (accept), sistem meng-generate resi balik otomatis melalui integrasi JNE.",
+                "Setiap perubahan state/status mengirim push notification."
+            ],
+            "functional_scope": [
+                "UI/flow pasca penerimaan barang: kemunculan tombol \"Ajukan Komplain\" berdasarkan waktu (2x24 jam setelah diterima).",
+                "Form pengajuan komplain/retur oleh user.",
+                "Upload lampiran bukti berupa video unboxing.",
+                "Pemilihan opsi penyelesaian (refund saldo; tukar unit disebutkan namun diperdebatkan).",
+                "Proses penanganan komplain oleh admin termasuk SLA respons 3 hari.",
+                "Alur persetujuan (accept) dan pembuatan resi pengembalian otomatis.",
+                "Integrasi pengiriman untuk generate resi balik (JNE).",
+                "Push notification untuk perubahan state/status komplain/retur."
+            ],
+            "technical_details": "Integrasi JNE untuk generate resi balik; push notification; ketentuan refund mengikuti regulasi OJK jika masuk ke wallet.",
+            "questions_ambiguities": [
+                "Apakah opsi \"Tukar Unit\" akan diimplementasikan pada rilis awal atau ditunda (komentar PM menyarankan fokus refund saldo saja)?",
+                "Definisi tepat waktu \"2x24 jam setelah barang diterima\": apakah dihitung dari timestamp status delivered/diterima di sistem, atau konfirmasi penerimaan oleh user?",
+                "Apa saja field yang wajib ada di form komplain (alasan, deskripsi, nomor pesanan, dsb.) belum disebutkan.",
+                "Aturan validasi untuk bukti video unboxing (format, durasi, ukuran file, jumlah file) belum disebutkan.",
+                "Definisi dan daftar state/status yang dimaksud untuk notifikasi (mis. diajukan, diproses, diterima/ditolak, resi dibuat, dll.) belum dirinci.",
+                "Apa yang terjadi jika admin tidak merespons dalam 3 hari (eskalasi/auto-approve/auto-reject) belum dijelaskan.",
+                "Kapan resi balik dibuat: langsung saat accept atau ada langkah tambahan (mis. konfirmasi alamat pickup/drop-off) belum disebutkan.",
+                "Detail integrasi JNE yang dibutuhkan (jenis layanan, alur pickup/drop-off, data yang dikirim/diterima) tidak dijelaskan.",
+                "Ruang lingkup kepatuhan OJK untuk refund ke wallet: aturan spesifik apa yang harus diikuti dan bagaimana dampaknya ke alur refund belum dijelaskan."
+            ]
+        },
+        "metrics": {
+            "jaccard_similarity_criteria": 0.0
+        }
+    },
+    {
+        "test_case_id": 24,
+        "category": "Complex",
+        "temperature": 0.5,
+        "latency": 7.467066287994385,
+        "is_valid_format": true,
+        "error": null,
+        "ground_truth": {
+            "feature_goal": "Migrasi media storage ke cloud dan implementasi optimasi format gambar.",
+            "acceptance_criteria": [
+                "AWS S3 migration",
+                "Auto compress & WebP conversion",
+                "Update mobile library to Coil",
+                "Client-side caching"
+            ],
+            "functional_scope": [
+                "Backend Media Service",
+                "Admin CMS",
+                "Mobile Client"
+            ],
+            "technical_details": "AWS S3, WebP, Coil (Android)",
+            "questions_ambiguities": [
+                "Strategi fallback untuk versi iOS lama yang tidak support WebP.",
+                "Konfigurasi Signed URL di CloudFront belum didefinisikan."
+            ]
+        },
+        "prediction": {
+            "feature_goal": "Memigrasikan aset gambar (gambar produk dan profil) dari storage on-premise ke AWS S3 untuk mengatasi keterbatasan kapasitas, sekaligus mengoptimasi gambar baru dengan kompresi dan konversi ke WebP, tanpa mengganggu layanan yang sedang berjalan.",
+            "acceptance_criteria": [
+                "Aset media (gambar produk, profil) dimigrasikan ke S3 bucket.",
+                "Proses migrasi tidak mengganggu layanan (dijalankan via background worker).",
+                "Setiap admin upload gambar baru otomatis dikompres dan dikonversi ke WebP.",
+                "S3 bucket tidak bersifat public; akses gambar menggunakan CloudFront + Signed URL.",
+                "Aplikasi mobile Android mengganti image loader ke Coil untuk dukungan WebP yang efisien.",
+                "Dipastikan ada mekanisme fallback untuk iOS versi lama yang bermasalah dengan WebP."
+            ],
+            "functional_scope": [
+                "Penyimpanan dan pengelolaan aset gambar (produk dan profil).",
+                "Proses migrasi aset dari on-premise storage ke S3.",
+                "Background job/worker untuk migrasi agar tidak mengganggu layanan.",
+                "Alur upload gambar oleh admin (pipeline: kompresi + konversi WebP).",
+                "Delivery/akses gambar melalui CloudFront Signed URL (bucket non-public).",
+                "Aplikasi Android: perubahan image loader ke Coil.",
+                "Aplikasi iOS: penanganan kompatibilitas WebP (fallback untuk versi lama)."
+            ],
+            "technical_details": "AWS S3, CloudFront, Signed URL, WebP, Coil (Android)",
+            "questions_ambiguities": [
+                "Apakah semua gambar existing harus dikonversi ke WebP saat migrasi, atau hanya gambar baru yang diupload admin?",
+                "Definisi 'fallback' untuk iOS versi lama: apakah menggunakan format alternatif (mis. JPEG/PNG) atau strategi lain, dan versi iOS minimum yang harus didukung?",
+                "Apakah URL gambar yang dikonsumsi client harus berubah (mis. domain CloudFront) dan bagaimana dampaknya ke data/field yang sudah tersimpan?",
+                "Kriteria kualitas kompresi/ukuran target untuk optimasi gambar (mis. batas maksimal file size, dimensi, atau quality level) belum disebutkan.",
+                "Apakah ada kebutuhan untuk menghapus aset dari on-premise setelah migrasi selesai, dan bagaimana strategi verifikasi keberhasilan migrasi?",
+                "Cakupan jenis media: hanya gambar atau termasuk media lain (tidak disebutkan selain gambar)."
+            ]
+        },
+        "metrics": {
+            "jaccard_similarity_criteria": 0.0
+        }
+    }
+]

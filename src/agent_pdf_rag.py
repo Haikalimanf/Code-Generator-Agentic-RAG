@@ -104,7 +104,7 @@ def run_compliance_expert_agent(user_query: str, thread_id: str = "rag_default")
     config = {"configurable": {"thread_id": thread_id}}
     final_output = ""
 
-    print(f"\n[Compliance Expert] Analyzing guidelines for: {user_query[:50]}...", file=sys.stderr)
+    print(f"[Compliance Expert] Analyzing: {user_query[:50]}...", file=sys.stderr)
 
     for chunk in agent_executor.stream(
         {"messages": [("human", user_query)]},
@@ -112,16 +112,16 @@ def run_compliance_expert_agent(user_query: str, thread_id: str = "rag_default")
         stream_mode="updates"
     ):
         for node_name, node_update in chunk.items():
-            print(f"📍 [Node: {node_name}] is processing...", file=sys.stderr)
+            print(f"[Node: {node_name}] processing...", file=sys.stderr)
             if "messages" in node_update:
                 last_msg = node_update["messages"][-1]
                 if hasattr(last_msg, 'content') and last_msg.content:
                     final_output = last_msg.content
 
-    print(f"✅ [Compliance Expert] Analysis complete.", file=sys.stderr)
+    print(f"DONE [Compliance Expert] Analysis complete.", file=sys.stderr)
 
     # Konversi ke Structured Output
-    print(f"📝 [Compliance Expert] Structuring analysis...", file=sys.stderr)
+    print(f"Structuring analysis...", file=sys.stderr)
     llm_structured = llm.with_structured_output(ComplianceAnalysis)
     structured_result = llm_structured.invoke(final_output)
 
@@ -136,11 +136,11 @@ if __name__ == "__main__":
         result = run_compliance_expert_agent(query)
         
         print("\n" + "="*60)
-        print("📋 COMPANY COMPLIANCE ANALYSIS")
+        print("REPORT: COMPANY COMPLIANCE ANALYSIS")
         print("="*60)
         print(result.model_dump_json(indent=4))
         print("="*60)
         
     except Exception as e:
-        print(f"\n❌ [Fatal Error] {str(e)}", file=sys.stderr)
+        print(f"\n[Fatal Error] {str(e)}", file=sys.stderr)
         traceback.print_exc()
