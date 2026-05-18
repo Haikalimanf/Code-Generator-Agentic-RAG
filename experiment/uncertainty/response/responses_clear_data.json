@@ -1,0 +1,362 @@
+[
+    {
+        "id_user_story": "US01",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Implementasi fitur autentikasi pengguna",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a secure user authentication system including registration, login/logout, password reset, email verification, and OAuth options, so that users can access their accounts safely and conveniently.",
+            "As a mobile developer, I want to implement a secure user authentication system with registration, login/logout, password reset, email verification, and OAuth login options, so that users can easily and securely access their accounts.",
+            "As a mobile developer, I want to implement a secure user authentication system with registration, login/logout, password reset, email verification, and OAuth options, so that users can easily access their accounts and maintain security.",
+            "As a mobile developer, I want to implement a secure user authentication system that includes registration, login/logout, password reset, email verification, and OAuth login options, so that users can access the app safely and conveniently.",
+            "As a mobile developer, I want to implement a secure user authentication system with features like registration, login/logout, and OAuth options, so that users can easily and safely access their accounts."
+        ]
+    },
+    {
+        "id_user_story": "US02",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Integrasi Payment Gateway Midtrans",
+        "sampled_responses": [
+            "As a mobile developer, I want to integrate the Midtrans payment gateway for various payment methods and ensure proper processing of the callback webhook with idempotency, so that users can complete their transactions smoothly and avoid issues with duplicate order updates.",
+            "As a mobile developer, I want to integrate the Midtrans payment gateway for various payment methods and ensure proper processing of the callback webhook with idempotency, so that users can complete their transactions smoothly and avoid issues with duplicate order updates.",
+            "As a mobile developer, I want to integrate the Midtrans payment gateway for various payment methods and ensure proper processing of the callback webhook with idempotency, so that users can complete their transactions smoothly and avoid issues with duplicate order updates.",
+            "As a mobile developer, I want to integrate the Midtrans payment gateway for various payment methods and ensure proper processing of the callback webhook with idempotency, so that users can complete their transactions smoothly and avoid issues with duplicate order updates.",
+            "As a mobile developer, I want to integrate the Midtrans payment gateway for various payment methods and ensure proper processing of the callback webhook with idempotency, so that users can complete their transactions smoothly and avoid issues with duplicate order updates."
+        ]
+    },
+    {
+        "id_user_story": "US03",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Fitur Notifikasi Push dengan Firebase (FCM)",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement Firebase Cloud Messaging (FCM) for push notifications, so that users can receive real-time updates on promotions, order statuses, and abandoned cart reminders directly on their devices.",
+            "As a mobile developer, I want to implement Firebase Cloud Messaging (FCM) for push notifications, so that users can receive real-time updates on promotions, order statuses, and abandoned cart reminders directly on their devices.",
+            "As a mobile developer, I want to implement Firebase Cloud Messaging (FCM) for push notifications, so that users can receive real-time updates on promotions, order statuses, and abandoned cart reminders directly on their devices.",
+            "As a mobile developer, I want to implement Firebase Cloud Messaging (FCM) for push notifications, so that users can receive real-time updates on promotions, order statuses, and abandoned cart reminders directly on their devices.",
+            "As a mobile developer, I want to implement Firebase Cloud Messaging (FCM) for push notifications, so that users can receive real-time updates on promotions, order statuses, and abandoned cart reminders directly on their devices."
+        ]
+    },
+    {
+        "id_user_story": "US04",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Export Laporan Penjualan ke format PDF dan Excel",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a download button for monthly sales reports in both PDF and Excel formats, so that users can easily print and distribute sales reports without manual conversion.",
+            "As a mobile developer, I want to implement a download button for monthly sales reports that generates PDF and Excel files, so that users can easily print and distribute sales reports without manual conversion.",
+            "As a mobile developer, I want to implement a download button for monthly sales reports that generates PDF and Excel files, so that users can easily print and distribute their sales reports without manual conversion.",
+            "As a mobile developer, I want to implement a download button for monthly sales reports that generates PDF and Excel files, so that users can easily print and distribute their sales reports without manual conversion.",
+            "As a mobile developer, I want to implement a download button for monthly sales reports that generates PDF and Excel files, so that users can easily print and distribute their reports without manual conversion."
+        ]
+    },
+    {
+        "id_user_story": "US05",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Implementasi Multi-Language (i18n)",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a multi-language feature that allows users to switch between Bahasa Indonesia and English, so that they can interact with the app in their preferred language and have the date and currency formats adjusted accordingly.",
+            "As a mobile developer, I want to implement a multi-language feature that allows users to switch between Bahasa Indonesia and English, so that they can interact with the app in their preferred language and have the date and currency formats adjusted accordingly.",
+            "As a mobile developer, I want to implement a multi-language feature that allows users to switch between Bahasa Indonesia and English, so that they can interact with the app in their preferred language and have the date and currency formats adjusted accordingly.",
+            "As a mobile developer, I want to implement a multi-language feature that allows users to switch between Bahasa Indonesia and English, so that they can interact with the app in their preferred language and have the date and currency formats adjusted accordingly.",
+            "As a mobile developer, I want to implement a multi-language feature that allows users to switch between Bahasa Indonesia and English, so that they can interact with the app in their preferred language and have the date and currency formats adjusted accordingly."
+        ]
+    },
+    {
+        "id_user_story": "US06",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Role-Based Access Control (RBAC) pada panel admin",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement role-based access control for the admin panel, so that different user roles can have appropriate permissions and access to features within the application.",
+            "As a mobile developer, I want to implement role-based access control in the admin panel, so that users can have permissions based on their roles for enhanced security and functionality.",
+            "As a mobile developer, I want to implement role-based access control for the admin panel, so that different user roles can have the appropriate access and functionalities within the application.",
+            "As a mobile developer, I want to implement role-based access control for the admin panel, so that different user roles can have appropriate permissions while ensuring secure access to the application.",
+            "As a mobile developer, I want to implement role-based access control for the admin panel, so that different user roles can access specific features securely and efficiently."
+        ]
+    },
+    {
+        "id_user_story": "US07",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Fitur Keranjang Belanja (Shopping Cart)",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a shopping cart feature that allows users to add, update, and remove products while displaying real-time subtotal prices with tax, so that users have a seamless and efficient shopping experience.",
+            "As a mobile developer, I want to implement a shopping cart feature that allows users to add, update, and remove products while displaying real-time subtotal prices with tax, so that users have a seamless and efficient shopping experience.",
+            "As a mobile developer, I want to implement a shopping cart feature that allows users to add, update, and remove products while displaying real-time subtotal prices with tax, so that users have a seamless and efficient shopping experience.",
+            "As a mobile developer, I want to implement a shopping cart feature that allows users to add, update, and remove products while displaying real-time subtotal prices with tax, so that users have a seamless and efficient shopping experience.",
+            "As a mobile developer, I want to implement a shopping cart feature that allows users to add, update, and remove products while displaying real-time subtotal prices with tax, so that users have a seamless and efficient shopping experience."
+        ]
+    },
+    {
+        "id_user_story": "US08",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Fitur Pencarian Lanjutan (Advanced Filter & Sorting)",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement advanced search filters and sorting options for the product page, so that users can easily find products that meet their specific criteria.",
+            "As a mobile developer, I want to implement advanced search filters and sorting options for the product page, so that users can easily find products that meet their specific criteria.",
+            "As a mobile developer, I want to implement advanced search filters and sorting options for the product page, so that users can easily find products that meet their specific criteria.",
+            "As a mobile developer, I want to implement advanced search filters and sorting options for the product page, so that users can easily find products that meet their specific criteria.",
+            "As a mobile developer, I want to implement advanced search filters and sorting options for the product page, so that users can easily find products that meet their specific criteria."
+        ]
+    },
+    {
+        "id_user_story": "US09",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Sistem Ulasan dan Rating Produk",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement backend validation for user reviews and ratings to ensure only users with 'Delivered' order status can submit reviews, so that we can maintain the integrity of product feedback.",
+            "As a mobile developer, I want to implement backend validation to ensure that only users with an order status of 'Delivered' can submit product ratings and reviews, so that we maintain the integrity of user feedback on our platform.",
+            "As a mobile developer, I want to implement backend validation to ensure only users with 'Delivered' order status can submit product ratings and reviews, so that we maintain the integrity of user feedback and avoid reviews from incomplete orders.",
+            "As a mobile developer, I want to implement a validation to allow only users with 'Delivered' order status to submit ratings and text reviews, so that we can ensure reviews are only provided for completed transactions.",
+            "As a mobile developer, I want to implement backend validation that restricts users from submitting ratings and reviews for products unless their order status is 'Delivered', so that we ensure only completed orders can provide feedback."
+        ]
+    },
+    {
+        "id_user_story": "US10",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Integrasi Google Maps API untuk Estimasi Pengiriman",
+        "sampled_responses": [
+            "As a mobile developer, I want to integrate Google Maps API with Places Autocomplete during the checkout process, so that users can easily fill in their shipping address and obtain dynamic shipping costs based on the calculated distance.",
+            "As a mobile developer, I want to integrate Google Maps API with Places Autocomplete for the delivery address input, so that users can easily find their addresses and calculate dynamic shipping costs based on their location.",
+            "As a mobile developer, I want to integrate Google Maps API with Places Autocomplete for the delivery address input, so that users can easily select their address and automatically calculate dynamic shipping costs based on the nearest warehouse.",
+            "As a mobile developer, I want to integrate Google Maps API with Places Autocomplete for the delivery address input, so that users can easily find and select their delivery address while calculating dynamic shipping costs.",
+            "As a mobile developer, I want to integrate Google Maps API with Places Autocomplete for the delivery address input, so that users can easily find their address and we can calculate dynamic shipping costs based on their location."
+        ]
+    },
+    {
+        "id_user_story": "US11",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Manajemen Inventaris Stok Barang dengan Auto-Deduct",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement an automated Cron Job for canceling pending orders older than 24 hours and restoring stock levels, so that users can see accurate stock availability without manual intervention.",
+            "As a mobile developer, I want to implement an automated Cron Job that cancels pending orders after 24 hours and restores inventory, so that users can see accurate stock availability without manual intervention.",
+            "As a mobile developer, I want to implement an automatic Cron Job to cancel pending orders after 24 hours and restore stock levels, so that users can see accurate stock availability without manual intervention.",
+            "As a mobile developer, I want to implement an automatic Cron Job to cancel pending orders after 24 hours and restore stock, so that users can view accurate stock availability without manual intervention.",
+            "As a mobile developer, I want to implement an automatic Cron Job to cancel pending orders after 24 hours and restore the stock, so that users can see accurate stock availability without manual intervention."
+        ]
+    },
+    {
+        "id_user_story": "US12",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Toggle Dark Mode (Tema Gelap)",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a toggle feature for Dark Mode that saves user preferences in Local Storage, so that users can easily switch between Light Mode and Dark Mode with their settings persisting across app sessions.",
+            "As a mobile developer, I want to implement a toggle feature for Dark Mode that saves user preferences in Local Storage, so that users can easily switch between Light Mode and Dark Mode with their settings persisting across app sessions.",
+            "As a mobile developer, I want to implement a toggle feature for Dark Mode that saves user preferences in Local Storage, so that users can easily switch between Light Mode and Dark Mode with their settings persisting across app sessions.",
+            "As a mobile developer, I want to implement a toggle feature for Dark Mode that saves user preferences in Local Storage, so that users can easily switch between Light Mode and Dark Mode with their settings persisting across app sessions.",
+            "As a mobile developer, I want to implement a toggle feature for Dark Mode that saves user preferences in Local Storage, so that users can easily switch between Light Mode and Dark Mode with their settings persisting across app sessions."
+        ]
+    },
+    {
+        "id_user_story": "US13",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Chat Real-time Customer Service",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a typing indicator in the chat widget, so that users can see when customer service agents are typing and feel more engaged in the conversation.",
+            "As a mobile developer, I want to implement a typing indicator in the chat widget, so that users can see when customer service agents are typing and feel more engaged in the conversation.",
+            "As a mobile developer, I want to implement a typing indicator in the chat widget for real-time customer service, so that users feel more engaged during the conversation by knowing when the agent is typing a response.",
+            "As a mobile developer, I want to implement a typing indicator in the chat widget, so that users can see when customer service agents are typing and feel more engaged in the conversation.",
+            "As a mobile developer, I want to implement a 'typing...' indicator in the chat widget, so that users can see when the customer service agent is typing and feel more engaged in the conversation."
+        ]
+    },
+    {
+        "id_user_story": "US14",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Offline-First Data Sync Menggunakan Room Database",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement offline-first data synchronization using WorkManager to update the Room Database automatically when the internet connection is restored, so that users always have the latest product data available even when using the app offline.",
+            "As a mobile developer, I want to implement offline-first data synchronization using Room Database with WorkManager, so that users receive the latest product data automatically when their internet connection is restored, even after using the app offline.",
+            "As a mobile developer, I want to implement offline-first data synchronization using WorkManager and Room Database, so that users can access the latest product data automatically when their internet connection is restored.",
+            "As a mobile developer, I want to implement offline-first data synchronization using WorkManager to automatically sync product data from the server to the Room Database when the internet is back online, so that users always have the latest product data available even after using the app offline.",
+            "As a mobile developer, I want to implement offline-first data synchronization using Room Database with WorkManager, so that users always have access to the latest product data even when they were previously offline."
+        ]
+    },
+    {
+        "id_user_story": "US15",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Integrasi Barcode dan QR Code Scanner",
+        "sampled_responses": [
+            "As a mobile developer, I want to integrate a barcode and QR code scanner using ML Kit Vision, so that warehouse staff can quickly scan product labels and improve the speed of stock entry and exit in the mobile application.",
+            "As a mobile developer, I want to integrate a barcode and QR code scanner using ML Kit Vision, so that warehouse staff can quickly scan product labels for more efficient stock entry and exit.",
+            "As a mobile developer, I want to integrate a barcode and QR code scanner using ML Kit Vision, so that warehouse personnel can quickly scan product labels for faster stock entry and exit.",
+            "As a mobile developer, I want to integrate a barcode and QR code scanner using ML Kit Vision, so that warehouse staff can quickly scan product labels for stock entry and exit via the mobile application.",
+            "As a mobile developer, I want to integrate a barcode and QR code scanner using ML Kit Vision, so that warehouse staff can efficiently scan product labels and streamline stock entry and exit processes."
+        ]
+    },
+    {
+        "id_user_story": "US16",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Implementasi Pagination berbasis Cursor (Infinite Scroll)",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement cursor-based pagination for the product feed using infinite scroll, so that users can continuously load more products without having to navigate between pages.",
+            "As a mobile developer, I want to implement cursor-based infinite scroll on the product feed, so that users can seamlessly load more products without navigating through pagination links.",
+            "As a mobile developer, I want to implement cursor-based pagination with infinite scroll for the product feed, so that users can seamlessly load more data without interruption while scrolling.",
+            "As a mobile developer, I want to implement cursor-based pagination with infinite scroll on the product feed, so that users can seamlessly load more items without navigating through pages.",
+            "As a mobile developer, I want to implement cursor-based pagination with an infinite scroll feature on the product feed, so that users can seamlessly view more products without the need to navigate through multiple pages."
+        ]
+    },
+    {
+        "id_user_story": "US17",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Sistem Rekomendasi Produk Berbasis History Pembelian",
+        "sampled_responses": [
+            "As a mobile developer, I want to integrate the Data Science team's recommendations API into the product detail page, so that users can discover relevant products based on their purchase and viewing history.",
+            "As a mobile developer, I want to integrate the /recommendations API into the product detail page, so that users can find relevant products based on their purchase and viewing history.",
+            "As a mobile developer, I want to integrate the recommendations API into the product detail page, so that users can discover relevant products based on their purchase history and previous views.",
+            "As a mobile developer, I want to integrate the recommendations API into the product detail page, so that users can see relevant products based on their purchase and viewing history.",
+            "As a mobile developer, I want to integrate the recommendations API into the product detail page, so that users can see relevant products based on their previous purchase and viewing history."
+        ]
+    },
+    {
+        "id_user_story": "US18",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Sistem Kupon Promosi dan Voucher Diskon",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement specific error validation messages for promo codes on the checkout page, so that users can clearly understand why their entered promo code is invalid.",
+            "As a mobile developer, I want to implement specific validation messages for promo code failures during checkout, so that users can easily understand the reasons why their promo codes are not applicable.",
+            "As a mobile developer, I want to implement specific error message validation for promo codes on the checkout page, so that users can understand the exact reason their promo codes are not valid.",
+            "As a mobile developer, I want to implement specific error validation messages for promo codes on the checkout page, so that users can easily understand why their entered promo codes are invalid.",
+            "As a mobile developer, I want to implement validation for promo codes on the checkout page with specific error messages, so that users can understand the exact reason why their promo code is not valid."
+        ]
+    },
+    {
+        "id_user_story": "US19",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Upload Multi-Gambar untuk Foto Profil dan Galeri UMKM",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement multi-image upload with image cropping and automatic compression to WebP format, so that UMKM can efficiently manage their profile and gallery images for better performance.",
+            "As a mobile developer, I want to implement multi-image upload with image cropping and automatic compression to WebP format, so that UMKM can efficiently manage their profile and gallery images for better performance.",
+            "As a mobile developer, I want to implement multi-image upload with image cropping and automatic compression to WebP format, so that UMKM can efficiently manage their profile and gallery images for better performance.",
+            "As a mobile developer, I want to implement multi-image upload with image cropping and automatic compression to WebP format, so that UMKM can efficiently manage their profile and gallery images for better performance.",
+            "As a mobile developer, I want to implement multi-image upload with image cropping and automatic compression to WebP format, so that UMKM can efficiently manage their profile and gallery images for better performance."
+        ]
+    },
+    {
+        "id_user_story": "US20",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Wishlist / Daftar Keinginan",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement optimistic UI updates for the wishlist heart icon, so that users receive immediate visual feedback when interacting with the wishlist feature.",
+            "As a mobile developer, I want to implement an optimistic UI update for the wishlist icon button, so that users receive immediate visual feedback when they add or remove items from their wishlist.",
+            "As a mobile developer, I want to implement optimistic UI updates on the wishlist button, so that users receive immediate visual feedback when adding items to their wishlist without experiencing delays.",
+            "As a mobile developer, I want to implement an optimistic UI update for the wishlist heart icon, so that users receive immediate visual feedback when they add items to their wishlist.",
+            "As a mobile developer, I want to implement an optimistic UI update for the wishlist heart icon, so that users can experience immediate visual feedback when they interact with the wishlist without waiting for the API response."
+        ]
+    },
+    {
+        "id_user_story": "US21",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Login Integrasi Apple ID (Sign in with Apple)",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement the 'Sign in with Apple' option on the login page, so that our iOS application meets App Store review requirements and enhances user authentication options.",
+            "As a mobile developer, I want to implement the 'Sign in with Apple' feature on the login page, so that our iOS app can pass the App Store review by complying with their requirement for Apple ID authentication.",
+            "As a mobile developer, I want to implement the 'Sign in with Apple' feature on the login page, so that our iOS app can meet App Store review requirements and provide users with a secure login option.",
+            "As a mobile developer, I want to implement the 'Sign in with Apple' option on the login page, so that our iOS application can comply with App Store review requirements and provide users with an additional login method.",
+            "As a mobile developer, I want to implement the 'Sign in with Apple' feature on the login page, so that we can comply with App Store requirements and enhance user authentication options."
+        ]
+    },
+    {
+        "id_user_story": "US22",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Dasbor Analitik Statistik Penjualan Menggunakan Chart.js",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a Line Chart for the last 30 days of sales revenue on the dashboard using Chart.js, so that users can visualize sales data and filter it by the selected month or year.",
+            "As a mobile developer, I want to implement a Line Chart for the last 30 days of sales data on the dashboard using Chart.js, so that users can visualize sales trends and filter the data by selected month or year.",
+            "As a mobile developer, I want to implement a Line Chart using Chart.js to visualize sales trends for the last 30 days on the dashboard, so that users can filter and analyze their sales data effectively by month or year.",
+            "As a mobile developer, I want to implement a Line Chart for the last 30 days of sales data using Chart.js on the dashboard, so that users can visualize and filter their sales data by selected month or year.",
+            "As a mobile developer, I want to implement a Line Chart of the last 30 days sales trend using Chart.js on the dashboard, so that users can visualize sales data and filter it by selected month or year."
+        ]
+    },
+    {
+        "id_user_story": "US23",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Two-Factor Authentication (2FA) Via SMS/OTP",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement Two-Factor Authentication (2FA) via SMS/OTP using Twilio, so that user accounts are more secure when logging in from new devices.",
+            "As a mobile developer, I want to implement Two-Factor Authentication (2FA) via SMS/OTP using Twilio, so that user accounts are more secure when logging in from new devices.",
+            "As a mobile developer, I want to implement Two-Factor Authentication (2FA) via SMS/OTP using Twilio, so that user accounts are more secure when logging in from new devices.",
+            "As a mobile developer, I want to implement Two-Factor Authentication (2FA) via SMS/OTP using Twilio, so that user accounts are more secure when logging in from new devices.",
+            "As a mobile developer, I want to implement Two-Factor Authentication (2FA) via SMS/OTP using Twilio, so that user accounts are more secure when logging in from new devices."
+        ]
+    },
+    {
+        "id_user_story": "US24",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Implementasi Endpoint GraphQL untuk Data Produk",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a new GraphQL endpoint to access product catalog data, so that I can reduce under/over-fetching and optimize data retrieval for the mobile application.",
+            "As a mobile developer, I want to implement a new GraphQL endpoint for product data, so that I can efficiently fetch only the necessary attributes and improve data handling in the mobile application.",
+            "As a mobile developer, I want to implement a new GraphQL endpoint for accessing product catalog data, so that I can reduce under/over-fetching and efficiently request only the necessary attributes.",
+            "As a mobile developer, I want to implement a new GraphQL endpoint for accessing product data, so that I can reduce under/over-fetching and request only the necessary attributes for our mobile application.",
+            "As a mobile developer, I want to implement a new GraphQL endpoint to access product catalog data, so that I can reduce under/over-fetching and only retrieve the necessary attributes."
+        ]
+    },
+    {
+        "id_user_story": "US25",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Log Aktivitas / Audit Trail Pengguna Internal",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement an asynchronous logging system for CRUD actions performed by Admin and Staff via a message queue, so that the Admin can audit all system activities without compromising the main API's response time.",
+            "As a mobile developer, I want to implement an asynchronous logging feature for all CRUD actions performed by Admin and Staff via a message queue, so that the Admin can audit system activities without compromising the API's response time.",
+            "As a mobile developer, I want to implement an asynchronous logging system for CRUD actions performed by Admin and Staff, so that the admin can audit system activities without affecting the API's response time.",
+            "As a mobile developer, I want to implement an asynchronous logging system for CRUD activities of Admin and Staff, so that Admin users can audit all system activities without affecting the main API response time.",
+            "As a mobile developer, I want to implement an asynchronous logging mechanism for CRUD actions performed by Admin and Staff, so that the admin can audit all system activities without compromising the main API's response time."
+        ]
+    },
+    {
+        "id_user_story": "US26",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Sistem Ticketing Customer Support",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a customer support ticketing system that allows users to create and track their complaint tickets, so that users can receive timely updates and resolutions to their issues.",
+            "As a mobile developer, I want to implement a customer support ticketing system that allows users to create and track their complaint tickets, so that users can receive timely updates and resolutions to their issues.",
+            "As a mobile developer, I want to implement a customer support ticketing system that allows users to create and track their complaint tickets, so that users can receive timely updates and resolutions to their issues.",
+            "As a mobile developer, I want to implement a customer support ticketing system that allows users to create and track their complaint tickets, so that users can receive timely updates and resolutions to their issues.",
+            "As a mobile developer, I want to implement a customer support ticketing system that allows users to create and track their complaint tickets, so that users can receive timely updates and resolutions to their issues."
+        ]
+    },
+    {
+        "id_user_story": "US27",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Pengiriman Resi Otomatis via API WhatsApp",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement automatic shipment notification via WhatsApp API when an order status is changed to 'Shipped', so that customers receive real-time updates with tracking information about their orders.",
+            "As a mobile developer, I want to implement automatic tracking number notifications via the WhatsApp API when an order is marked as 'Shipped', so that buyers receive timely updates on their shipments.",
+            "As a mobile developer, I want to implement automatic tracking number notifications via WhatsApp API when an order status changes to 'Shipped', so that customers receive timely updates about their shipments.",
+            "As a mobile developer, I want to implement automatic tracking number notifications via the WhatsApp API upon order shipment, so that buyers receive real-time updates about their orders.",
+            "As a mobile developer, I want to implement automatic tracking information delivery via WhatsApp API when an order status changes to 'Shipped', so that buyers receive timely updates about their shipments."
+        ]
+    },
+    {
+        "id_user_story": "US28",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Program Sistem Poin Reward Pelanggan",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a scheduled batch job that resets user points every December 31st, so that users can see the expiration history of their points in their profiles.",
+            "As a mobile developer, I want to implement a scheduled batch job that resets user points to zero on December 31st and logs the reset in the mutation table, so that users can see their expired points history in their profiles.",
+            "As a mobile developer, I want to implement a scheduled batch job to reset user points automatically on December 31st at 11:59 PM, so that users can see their expired points history in their profile.",
+            "As a mobile developer, I want to implement a scheduled batch job that resets user points every December 31st and records the expiration in the points mutation table, so that users can track their expired points in their profiles.",
+            "As a mobile developer, I want to implement a scheduled batch job that resets user points annually on December 31st, so that users can view their expired points history in their profile."
+        ]
+    },
+    {
+        "id_user_story": "US29",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Fitur Pembanding Produk (Product Comparison)",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a product comparison feature that allows users to select up to three electronic products and view their specifications side-by-side, so that users can easily compare key attributes like RAM, CPU, Battery, and Price.",
+            "As a mobile developer, I want to implement a product comparison feature that allows users to select up to 3 electronic products and view their specifications side by side, so that users can easily compare key attributes like RAM, CPU, Battery, and Price.",
+            "As a mobile developer, I want to implement a product comparison feature that allows users to select and compare up to three electronic products side-by-side, so that users can easily evaluate their specifications such as RAM, CPU, Battery, and Price.",
+            "As a mobile developer, I want to implement a product comparison feature that allows users to select up to 3 electronic products and view their specifications side by side, so that users can easily compare key attributes like RAM, CPU, Battery, and Price.",
+            "As a mobile developer, I want to implement a product comparison feature that allows users to select and view up to 3 electronic products side by side, so that they can easily compare specifications like RAM, CPU, Battery, and Price in a dynamic table."
+        ]
+    },
+    {
+        "id_user_story": "US30",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Sistem Flash Sale dengan Countdown Timer Real-time",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a real-time Countdown Timer for the Flash Sale feature, so that users can see the remaining time to purchase discounted items and avoid 'overselling' issues during high traffic periods.",
+            "As a mobile developer, I want to implement a real-time Countdown Timer for the Flash Sale feature, so that users can see the remaining time to purchase discounted items and avoid 'overselling' issues during high traffic periods.",
+            "As a mobile developer, I want to implement a real-time Countdown Timer for the Flash Sale feature, so that users can see the remaining time to purchase discounted items and avoid 'overselling' issues during high traffic periods.",
+            "As a mobile developer, I want to implement a real-time Countdown Timer for the Flash Sale feature, so that users can see the remaining time to purchase discounted items and avoid 'overselling' issues during high traffic periods.",
+            "As a mobile developer, I want to implement a real-time Countdown Timer for the Flash Sale feature, so that users can see the remaining time to purchase discounted items and avoid 'overselling' issues during high traffic periods."
+        ]
+    }
+]

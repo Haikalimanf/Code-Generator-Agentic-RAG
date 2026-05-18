@@ -1,0 +1,362 @@
+[
+    {
+        "id_user_story": "US01",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Tambahkan filter pencarian",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a search filter feature, so that users can easily find specific items within the application.",
+            "As a mobile developer, I want to implement a search filter feature, so that users can easily find the content they are looking for.",
+            "As a mobile developer, I want to implement a search filter feature, so that users can easily find relevant content within the application.",
+            "As a mobile developer, I want to implement a search filter feature, so that users can easily find specific content within the application.",
+            "As a mobile developer, I want to implement a search filter feature, so that users can easily find specific content within the application."
+        ]
+    },
+    {
+        "id_user_story": "US02",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Opsi E-Wallet",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement an E-Wallet option in the application, so that users can easily make transactions using their preferred digital payment method.",
+            "As a mobile developer, I want to implement an e-wallet option, so that users can easily make transactions through their preferred digital payment methods.",
+            "As a mobile developer, I want to implement an e-wallet option for users, so that they can make seamless transactions within the app.",
+            "As a mobile developer, I want to implement an e-wallet option in the application, so that users have a seamless payment method to enhance their purchasing experience.",
+            "As a mobile developer, I want to implement an e-wallet option in the application, so that users can conveniently make transactions using their preferred digital payment methods."
+        ]
+    },
+    {
+        "id_user_story": "US03",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Penghapusan Permanen Entitas",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a permanent deletion feature for entities, so that users can manage their data effectively while considering the implications of losing associated data.",
+            "As a mobile developer, I want to implement a permanent deletion feature for entities, so that users can manage their data effectively without retaining unwanted information.",
+            "As a mobile developer, I want to implement a permanent deletion feature for entities, so that users can independently manage their data while ensuring critical information is properly handled.",
+            "As a mobile developer, I want to implement a permanent deletion feature for entities, so that users can manage their data effectively while considering the implications of data loss.",
+            "As a mobile developer, I want to implement a permanent deletion feature for entities, so that users can independently manage their data while being aware of the potential loss of all related information."
+        ]
+    },
+    {
+        "id_user_story": "US04",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Export Laporan",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement an export feature for reports, so that users can easily download and share their data in a convenient format.",
+            "As a mobile developer, I want to implement an export feature for reports, so that users can easily download and share their data in a convenient format.",
+            "As a mobile developer, I want to implement the export feature for reports, so that users can easily download and share their reports in various formats.",
+            "As a mobile developer, I want to implement a feature to export reports, so that users can easily share and analyze data outside the application.",
+            "As a mobile developer, I want to implement a feature to export reports, so that users can easily download and share their data in a convenient format."
+        ]
+    },
+    {
+        "id_user_story": "US05",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Sistem Poin",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a point system, so that users can earn and track points as they engage with the app.",
+            "As a mobile developer, I want to implement a points system in the application, so that users can earn and track their points for engaging with the app.",
+            "As a mobile developer, I want to implement a point system that tracks user achievements, so that users can be rewarded for their activities and enhance engagement.",
+            "As a mobile developer, I want to implement a point system feature, so that users can earn and track points within the app for their activities.",
+            "As a mobile developer, I want to implement a point system feature, so that users can earn and track their points within the application."
+        ]
+    },
+    {
+        "id_user_story": "US06",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Validasi Password",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement password validation feature, so that users can create secure accounts and prevent unauthorized access.",
+            "As a mobile developer, I want to implement password validation, so that users can create secure accounts and protect their personal information.",
+            "As a mobile developer, I want to implement password validation on the mobile app, so that users can create secure accounts and protect their personal information.",
+            "As a mobile developer, I want to implement password validation to enhance security during user authentication, so that users can safely access their accounts without compromising their personal information.",
+            "As a mobile developer, I want to implement password validation functionality, so that users can ensure their passwords meet security requirements before account creation."
+        ]
+    },
+    {
+        "id_user_story": "US07",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Penyesuaian Bahasa",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement language adjustments in the app, so that users can understand the content more directly.",
+            "As a mobile developer, I want to implement language adjustments in the app, so that users can understand the content directly in their preferred language.",
+            "As a mobile developer, I want to implement language adjustments in the app, so that users can understand the content directly.",
+            "As a mobile developer, I want to implement language adjustments in the app, so that users can understand the content directly in their preferred language.",
+            "As a mobile developer, I want to implement language adjustments in the app, so that users can understand the content directly in their preferred language."
+        ]
+    },
+    {
+        "id_user_story": "US08",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Promo Harbolnas",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement the Harbolnas promotional feature, so that users can access special discounts and promotions during the Harbolnas event.",
+            "As a mobile developer, I want to implement a promotional feature for Harbolnas, so that users can easily access and utilize special offers during the event.",
+            "As a mobile developer, I want to implement a promotional feature for Harbolnas, so that users can take advantage of special discounts and offers during the event.",
+            "As a mobile developer, I want to implement the Harbolnas promo feature, so that users can access exclusive deals during the promotional event.",
+            "As a mobile developer, I want to implement the Harbolnas promo feature, so that users can take advantage of special discounts and offers during the Harbolnas event."
+        ]
+    },
+    {
+        "id_user_story": "US09",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Batasan Pengunggahan",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement upload limits for users, so that we can maintain system performance and prevent misuse.",
+            "As a mobile developer, I want to implement upload limits for users, so that we can maintain server stability and improve performance.",
+            "As a mobile developer, I want to implement an upload limit feature, so that users can maintain better control and avoid overload during file uploads.",
+            "As a mobile developer, I want to implement upload limits for users, so that we can ensure fair usage and maintain server performance.",
+            "As a mobile developer, I want to implement upload limits for users, so that we can maintain performance and prevent misuse of the system."
+        ]
+    },
+    {
+        "id_user_story": "US10",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Blokir Pengguna",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a user blocking feature, so that users can manage and restrict interactions with unwanted accounts.",
+            "As a mobile developer, I want to implement a user blocking feature, so that users can prevent unwanted interactions with specific accounts.",
+            "As a mobile developer, I want to implement a user blocking feature, so that users can prevent unwanted interactions and enhance their experience in the app.",
+            "As a mobile developer, I want to implement a user blocking feature, so that users can prevent unwanted interactions with specific individuals within the app.",
+            "As a mobile developer, I want to implement a user blocking feature, so that users can prevent unwanted interactions from specific accounts."
+        ]
+    },
+    {
+        "id_user_story": "US11",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Notifikasi Email Pengingat Keranjang",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement email notification reminders for abandoned carts, so that users are prompted to complete their purchases and reduce cart abandonment rates.",
+            "As a mobile developer, I want to implement email notifications for abandoned carts, so that users are reminded to complete their purchases and reduce cart abandonment rates.",
+            "As a mobile developer, I want to implement email notifications for abandoned carts, so that users are reminded to complete their purchases promptly.",
+            "As a mobile developer, I want to implement an email notification feature that reminds users about their abandoned carts, so that we can encourage them to complete their purchases.",
+            "As a mobile developer, I want to implement an email notification feature that reminds users about their abandoned carts, so that we can help increase conversion rates by encouraging users to complete their purchases."
+        ]
+    },
+    {
+        "id_user_story": "US12",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Keranjang Belanja Kedaluwarsa",
+        "sampled_responses": [
+            "As a mobile developer, I want the shopping cart to automatically expire and be cleared after a specified time period, so that users have an updated and manageable cart experience.",
+            "As a mobile developer, I want the shopping cart to automatically clear expired items, so that users can have an updated and relevant cart experience.",
+            "As a mobile developer, I want the shopping cart to automatically expire and be cleared after a specific time limit, so that users have an updated view of available items and reduce clutter in their cart.",
+            "As a mobile developer, I want the shopping cart to automatically expire and clear itself after a set time, so that users have a refreshed experience without lingering items.",
+            "As a mobile developer, I want to implement an automatic removal feature for expired items in the shopping cart, so that users have a clear and manageable cart without old items."
+        ]
+    },
+    {
+        "id_user_story": "US13",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Integrasi Jasa Ekspedisi Baru",
+        "sampled_responses": [
+            "As a mobile developer, I want to integrate a new shipping service, so that users can select their preferred shipping option during the checkout process.",
+            "As a mobile developer, I want to integrate a new shipping service, so that users can select their preferred shipping option during checkout.",
+            "As a mobile developer, I want to integrate a new shipping service into the app, so that users can select it as a delivery option during checkout.",
+            "As a mobile developer, I want to integrate a new shipping service, so that users can select it during the checkout process.",
+            "As a mobile developer, I want to integrate the new shipping service, so that users can select it during their checkout process."
+        ]
+    },
+    {
+        "id_user_story": "US14",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Otorisasi Super Admin",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement full access rights for the Super Admin, so that they can manage settings effectively within the application.",
+            "As a mobile developer, I want to implement full access rights for the Super Admin, so that they can configure settings efficiently.",
+            "As a Super Admin, I want to implement full access permissions for managing system settings, so that I can manage the system settings effectively.",
+            "As a mobile developer, I want to implement full access rights for Super Admin, so that they can effectively manage and configure the application settings.",
+            "As a Super Admin, I want to implement full access rights, so that I can manage all aspects of the application effectively."
+        ]
+    },
+    {
+        "id_user_story": "US15",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Tampilan Dark Mode",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement dark mode that changes colors automatically, so that users can significantly reduce eye strain during night-time browsing.",
+            "As a mobile developer, I want to implement an automatic dark mode feature that adjusts colors based on user preferences, so that users with OLED screens can conserve battery life more effectively.",
+            "As a mobile developer, I want to implement an automatic color change feature for dark mode, so that users experience a seamless visual transition as their surrounding environment gets darker.",
+            "As a mobile developer, I want to implement a dark mode feature that automatically adjusts the color scheme, so that users can focus better on the content without being distracted by a bright screen glare.",
+            "As a mobile developer, I want to implement an automatic dark mode feature that changes colors based on user preferences, so that users can minimize blue light exposure before going to sleep."
+        ]
+    },
+    {
+        "id_user_story": "US16",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Mekanisme Refund Otomatis",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement an automatic refund mechanism for canceled transactions, so that users can receive their money back without delay or manual intervention.",
+            "As a mobile developer, I want to implement an automatic refund mechanism for canceled transactions, so that users can receive their refunds promptly without manual intervention.",
+            "As a mobile developer, I want to implement an automatic refund mechanism for canceled transactions, so that users receive their refunds promptly and improve overall satisfaction.",
+            "As a mobile developer, I want to implement an automatic refund mechanism for canceled transactions, so that users can receive their money back without manual intervention.",
+            "As a mobile developer, I want to implement an automatic refund mechanism for cancelled transactions, so that users receive their refunds promptly and enhance their overall experience."
+        ]
+    },
+    {
+        "id_user_story": "US17",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Urutan Beranda",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a feature to sort items on the home screen, so that users can find their desired content in seconds without endless scrolling.",
+            "As a mobile developer, I want to implement a feature to sort items on the homepage, so that users can tailor the dashboard layout to match their daily workflow.",
+            "As a mobile developer, I want to implement a feature that sorts the home feed based on user preferences, so that users can easily switch between the newest updates and top-rated posts.",
+            "As a mobile developer, I want to implement a sorting feature for the homepage, so that users can prioritize high-priority tasks or unread items at the very top.",
+            "As a mobile developer, I want to implement a feature that sorts the home feed items, so that users can keep their feed organized and focus strictly on what matters to them."
+        ]
+    },
+    {
+        "id_user_story": "US18",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Pengelolaan Sesi Tidak Aktif",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement different handling for inactive sessions based on the triggering user, so that we can either require confirmation before ending the session or terminate it immediately as needed.",
+            "As a mobile developer, I want to implement session inactivity management that varies based on the trigger, so that users can have either a confirmation before the session ends or the session can terminate immediately based on specific conditions.",
+            "As a mobile developer, I want to implement an inactive session management feature that distinguishes between user-initiated and automatic session termination, so that we can enhance user experience while ensuring security.",
+            "As a mobile developer, I want to implement a session management feature that handles inactive sessions differently based on the triggering user, so that users have the appropriate experience whether they need confirmation or the session should end immediately.",
+            "As a mobile developer, I want to implement different handling for inactive sessions based on the triggering party, so that users receive appropriate confirmation or immediate termination of their session according to the context."
+        ]
+    },
+    {
+        "id_user_story": "US19",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Pembagian Daftar Riwayat",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a feature that divides the history list into several sections, so that users can view their history more organized and easily.",
+            "As a mobile developer, I want to implement the feature to paginate the history list, so that users can easily navigate and view their history without overwhelming them with too much information at once.",
+            "As a mobile developer, I want to implement a feature that divides the history list into sections, so that users can easily navigate and manage their history.",
+            "As a mobile developer, I want to implement a segmented view for the history list, so that users can easily navigate and find specific entries.",
+            "As a mobile developer, I want to implement functionality to divide the history list into several sections, so that users can easily navigate and manage their history."
+        ]
+    },
+    {
+        "id_user_story": "US20",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Fitur Rating Produk",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a product rating feature that allows users to give star ratings and write reviews after completing a purchase, so that users can provide feedback on products and help others make informed decisions.",
+            "As a mobile developer, I want to implement a product rating feature that allows users to give star ratings and write reviews after completing a purchase, so that users can share their feedback and help others make informed decisions.",
+            "As a mobile developer, I want to implement a product rating feature that allows users to give star ratings and write reviews after completing their purchase, so that we can enhance user engagement and gather feedback for product improvement.",
+            "As a mobile developer, I want to implement a product rating feature allowing users to give star ratings and write reviews after completing their purchase, so that we can enhance user engagement and gather valuable feedback on our products.",
+            "As a mobile developer, I want to implement a product rating feature that allows users to give star ratings and write reviews after their purchase, so that users can share their experiences and help others make informed decisions."
+        ]
+    },
+    {
+        "id_user_story": "US21",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Penanganan Input Tidak Tepat",
+        "sampled_responses": [
+            "As a mobile developer, I want the system to display the closest or most relevant suggestions when users input data incorrectly, so that users can still find what they are looking for despite errors in their input.",
+            "As a mobile developer, I want the system to suggest the closest or most relevant options when a user inputs incorrect data, so that the user can still find what they are looking for.",
+            "As a mobile developer, I want the system to provide suggestions for the most similar or relevant inputs when a user types incorrectly, so that users can continue their tasks without frustration.",
+            "As a mobile developer, I want to implement a feature that displays the closest or most relevant match when users enter incorrect input, so that users can still receive helpful suggestions and improve their experience.",
+            "As a mobile developer, I want the system to display the closest or most relevant suggestion when the user inputs incorrect data, so that the user can still find what they are looking for despite errors."
+        ]
+    },
+    {
+        "id_user_story": "US22",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Tampilan Tabel Laporan",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a responsive table layout that fits all content on small screens without scrolling, so that users can view the entire report easily.",
+            "As a mobile developer, I want to implement a responsive table display for reports on small screens, so that users can view all the information without needing to scroll.",
+            "As a mobile developer, I want to implement a table display for reports that fits on small screens without scrolling, so that users can view all information at once easily.",
+            "As a mobile developer, I want to implement a responsive table display for reports on small screens, so that users can view all information without horizontal scrolling.",
+            "As a mobile developer, I want to ensure the report table is fully visible on small screens without the need to scroll, so that users can comfortably view all data at once."
+        ]
+    },
+    {
+        "id_user_story": "US23",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Flash Sale Countdown Timer",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a flash sale countdown timer, so that users feel a sense of urgency and grab limited-time deals before stock runs out.",
+            "As a mobile developer, I want to implement a countdown timer for the flash sale feature, so that users can prepare their shopping carts and check out swiftly before the discount expires.",
+            "As a mobile developer, I want to implement a countdown timer for the flash sale feature, so that users know exactly how much time is left to make a quick yet informed purchasing decision.",
+            "As a mobile developer, I want to implement a countdown timer for the flash sale feature, so that users experience the excitement of a live event and don't miss out on exclusive price drops.",
+            "As a mobile developer, I want to implement a countdown timer for the flash sale, so that users can easily track the sale window without needing to calculate time zones manually."
+        ]
+    },
+    {
+        "id_user_story": "US24",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Fitur Upload Video Ulasan",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a video upload feature for reviews with size limitations, so that users can share their feedback without affecting app performance.",
+            "As a mobile developer, I want to implement a video upload feature for reviews, so that users can easily share their experiences without overloading the system.",
+            "As a mobile developer, I want to implement a video upload feature for reviews that is limited in size, so that it does not overload the application performance.",
+            "As a mobile developer, I want to implement a video upload feature for reviews, so that users can provide richer feedback without overwhelming the system.",
+            "As a mobile developer, I want to implement a feature that allows users to upload review videos while enforcing limitations to prevent performance issues, so that the app remains responsive and user-friendly."
+        ]
+    },
+    {
+        "id_user_story": "US25",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Estimasi Waktu Pengiriman",
+        "sampled_responses": [
+            "As a mobile developer, I want to display estimated delivery times without calculations, so that users can easily understand when their orders will arrive.",
+            "As a mobile developer, I want to display estimated delivery times without calculating the specific duration, so that users can have a clear expectation of when their orders will arrive.",
+            "As a mobile developer, I want to display estimated delivery information without performing any calculations, so that users can easily know when to expect their items.",
+            "As a mobile developer, I want to display estimated delivery times for users based on predefined data, so that they can plan their activities accordingly without needing to calculate the delivery duration themselves.",
+            "As a mobile developer, I want to display estimated delivery times without calculating them, so that users can know when to expect their items."
+        ]
+    },
+    {
+        "id_user_story": "US26",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Badge Verifikasi Toko Official",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement an official store verification badge that displays after a seller reaches the sales threshold, so that users can easily identify verified sellers on the platform.",
+            "As a mobile developer, I want to implement a verification badge for official stores once they reach the sales threshold, so that users can easily identify verified sellers and enhance trust in their purchases.",
+            "As a mobile developer, I want to implement an official store verification badge that appears once a seller reaches their sales threshold, so that customers can easily identify verified sellers.",
+            "As a mobile developer, I want to implement a badge icon that appears after a store reaches the sales threshold and verification, so that customers can easily identify verified official stores.",
+            "As a mobile developer, I want to implement a badge for verified official stores after they reach a sales threshold, so that users can easily identify trusted sellers within the app."
+        ]
+    },
+    {
+        "id_user_story": "US27",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Fitur Tambah Wishlist",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a 'Add to Wishlist' feature that saves items to a favorites list, so that users can retain their selections even after the items are no longer available.",
+            "As a mobile developer, I want to implement a feature to add items to a wishlist, so that users can save their favorite items and retain access to them even after they are no longer available.",
+            "As a mobile developer, I want to implement a 'Add to Wishlist' feature that allows users to save items to a favorites list, so that users can access their saved items even after they are no longer available.",
+            "As a mobile developer, I want to implement a feature that allows users to add items to a wishlist, so that their selected favorites remain accessible even if they are no longer available.",
+            "As a mobile developer, I want to implement a wishlist feature that allows users to save items as favorites, so that their selections remain accessible even after the items are no longer available."
+        ]
+    },
+    {
+        "id_user_story": "US28",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Autentikasi Pihak Ketiga",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement third-party authentication, so that users can log in easily and securely without needing to create a new account.",
+            "As a mobile developer, I want to implement third-party authentication options, so that users can easily log in and customize their privacy settings.",
+            "As a mobile developer, I want to implement third-party authentication, so that users can easily log in using their existing accounts without needing to create a new one.",
+            "As a mobile developer, I want to implement third-party authentication, so that users can easily log in without creating a new account.",
+            "As a mobile developer, I want to implement third-party authentication, so that users can log in seamlessly and choose not to display their profile information if they prefer."
+        ]
+    },
+    {
+        "id_user_story": "US29",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Sinkronisasi Kontak Pengguna",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement user contact synchronization by requesting access permissions and storing the data, so that users can easily access their contacts within the app for improved functionality.",
+            "As a mobile developer, I want to implement user contact synchronization with permission handling, so that users can easily access and store their contact data for convenience.",
+            "As a mobile developer, I want to implement a user contact synchronization feature, so that users can easily access and save their contacts for convenience.",
+            "As a mobile developer, I want to request user permission to access contacts and store that data, so that users can conveniently sync their contacts within the app.",
+            "As a mobile developer, I want to implement user contact synchronization, so that users can easily access and save their contacts for convenience."
+        ]
+    },
+    {
+        "id_user_story": "US30",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Sistem Notifikasi Status Transaksi",
+        "sampled_responses": [
+            "As a mobile developer, I want to implement a notification system for transaction status updates, so that users can receive timely information about their transactions.",
+            "As a mobile developer, I want to implement a notification system for transaction status updates, so that users are informed in real-time whenever there are changes to their transaction status.",
+            "As a mobile developer, I want to implement a notification system for transaction status updates, so that users are informed about their transaction progress in real-time.",
+            "As a mobile developer, I want to implement a notification system for transaction status updates, so that users receive timely alerts about their transaction changes.",
+            "As a mobile developer, I want to implement a notification system for transaction status updates, so that users receive timely updates about their transactions."
+        ]
+    }
+]

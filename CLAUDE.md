@@ -8,56 +8,63 @@ This is an **Android Development Automation System** using multiple MCP (Model C
 
 ## Architecture
 
-The system uses a multi-agent orchestration pattern with 4 main context sources:
+The project follows a modular package structure:
 
-1. **GitLab Agent** (`agent_gitlab.py`) - Fetches requirements from GitLab issues
-2. **Integration Orchestrator** (`orchestrator.py`) - Coordinates 3 MCP servers + direct RAG access:
-   - Postman MCP (`postman_context_server.py`) - API contracts and endpoint schemas
-   - Android Studio MCP (`agent_context_android_studio.py`) - Project structure and source code
-   - Context7 MCP (`agent_context_7.py`) - Kotlin/Android documentation via Upstash Context7
-   - Figma MCP (`figma_context_server.py`) - Design specifications and XML metadata
-   - PDF RAG (`agent_pdf_rag.py`) - Company documents and coding standards (direct import, not MCP)
-
-3. **Integration Example** (`integration.py`) - Demonstrates full workflow: GitLab → Orchestrator → Code Generator
+```
+src/
+├── config/           # Centralized configuration
+│   └── settings.py   # Single source of truth for env vars and paths
+├── models/           # Pydantic schemas (shared across all agents)
+│   └── schemas.py     # GitLabAnalysis, PostmanAPIAnalysis, etc.
+├── utils/            # Shared utilities
+│   ├── logging_config.py   # Structured logging via logging module
+│   ├── error_handler.py    # wrap_tool_call / wrap_async_tool_call
+│   └── llm_factory.py      # create_llm, create_agent_with_memory, execute_agent_and_structure
+├── agents/           # Standalone agents (no MCP server)
+│   └── gitlab.py     # GitLab issue extraction agent
+├── servers/          # MCP servers and services
+│   ├── orchestrator.py      # Main orchestrator MCP server
+│   ├── postman.py            # Postman API collections MCP server
+│   ├── android_studio.py     # Android project context MCP server
+│   ├── figma.py              # Figma design context MCP server
+│   ├── context7.py           # Kotlin documentation via Context7
+│   └── pdf_rag.py            # RAG chain for company PDFs (direct import)
+├── integration.py    # Full workflow demo: GitLab -> Orchestrator
+└── ingest_pdf.py     # PDF ingestion utility
+```
 
 ## Common Commands
-
-This project uses **UV** as the Python package manager:
 
 ```bash
 # Install dependencies
 uv sync
 
-# Run a script
-uv run src/orchestrator.py
-uv run src/integration.py
+# Run orchestrator
+uv run python -m src.servers.orchestrator
 
-# Run with arguments
-uv run src/postman_context_server.py --api-key $POSTMAN_API_KEY
-uv run src/agent_context_android_studio.py --root /path/to/android/project
-uv run src/figma_context_server.py
+# Run integration example
+uv run python -m src.integration
+
+# Individual MCP servers
+uv run python -m src.servers.postman -- --api-key $POSTMAN_API_KEY
+uv run python -m src.servers.android_studio -- --root /path/to/android/project
+uv run python -m src.servers.figma -- --server
 
 # Ingest PDF documents
-uv run src/ingest_pdf.py
+uv run python -m src.ingest_pdf
 ```
 
-## Key Files and Their Roles
+## Key Design Decisions
 
-| File | Purpose |
-|------|---------|
-| `src/orchestrator.py` | Main MCP server that coordinates all context sources. Run this first in a terminal. |
-| `src/integration.py` | Example client that connects to orchestrator and demonstrates full workflow |
-| `src/agent_gitlab.py` | Standalone agent to extract requirements from GitLab issues |
-| `src/postman_context_server.py` | MCP server for Postman API collections (cloud or local JSON) |
-| `src/agent_context_android_studio.py` | MCP server to read Android project files, structure, manifests |
-| `src/figma_context_server.py` | MCP server for Figma design context and XML metadata |
-| `src/agent_context_7.py` | MCP server for Kotlin documentation via Context7 |
-| `src/agent_pdf_rag.py` | Direct RAG chain for company PDFs (imported by orchestrator) |
-| `src/ingest_pdf.py` | Utility to ingest PDFs into PostgreSQL vector store |
+1. **Centralized config**: All env vars read once in `src/config/settings.py`. No more scattered `os.getenv()` calls.
+2. **Shared schemas**: All Pydantic models in `src/models/schemas.py`. No duplicate model definitions.
+3. **Shared utilities**: `wrap_tool_call`, `create_llm`, `create_agent_with_memory`, `execute_agent_and_structure` in `src/utils/`. No more copy-pasting.
+4. **Structured logging**: Uses Python `logging` module instead of `print(..., file=sys.stderr)`.
+5. **RAG Architecture**: PDF RAG uses PostgreSQL with pgvector. Orchestrator imports `run_compliance_expert_agent` directly from `src.servers.pdf_rag` -- not as MCP.
 
 ## Environment Variables
 
-The following must be set in `.env`:
+Set these in `.env`:
 
 ```bash
 # LLM (via OpenRouter)
@@ -80,56 +87,13 @@ POSTMAN_WORKSPACE_ID=your_workspace
 ANDROID_PROJECT_ROOT=/path/to/android/project
 ```
 
-## Development Workflow
-
-**To test the full integration:**
-
-1. **Terminal 1** - Start the orchestrator MCP server:
-   ```bash
-   uv run src/orchestrator.py
-   ```
-
-2. **Terminal 2** - Run the integration example:
-   ```bash
-   uv run src/integration.py
-   ```
-
-**To use individual MCP servers:**
-
-```bash
-# Postman (with local JSON)
-uv run src/postman_context_server.py --collection-json /path/to/collection.json
-
-# Postman (with cloud API)
-uv run src/postman_context_server.py --api-key $POSTMAN_API_KEY
-
-# Android Studio context
-uv run src/agent_context_android_studio.py --root /path/to/android/project
-
-# Figma design context
-uv run src/figma_context_server.py
-```
-
 ## Important Implementation Details
 
 ### MCP Server Pattern
 All MCP servers use `fastmcp.FastMCP` with `stdio` transport. Tools are decorated with `@mcp.tool()`. Servers run with `mcp.run(transport="stdio")`.
 
-### RAG Architecture
-The PDF RAG uses PostgreSQL with pgvector (via `langchain_postgres.PGVector`). The orchestrator imports `rag_chain` directly from `agent_pdf_rag.py` - it does NOT run as an MCP server but is imported as a module.
-
 ### Agent Pattern
-Agents use `langgraph.prebuilt.create_react_agent` with `langchain_mcp_adapters.client.MultiServerMCPClient`. Example:
-
-```python
-from langchain_mcp_adapters.client import MultiServerMCPClient
-from langgraph.prebuilt import create_react_agent
-
-async with MultiServerMCPClient(config) as client:
-    tools = await client.get_tools()
-    agent = create_react_agent(llm, tools)
-    response = await agent.ainvoke({"messages": [...]})
-```
+Agents use `langgraph.prebuilt.create_react_agent` or `langchain.agents.create_agent` with `langchain_mcp_adapters.client.MultiServerMCPClient`. The `execute_agent_and_structure` helper in `src/utils/llm_factory.py` standardizes the pattern of streaming agent output then converting to Pydantic structured output.
 
 ### Collection Name
-The vectorstore collection is named `permenpan_index_v3` (defined in `agent_pdf_rag.py` and `ingest_pdf.py`).
+The vectorstore collection is configured via `RAG_COLLECTION_NAME` env var (default: `company_guidelines`).

@@ -1,12 +1,12 @@
 [project]
 name = "membuat-mcp-server"
 version = "0.1.0"
-description = "Add your description here"
+description = "Android Development Automation System using MCP servers for coordinated code generation workflows"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = [
-    "asyncio>=4.0.0",
     "fastmcp>=3.1.1",
+    "httpx>=0.27.0",
     "langchain>=1.2.15",
     "langchain-community>=0.4.1",
     "langchain-huggingface>=1.2.2",
@@ -14,9 +14,28 @@ dependencies = [
     "langchain-openai>=1.1.12",
     "langchain-postgres>=0.0.17",
     "langgraph>=1.1.3",
+    "matplotlib>=3.10.9",
+    "pandas>=2.3.3",
     "psycopg2-binary>=2.9.11",
+    "pydantic>=2.0.0",
     "pypdf>=6.10.2",
     "python-dotenv>=1.2.2",
-    "python-gitlab>=3.15.0",
+    "python-gitlab>=3.10.0",
+    "seaborn>=0.13.2",
     "sentence-transformers>=5.3.0",
+]
+
+[project.scripts]
+orchestrator = "src.servers.orchestrator:main"
+postman = "src.servers.postman:main"
+android-context = "src.servers.android_studio:main"
+figma = "src.servers.figma:main"
+context7 = "src.servers.context7:main"
+pdf-rag = "src.servers.pdf_rag:main"
+gitlab-agent = "src.agents.gitlab:main"
+
+[dependency-groups]
+dev = [
+    "jupyter>=1.1.1",
+    "nbconvert>=7.17.1",
 ]

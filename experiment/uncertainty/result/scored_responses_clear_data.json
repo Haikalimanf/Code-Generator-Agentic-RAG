@@ -1,0 +1,492 @@
+[
+    {
+        "id_test_case": "US01",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Implementasi fitur autentikasi pengguna",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 4,
+                "probability": 0.8
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.5,
+        "normalized_uncertainty_score": 0.311
+    },
+    {
+        "id_test_case": "US02",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Integrasi Payment Gateway Midtrans",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US03",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Fitur Notifikasi Push dengan Firebase (FCM)",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US04",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Export Laporan Penjualan ke format PDF dan Excel",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US05",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Implementasi Multi-Language (i18n)",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US06",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Role-Based Access Control (RBAC) pada panel admin",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 4,
+                "probability": 0.8
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.5,
+        "normalized_uncertainty_score": 0.311
+    },
+    {
+        "id_test_case": "US07",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Fitur Keranjang Belanja (Shopping Cart)",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US08",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Fitur Pencarian Lanjutan (Advanced Filter & Sorting)",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US09",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Sistem Ulasan dan Rating Produk",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 4,
+                "probability": 0.8
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.5,
+        "normalized_uncertainty_score": 0.311
+    },
+    {
+        "id_test_case": "US10",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Integrasi Google Maps API untuk Estimasi Pengiriman",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US11",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Manajemen Inventaris Stok Barang dengan Auto-Deduct",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US12",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Toggle Dark Mode (Tema Gelap)",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US13",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Chat Real-time Customer Service",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 4,
+                "probability": 0.8
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.5,
+        "normalized_uncertainty_score": 0.311
+    },
+    {
+        "id_test_case": "US14",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Offline-First Data Sync Menggunakan Room Database",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 4,
+                "probability": 0.8
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.5,
+        "normalized_uncertainty_score": 0.311
+    },
+    {
+        "id_test_case": "US15",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Integrasi Barcode dan QR Code Scanner",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US16",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Implementasi Pagination berbasis Cursor (Infinite Scroll)",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 4,
+                "probability": 0.8
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.5,
+        "normalized_uncertainty_score": 0.311
+    },
+    {
+        "id_test_case": "US17",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Sistem Rekomendasi Produk Berbasis History Pembelian",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US18",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Sistem Kupon Promosi dan Voucher Diskon",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US19",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Upload Multi-Gambar untuk Foto Profil dan Galeri UMKM",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US20",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Wishlist / Daftar Keinginan",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 4,
+                "probability": 0.8
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.5,
+        "normalized_uncertainty_score": 0.311
+    },
+    {
+        "id_test_case": "US21",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Login Integrasi Apple ID (Sign in with Apple)",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US22",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Dasbor Analitik Statistik Penjualan Menggunakan Chart.js",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US23",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Two-Factor Authentication (2FA) Via SMS/OTP",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US24",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Implementasi Endpoint GraphQL untuk Data Produk",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US25",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Log Aktivitas / Audit Trail Pengguna Internal",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US26",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Sistem Ticketing Customer Support",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US27",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Pengiriman Resi Otomatis via API WhatsApp",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US28",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Program Sistem Poin Reward Pelanggan",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    },
+    {
+        "id_test_case": "US29",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Fitur Pembanding Produk (Product Comparison)",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 4,
+                "probability": 0.8
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.5,
+        "normalized_uncertainty_score": 0.311
+    },
+    {
+        "id_test_case": "US30",
+        "uncertainty_type": "Clear Contextual",
+        "original_issue_title": "[FEAT] Sistem Flash Sale dengan Countdown Timer Real-time",
+        "total_clusters": 1,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 5,
+                "probability": 1.0
+            }
+        ],
+        "discrete_semantic_entropy": 0.0,
+        "normalized_uncertainty_score": 0.0
+    }
+]

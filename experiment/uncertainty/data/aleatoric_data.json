@@ -1,0 +1,272 @@
+[
+    {
+        "id_data": "01",
+        "issue_title": "[FEAT] Tambahkan filter pencarian",
+        "issue_description": "Buat filter pencarian di halaman utama.",
+        "issue_comments": [
+            "Developer A: Filternya berdasarkan harga dan merek saja ya.",
+            "Developer B: Kata manajer kemarin filternya berdasarkan kategori ketersediaan stok, bukan merek."
+        ]
+    },
+    {
+        "id_data": "02",
+        "issue_title": "[FEAT] Tambahkan opsi pembayaran E-Wallet",
+        "issue_description": "Kita perlu menerima pembayaran melalui E-Wallet agar user lebih mudah checkout.",
+        "issue_comments": [
+            "Backend Dev: E-Wallet apa saja yang mau diintegrasikan? OVO, Dana, GoPay, atau semuanya?",
+            "Product Owner: Pokoknya integrasikan wallet yang paling populer, bikin simpel saja."
+        ]
+    },
+    {
+        "id_data": "03",
+        "issue_title": "[FEAT] Tombol Hapus Akun User",
+        "issue_description": "Tambahkan fitur hapus akun di menu profil sesuai standar kebijakan privasi (GDPR).",
+        "issue_comments": [
+            "Backend Dev: Ini implementasinya soft-delete (ganti status) atau hard-delete (hapus dari database)?",
+            "Data Engineer: Jangan di-hard delete, kita butuh historinya untuk analitik. Tapi tim legal bilang harus dihapus permanen."
+        ]
+    },
+    {
+        "id_data": "04",
+        "issue_title": "[FEAT] Export Laporan Transaksi",
+        "issue_description": "Sediakan tombol export ke PDF untuk laporan transaksi bulanan.",
+        "issue_comments": [
+            "Frontend Dev: Haruskah orientasinya Portrait atau Landscape? Kolom tabelnya lumayan banyak.",
+            "UI/UX: Terserah dev-nya saja, yang penting rapi dan muat semua."
+        ]
+    },
+    {
+        "id_data": "05",
+        "issue_title": "[FEAT] Sistem Poin Member",
+        "issue_description": "Tolong buatkan sistem poin. User dapat 1 poin setiap belanja Rp 10.000.",
+        "issue_comments": [
+            "QA Engineer: Di dokumen SRS yang revisi ditulisnya 1 poin setiap Rp 50.000. Mana yang dipakai?",
+            "Product Manager: Pakai aturan yang baru saja, tapi pastikan pelanggan lama tetap pakai perhitungan lama ya."
+        ]
+    },
+    {
+        "id_data": "06",
+        "issue_title": "[FEAT] Validasi Password Registrasi",
+        "issue_description": "Buat validasi password yang kuat. Minimal 8 karakter, kombinasi huruf dan angka.",
+        "issue_comments": [
+            "Security Team: Harus wajib ada simbol (special character) juga agar lolos audit.",
+            "Mobile Dev: Di UI desainnya tertulis 'Tidak boleh menggunakan simbol aneh'. Jadi gimana nih?"
+        ]
+    },
+    {
+        "id_data": "07",
+        "issue_title": "[FEAT] Multi-Language (EN / ID)",
+        "issue_description": "Aplikasi harus mendukung dwibahasa (Inggris dan Indonesia) secara otomatis.",
+        "issue_comments": [
+            "Developer A: Otomatisnya mendeteksi dari IP Address user, kan?",
+            "Developer B: Biasanya dari locale/bahasa bawaan OS di HP user. Kalau pakai IP nanti orang bule di Bali dapet bahasa Indo."
+        ]
+    },
+    {
+        "id_data": "08",
+        "issue_title": "[FEAT] Diskon Ongkos Kirim Promo Harbolnas",
+        "issue_description": "Terapkan diskon ongkos kirim sebesar 50% untuk periode Harbolnas besok.",
+        "issue_comments": [
+            "QA Tester: Diskon 50% ini ada batas maksimal potongan dalam rupiah tidak? Misalnya maksimal Rp 20.000?",
+            "Marketing: Pokoknya potongan 50%. Tapi kalau dari luar pulau Jawa jangan kemurahan potongannya."
+        ]
+    },
+    {
+        "id_data": "09",
+        "issue_title": "[FEAT] Batas Maksimal Upload Gambar Produk",
+        "issue_description": "Tambahkan limitasi ukuran file. Maksimal upload gambar adalah 5MB.",
+        "issue_comments": [
+            "Frontend Dev: Maksimal 5MB ini untuk total seluruh gambar (jika upload 5 gambar sekaligus) atau per gambar?",
+            "Backend Dev: Endpoint API saya di-set membatasi body payload maksimal 5MB total."
+        ]
+    },
+    {
+        "id_data": "10",
+        "issue_title": "[FEAT] Fitur Blokir Pengguna (Admin Panel)",
+        "issue_description": "Admin harus bisa menekan tombol 'Banned' untuk memblokir user yang melanggar ToS.",
+        "issue_comments": [
+            "Developer A: Kalau user diblokir, transaksi aktifnya yang belum dikirim otomatis dibatalkan atau dilanjutkan?",
+            "Customer Support: Tergantung pelanggarannya, kadang dibatalkan, kadang dilanjutkan saja transaksinya."
+        ]
+    },
+    {
+        "id_data": "11",
+        "issue_title": "[FEAT] Notifikasi Email Pengingat Keranjang",
+        "issue_description": "Kirimkan email ke pelanggan yang memiliki item di keranjang tapi belum checkout.",
+        "issue_comments": [
+            "Backend Dev: Berapa lama batas waktunya sampai email dikirim? 12 jam, 24 jam, atau seminggu?",
+            "Product Owner: Cukup setelah beberapa waktu saat keranjangnya terlihat ditelantarkan."
+        ]
+    },
+    {
+        "id_data": "12",
+        "issue_title": "[FEAT] Keranjang Belanja Kedaluwarsa",
+        "issue_description": "Item di dalam keranjang otomatis hangus setelah 24 jam agar stok tidak tertahan.",
+        "issue_comments": [
+            "Manager: Jangan 24 jam, kemarin sepakatnya di meeting 2 jam saja.",
+            "Developer: Tapi di PRD (Product Requirements Document) masih tertulis 1 x 24 jam. Saya ikuti dokumen atau meeting?"
+        ]
+    },
+    {
+        "id_data": "13",
+        "issue_title": "[FEAT] Integrasi Jasa Ekspedisi Baru",
+        "issue_description": "Tambahkan opsi kurir baru 'J&X' ke halaman checkout. Gunakan API mereka yang terbaru.",
+        "issue_comments": [
+            "Developer: API v1 mereka sudah stabil tapi akan deprecate tahun depan. API v2 mereka masih beta dan sering timeout. Pakai yang mana?",
+            "Tech Lead: Coba pakai v2, kalau gagal fallback ke v1. Eh, tapi struktur response mereka kan beda total."
+        ]
+    },
+    {
+        "id_data": "14",
+        "issue_title": "[FEAT] Otorisasi Super Admin",
+        "issue_description": "Role 'Admin' bisa mengelola semua data pengguna dan staff.",
+        "issue_comments": [
+            "Security: Tunggu, apakah 'Admin' biasa bisa menghapus atau mengubah data milik 'Super Admin'?",
+            "Developer: Deskripsi bilang 'semua pengguna', berarti secara logika iya. Tapi biasanya kan hirarkinya gak boleh gitu."
+        ]
+    },
+    {
+        "id_data": "15",
+        "issue_title": "[FEAT] Tampilan Dark Mode",
+        "issue_description": "Tambahkan Dark Mode. Warna background berubah menjadi hitam.",
+        "issue_comments": [
+            "UI Designer: Pakai warna Dark Slate Gray (#1E1E1E), jangan hitam pekat (#000000).",
+            "Developer: Di tiket ditulis 'hitam'. Jadi saya hardcode black saja ya biar cepat."
+        ]
+    },
+    {
+        "id_data": "16",
+        "issue_title": "[FEAT] Mekanisme Refund Otomatis",
+        "issue_description": "Jika pesanan dibatalkan penjual, uang langsung direfund otomatis ke user.",
+        "issue_comments": [
+            "Finance: Refund dikembalikan ke kartu kredit pelanggan atau masuk ke saldo dompet in-app?",
+            "Product Manager: Ke saldo in-app untuk mempercepat, tapi kalau user complain, kembalikan ke metode awal."
+        ]
+    },
+    {
+        "id_data": "17",
+        "issue_title": "[FEAT] Sortir Daftar Produk di Beranda",
+        "issue_description": "Tampilkan produk dengan fitur sortir berdasarkan yang paling relevan.",
+        "issue_comments": [
+            "Developer A: 'Paling relevan' ini maksudnya berdasarkan skor rekomendasi AI, produk terbaru, atau penjualan terbanyak?",
+            "Developer B: Kata tim marketing, produk yang bayar iklan harusnya yang muncul duluan (relevan)."
+        ]
+    },
+    {
+        "id_data": "18",
+        "issue_title": "[FEAT] Auto-Logout untuk Keamanan",
+        "issue_description": "User akan otomatis ter-logout jika idle (tidak ada aktivitas) selama 15 menit.",
+        "issue_comments": [
+            "QA Tester: Kalau user sedang menonton video tutorial di dalam app selama 20 menit (tanpa menyentuh layar), apakah dianggap idle dan di-logout?",
+            "Product Manager: Hmm, harusnya sih tidak, tapi logika aplikasinya cuma melacak sentuhan layar."
+        ]
+    },
+    {
+        "id_data": "19",
+        "issue_title": "[FEAT] Pagination untuk History Pesanan",
+        "issue_description": "Tambahkan pagination pada daftar pesanan agar loading tidak lambat.",
+        "issue_comments": [
+            "Mobile Dev: Limitnya per halaman di aplikasi mobile itu 10.",
+            "Web Dev: Di aplikasi Web saya buat 20. Back-end tolong buat defaultnya sesuai client masing-masing aja, jangan difixed."
+        ]
+    },
+    {
+        "id_data": "20",
+        "issue_title": "[FEAT] Fitur Rating Produk (0 - 5)",
+        "issue_description": "User bisa memberikan ulasan dan rating produk dari rentang 0 sampai 5 bintang.",
+        "issue_comments": [
+            "Database Engineer: Secara skema DB saya tidak mengizinkan rating bernilai 0 (minimal 1).",
+            "UI Designer: Di UI ada opsi bintang kosong semua yang artinya 0 bintang."
+        ]
+    },
+    {
+        "id_data": "21",
+        "issue_title": "[FEAT] Toleransi Pencarian (Fuzzy Search)",
+        "issue_description": "Saat pengguna typo mengetik nama produk, sistem harus tetap menampilkan produk yang mirip.",
+        "issue_comments": [
+            "Backend Dev: Berapa jumlah karakter typo yang ditoleransi (Levenstein distance)? 1 atau 2 huruf?",
+            "Tech Lead: Bikin fleksibel aja. Kalau kata panjang boleh typo banyak, kalau kata pendek jangan sampai beda makna."
+        ]
+    },
+    {
+        "id_data": "22",
+        "issue_title": "[FEAT] Tampilan Tabel Laporan pada Web",
+        "issue_description": "Tabel laporan keuangan harus menampung 15 kolom data.",
+        "issue_comments": [
+            "Frontend Dev: Ini mau dibikin scroll horizontal kalau layarnya kecil, atau text-nya di-wrap ke bawah (word wrap)?",
+            "UI/UX: Dua-duanya jelek sih kalau di mobile. Di-hide aja kolom yang kurang penting?"
+        ]
+    },
+    {
+        "id_data": "23",
+        "issue_title": "[FEAT] Flash Sale Countdown Timer",
+        "issue_description": "Tambahkan timer hitung mundur untuk event Flash Sale di halaman utama.",
+        "issue_comments": [
+            "Frontend Dev: Timernya mengandalkan jam device user (client-time) atau jam server?",
+            "Backend Dev: Harusnya server, kalau client time user bisa manipulasi jam HP mereka buat dapat flash sale duluan."
+        ]
+    },
+    {
+        "id_data": "24",
+        "issue_title": "[FEAT] Format Upload Video Ulasan",
+        "issue_description": "User sekarang bisa meng-upload video singkat saat mengulas produk.",
+        "issue_comments": [
+            "Mobile Dev: Format apa saja yang diterima? MP4 pasti, tapi apakah AVI, MOV, atau WebM didukung?",
+            "Product Owner: Pokoknya video yang direkam lewat HP bisa diupload langsung."
+        ]
+    },
+    {
+        "id_data": "25",
+        "issue_title": "[FEAT] Estimasi Waktu Pengiriman (SLA)",
+        "issue_description": "Tampilkan informasi pesanan akan sampai dalam waktu 2-3 hari.",
+        "issue_comments": [
+            "Developer: Ini dihitung kalender biasa atau cuma hari kerja (tidak termasuk Sabtu-Minggu/Libur Nasional)?",
+            "Logistic Team: Tergantung kurirnya. Kurir A kirim hari Minggu, Kurir B libur."
+        ]
+    },
+    {
+        "id_data": "26",
+        "issue_title": "[FEAT] Badge Verifikasi 'Toko Official'",
+        "issue_description": "Berikan tanda centang biru untuk toko yang sudah terverifikasi dan punya banyak penjualan.",
+        "issue_comments": [
+            "Developer: 'Banyak penjualan' ini threshold-nya di angka berapa? 100, 500, atau 1000?",
+            "Operations: Threshold-nya beda-beda tiap kategori produk. Tanya divisi BD (Business Development)."
+        ]
+    },
+    {
+        "id_data": "27",
+        "issue_title": "[FEAT] Fitur Tambah Wishlist",
+        "issue_description": "Pengguna dapat mengklik ikon hati untuk menyimpan produk ke Wishlist.",
+        "issue_comments": [
+            "Frontend Dev: Apa yang ditampilkan di layar Wishlist kalau produknya tiba-tiba dihapus permanen oleh si penjual?",
+            "Product Manager: Jangan di-error-kan aplikasinya. Biarkan tetap ada tapi tidak bisa diklik. Atau hilangkan saja sekalian."
+        ]
+    },
+    {
+        "id_data": "28",
+        "issue_title": "[FEAT] Login Menggunakan Apple ID",
+        "issue_description": "Implementasikan Sign-In with Apple karena ini syarat wajib untuk App Store.",
+        "issue_comments": [
+            "Backend Dev: Kalau user milih untuk menyembunyikan email mereka (Hide My Email), apakah sistem kita otomatis meng-generate dummy email atau menolak registrasinya?",
+            "Tech Lead: Sistem kita wajib butuh email valid buat notif. Kalau mereka pakai email relay Apple, emailnya tetap masuk gak ya?"
+        ]
+    },
+    {
+        "id_data": "29",
+        "issue_title": "[FEAT] Sinkronisasi Kontak Pengguna",
+        "issue_description": "Tambahkan izin akses kontak HP untuk mencari teman yang juga memakai aplikasi ini.",
+        "issue_comments": [
+            "Developer A: Apakah kita harus menyimpan seluruh daftar kontaknya di database kita (upload kontak)?",
+            "Security: Jangan! Cukup kirim hash-nya ke server untuk dicocokkan, demi privasi. Tapi PM maunya disimpan biar gampang."
+        ]
+    },
+    {
+        "id_data": "30",
+        "issue_title": "[FEAT] Sistem Notifikasi Status Transaksi",
+        "issue_description": "Kirim notifikasi setiap status barang berubah (Diproses, Dikirim, Sampai).",
+        "issue_comments": [
+            "Mobile Dev: Format pesannya berupa Plain text sederhana atau menggunakan HTML/Rich Text?",
+            "Backend Dev: Firebase payload saya isinya raw string. Kalau butuh formatting bold/italic, kalian parse sendiri di frontend ya."
+        ]
+    }
+]

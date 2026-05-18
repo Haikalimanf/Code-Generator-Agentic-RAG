@@ -1,0 +1,242 @@
+[
+    {
+        "id_data": "01",
+        "issue_title": "[FEAT] Implementasi fitur autentikasi pengguna",
+        "issue_description": "Kita perlu menambahkan sistem autentikasi yang aman dengan:\n- Registrasi pengguna\n- Login/Logout\n- Reset password\n- Verifikasi email\n- Opsi login via OAuth (Google/Facebook)",
+        "issue_comments": [
+            "Tolong pastikan juga menggunakan OAuth untuk Google dan Facebook ya."
+        ]
+    },
+    {
+        "id_data": "02",
+        "issue_title": "[FEAT] Integrasi Payment Gateway Midtrans",
+        "issue_description": "Membangun sistem pembayaran yang terintegrasi dengan Midtrans untuk mendukung metode pembayaran:\n- Virtual Account (BCA, Mandiri, BNI)\n- E-Wallet (GoPay, ShopeePay)\n- Kartu Kredit\nPastikan callback Webhook diproses dengan benar untuk update status pesanan.",
+        "issue_comments": [
+            "Untuk webhook, tolong gunakan idempotency key agar tidak terjadi double processing jika webhook terkirim dua kali."
+        ]
+    },
+    {
+        "id_data": "03",
+        "issue_title": "[FEAT] Fitur Notifikasi Push dengan Firebase (FCM)",
+        "issue_description": "Menambahkan Firebase Cloud Messaging (FCM) untuk memberikan notifikasi langsung ke device pengguna terkait:\n- Promo terbaru\n- Update status pesanan\n- Pengingat keranjang yang ditinggalkan (Abandoned cart)",
+        "issue_comments": [
+            "Notifikasi harus diarahkan ke halaman spesifik (deep linking) ketika pengguna melakukan tap pada notifikasinya."
+        ]
+    },
+    {
+        "id_data": "04",
+        "issue_title": "[FEAT] Export Laporan Penjualan ke format PDF dan Excel",
+        "issue_description": "Sediakan tombol unduh laporan penjualan bulanan di halaman laporan. Tombol ini menghasilkan file PDF siap cetak agar pengguna dapat mencetak dan mendistribusikan laporan penjualan bulanan tanpa perlu konversi manual.",
+        "issue_comments": [
+            "Library PDF yang digunakan harus mendukung rendering tabel dengan jumlah baris hingga ribuan baris tanpa menyebabkan Memory Out of Bounds."
+        ]
+    },
+    {
+        "id_data": "05",
+        "issue_title": "[FEAT] Implementasi Multi-Language (i18n)",
+        "issue_description": "Tambahkan opsi pergantian bahasa antara Bahasa Indonesia dan English di dalam aplikasi agar pengguna dapat berinteraksi dengan aplikasi dalam bahasa yang mereka kuasai. Format tanggal dan mata uang harus ikut menyesuaikan dengan locale yang dipilih.",
+        "issue_comments": [
+            "Data terjemahan harus disimpan di file JSON terpisah per bahasa agar mudah dikelola dan diperluas di masa mendatang."
+        ]
+    },
+    {
+        "id_data": "06",
+        "issue_title": "[FEAT] Role-Based Access Control (RBAC) pada panel admin",
+        "issue_description": "Membangun sistem manajemen akses dengan role berikut:\n- Super Admin: Akses penuh\n- Manager: Bisa melihat laporan dan menyetujui transaksi\n- Staff: Hanya bisa entri data produk dan lihat pesanan\nPastikan route di backend maupun frontend terproteksi dengan middleware yang sesuai.",
+        "issue_comments": [
+            "Saya sudah menyiapkan tabel 'roles' dan 'permissions' di database, kalian tinggal buatkan middleware otorisasi-nya."
+        ]
+    },
+    {
+        "id_data": "07",
+        "issue_title": "[FEAT] Fitur Keranjang Belanja (Shopping Cart)",
+        "issue_description": "Pengguna harus bisa:\n- Menambahkan produk ke keranjang\n- Mengubah kuantitas produk (+/-)\n- Menghapus produk dari keranjang\n- Melihat subtotal harga secara real-time yang sudah terpotong pajak (PPN 11%).",
+        "issue_comments": [
+            "Untuk state management keranjang di sisi Frontend, mari gunakan Redux Toolkit agar state-nya mudah dikelola lintas halaman."
+        ]
+    },
+    {
+        "id_data": "08",
+        "issue_title": "[FEAT] Fitur Pencarian Lanjutan (Advanced Filter & Sorting)",
+        "issue_description": "Meningkatkan kemampuan search engine di halaman produk. Filter yang dibutuhkan:\n- Rentang Harga (Min/Max)\n- Kategori\n- Ketersediaan Stok (In Stock/Pre-Order)\nSorting yang dibutuhkan:\n- Terbaru\n- Harga termurah\n- Harga termahal",
+        "issue_comments": [
+            "Gunakan Debounce pada input pencarian teks agar tidak memberatkan server saat pengguna mengetik terlalu cepat."
+        ]
+    },
+    {
+        "id_data": "09",
+        "issue_title": "[FEAT] Sistem Ulasan dan Rating Produk",
+        "issue_description": "Tambahkan validasi agar hanya pengguna dengan status pesanan 'Delivered' yang dapat memberikan rating bintang dan ulasan teks pada produk, sehingga pengguna tidak dapat mengirimkan ulasan untuk pesanan yang belum selesai.",
+        "issue_comments": [
+            "Validasi status 'Delivered' harus dilakukan di sisi backend, bukan hanya frontend, untuk mencegah pengiriman ulasan langsung melalui API."
+        ]
+    },
+    {
+        "id_data": "10",
+        "issue_title": "[FEAT] Integrasi Google Maps API untuk Estimasi Pengiriman",
+        "issue_description": "Menambahkan peta interaktif pada saat pengguna mengisi alamat pengiriman (checkout). Tarik titik koordinat latitude dan longitude untuk mengkalkulasi jarak pengiriman dari gudang terdekat dan menetapkan biaya ongkir dinamis.",
+        "issue_comments": [
+            "Gunakan Maps Places Autocomplete API untuk mempermudah pencarian alamat ya."
+        ]
+    },
+    {
+        "id_data": "11",
+        "issue_title": "[FEAT] Manajemen Inventaris Stok Barang dengan Auto-Deduct",
+        "issue_description": "Implementasikan Cron Job yang berjalan otomatis untuk membatalkan pesanan yang masih pending lebih dari 24 jam dan mengembalikan stok yang direservasi ke jumlah semula, sehingga pengguna dapat melihat ketersediaan stok yang akurat tanpa intervensi manual.",
+        "issue_comments": [
+            "Cron Job harus mencatat setiap pembatalan dan pemulihan stok ke dalam log transaksi agar dapat diaudit."
+        ]
+    },
+    {
+        "id_data": "12",
+        "issue_title": "[FEAT] Toggle Dark Mode (Tema Gelap)",
+        "issue_description": "Menambahkan fungsionalitas bagi pengguna untuk mengganti tema tampilan aplikasi antara Light Mode dan Dark Mode. Preferensi harus disimpan di Local Storage agar tetap persisten saat halaman direfresh.",
+        "issue_comments": [
+            "Tolong pastikan juga untuk mengonfigurasi opsi 'System Preference' agar aplikasi secara otomatis mendeteksi pengaturan mode gelap bawaan dari OS pengguna."
+        ]
+    },
+    {
+        "id_data": "13",
+        "issue_title": "[FEAT] Chat Real-time Customer Service",
+        "issue_description": "Implementasikan indikator mengetik ('sedang mengetik...') pada widget chat agar pengguna dapat melihat kapan agen customer service sedang mengetik balasan dan merasa lebih terlibat dalam percakapan.",
+        "issue_comments": [
+            "Gunakan Socket.io untuk event 'typing' real-time. Batasi ukuran lampiran gambar maksimal 5MB per pengiriman."
+        ]
+    },
+    {
+        "id_data": "14",
+        "issue_title": "[FEAT] Offline-First Data Sync Menggunakan Room Database",
+        "issue_description": "Gunakan WorkManager untuk menyinkronisasikan data produk dari server ke Room Database lokal secara otomatis di latar belakang saat koneksi internet kembali aktif, sehingga pengguna selalu mendapatkan data produk terbaru meskipun sebelumnya menggunakan aplikasi secara offline.",
+        "issue_comments": [
+            "Jika data lokal dan server berbeda, jadikan server sebagai source of truth dan timpa data lokal yang lama."
+        ]
+    },
+    {
+        "id_data": "15",
+        "issue_title": "[FEAT] Integrasi Barcode dan QR Code Scanner",
+        "issue_description": "Modul kamera terintegrasi untuk petugas gudang agar bisa melakukan pemindaian (scan) QR Code/Barcode dari label produk, sehingga entri stok barang masuk dan barang keluar bisa lebih cepat dari aplikasi mobile.",
+        "issue_comments": [
+            "Gunakan ML Kit Vision dari Google untuk akurasi pemindaian yang lebih baik."
+        ]
+    },
+    {
+        "id_data": "16",
+        "issue_title": "[FEAT] Implementasi Pagination berbasis Cursor (Infinite Scroll)",
+        "issue_description": "Ganti sistem pagination standar (halaman 1, 2, 3) di beranda feed produk menjadi Infinite Scroll menggunakan Cursor-based Pagination. API akan menerima token cursor terakhir dan memberikan N data selanjutnya saat discroll ke paling bawah.",
+        "issue_comments": [
+            "Tolong pastikan ada indikator loading (skeleton loader atau spinner) saat data baru sedang di-fetch."
+        ]
+    },
+    {
+        "id_data": "17",
+        "issue_title": "[FEAT] Sistem Rekomendasi Produk Berbasis History Pembelian",
+        "issue_description": "Integrasikan API rekomendasi dari tim Data Science (endpoint /recommendations) ke halaman detail produk untuk menampilkan bagian 'Mungkin Anda juga suka', sehingga pengguna dapat menemukan produk relevan berdasarkan histori pembelian dan tontonan sebelumnya.",
+        "issue_comments": [
+            "API /recommendations sudah siap dari tim Data Science. Fokus implementasi hanya pada integrasi UI-nya saja."
+        ]
+    },
+    {
+        "id_data": "18",
+        "issue_title": "[FEAT] Sistem Kupon Promosi dan Voucher Diskon",
+        "issue_description": "Tambahkan validasi kode promo di halaman checkout dengan pesan error yang spesifik per jenis kegagalan, sehingga pengguna dapat memahami alasan tepat mengapa kode promo yang dimasukkan tidak dapat digunakan.",
+        "issue_comments": [
+            "Backend harus mengembalikan kode error berbeda untuk setiap jenis kegagalan: kedaluwarsa, minimum pembelian tidak terpenuhi, atau batas pemakaian tercapai."
+        ]
+    },
+    {
+        "id_data": "19",
+        "issue_title": "[FEAT] Upload Multi-Gambar untuk Foto Profil dan Galeri UMKM",
+        "issue_description": "Toko UMKM harus bisa meng-upload hingga 5 gambar sekaligus untuk profil toko mereka. Kita memerlukan image cropper di sisi frontend dan kompresi otomatis di backend sebelum di-upload ke layanan AWS S3.",
+        "issue_comments": [
+            "Kompresinya usahakan di-convert langsung ke format WebP agar performa rendering web-nya nanti tetap cepat."
+        ]
+    },
+    {
+        "id_data": "20",
+        "issue_title": "[FEAT] Wishlist / Daftar Keinginan",
+        "issue_description": "Implementasikan optimistic UI update pada tombol wishlist berbentuk ikon hati sehingga pengguna langsung merasakan umpan balik visual yang responsif ketika menekan tombol wishlist tanpa harus menunggu response dari API.",
+        "issue_comments": [
+            "Jika request API gagal, ikon harus dikembalikan ke status semula (rollback) dan tampilkan notifikasi error singkat."
+        ]
+    },
+    {
+        "id_data": "21",
+        "issue_title": "[FEAT] Login Integrasi Apple ID (Sign in with Apple)",
+        "issue_description": "Menambahkan opsi 'Sign in with Apple' di halaman Login sebagai pelengkap OAuth Google. Penting dilakukan agar aplikasi iOS kita lulus fase review App Store karena mereka mewajibkan opsi ini jika opsi OAuth lain ada.",
+        "issue_comments": [
+            "Harap dipelajari dokumentasi penanganan token email dari Apple karena mereka me-mask email asli pengguna dengan Apple Private Relay."
+        ]
+    },
+    {
+        "id_data": "22",
+        "issue_title": "[FEAT] Dasbor Analitik Statistik Penjualan Menggunakan Chart.js",
+        "issue_description": "Implementasikan Line Chart tren omset 30 hari terakhir menggunakan Chart.js pada dashboard agar pengguna dapat memvisualisasikan data penjualan dan memfilternya berdasarkan bulan atau tahun yang dipilih.",
+        "issue_comments": [
+            "API backend untuk agregasi data harus menggunakan Redis sebagai cache layer karena perhitungannya membutuhkan banyak I/O ke database."
+        ]
+    },
+    {
+        "id_data": "23",
+        "issue_title": "[FEAT] Two-Factor Authentication (2FA) Via SMS/OTP",
+        "issue_description": "Tingkatkan keamanan akun pengguna dengan 2FA. Ketika user mencoba login dari perangkat baru, kirimkan kode OTP 6 digit melalui SMS. User harus memasukkan kode ini agar login berhasil.",
+        "issue_comments": [
+            "Untuk provider SMS-nya, mari gunakan Twilio. Jangan lupa menambahkan rate-limiting pada endpoint request OTP untuk mencegah serangan botnet."
+        ]
+    },
+    {
+        "id_data": "24",
+        "issue_title": "[FEAT] Implementasi Endpoint GraphQL untuk Data Produk",
+        "issue_description": "Buka service GraphQL baru paralel dengan REST API lama untuk mengakses katalog produk. Ini akan membantu aplikasi mobile untuk mengurangi under/over-fetching data dan hanya meminta atribut yang diperlukan.",
+        "issue_comments": [
+            "Gunakan Apollo Server dan pastikan query kedalamannya dibatasi (Query Depth Limit) maksimal 5 level agar tidak ada resiko query membobol resource database."
+        ]
+    },
+    {
+        "id_data": "25",
+        "issue_title": "[FEAT] Log Aktivitas / Audit Trail Pengguna Internal",
+        "issue_description": "Catat setiap aksi CRUD Admin dan Staff secara asinkron melalui message queue agar pengguna (admin) dapat mengaudit seluruh aktivitas sistem tanpa mengorbankan response time API utama.",
+        "issue_comments": [
+            "Setiap log harus menyimpan: aktor, aksi, waktu, tabel terkait, dan snapshot data sebelum dan sesudah perubahan."
+        ]
+    },
+    {
+        "id_data": "26",
+        "issue_title": "[FEAT] Sistem Ticketing Customer Support",
+        "issue_description": "Pengguna dapat membuat tiket keluhan ('Create Ticket') apabila mengalami masalah dengan pesanan. Tambahkan status resolusi tiket: Open, In Progress, Resolved, dan Closed. Admin CS harus bisa memberikan balasan ke tiket tersebut.",
+        "issue_comments": [
+            "Kirim email otomatis kepada pengguna ketika status resolusi tiket berubah."
+        ]
+    },
+    {
+        "id_data": "27",
+        "issue_title": "[FEAT] Pengiriman Resi Otomatis via API WhatsApp",
+        "issue_description": "Setelah pesanan diubah statusnya menjadi 'Dikirim' oleh admin, sistem harus men-trigger pengiriman pesan WhatsApp kepada pembeli yang berisi Nomor Resi, Ekspedisi, dan tautan pelacakan pengiriman (tracking link).",
+        "issue_comments": [
+            "Kita akan menggunakan API WhatsApp Business resmi (Cloud API). Tolong buat template pesan (message template) agar langsung disetujui pihak Meta."
+        ]
+    },
+    {
+        "id_data": "28",
+        "issue_title": "[FEAT] Program Sistem Poin Reward Pelanggan",
+        "issue_description": "Implementasikan batch job terjadwal yang berjalan otomatis setiap 31 Desember untuk mereset seluruh poin pengguna menjadi nol dan mencatat riwayat penghapusan di tabel mutasi poin, sehingga pengguna dapat melihat riwayat poin yang kedaluwarsa di profil mereka.",
+        "issue_comments": [
+            "Batch job harus berjalan pada 31 Desember pukul 23:59 dan mencatat keterangan 'Expired - Annual Reset' di tabel mutasi poin."
+        ]
+    },
+    {
+        "id_data": "29",
+        "issue_title": "[FEAT] Fitur Pembanding Produk (Product Comparison)",
+        "issue_description": "Pengguna dapat memilih hingga maksimal 3 produk elektronik di layar mereka, lalu melihat spesifikasi mereka berdampingan secara horizontal di halaman komparasi (misalnya membandingkan RAM, CPU, Baterai, dan Harga).",
+        "issue_comments": [
+            "Spesifikasinya dinamis, jadi tabel yang dirender harus bisa mendeteksi parameter spesifikasi apa saja yang relevan untuk di-highlight."
+        ]
+    },
+    {
+        "id_data": "30",
+        "issue_title": "[FEAT] Sistem Flash Sale dengan Countdown Timer Real-time",
+        "issue_description": "Implementasikan logika Flash Sale di mana harga diskon hanya berlaku dalam jam tertentu. Tampilkan Countdown Timer di frontend yang tersinkronisasi akurat dengan jam server. Setelah waktu habis, keranjang belanja otomatis menyesuaikan harga ke harga normal.",
+        "issue_comments": [
+            "Di saat Flash Sale, traffic pasti melonjak. Kita butuh locking di sistem transaksi database untuk mencegah 'overselling' jika dua user memproses checkout barang yang stoknya sisa 1 secara persis bersamaan."
+        ]
+    }
+]

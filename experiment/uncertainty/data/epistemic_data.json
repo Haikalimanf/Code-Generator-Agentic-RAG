@@ -1,0 +1,242 @@
+[
+    {
+        "id_data": "01",
+        "issue_title": "[FEAT] Autentikasi Login Biometrik",
+        "issue_description": "Implementasikan fitur login menggunakan sidik jari/FaceID. API untuk validasi token biometrik sudah selesai dibuat di backend.",
+        "issue_comments": [
+            "Backend Dev: Untuk testing API biometriknya, tolong gunakan endpoint `/auth/v2/biometric/verify`. Endpoint ini belum ada di Swagger, jadi buka saja collection 'Security V2' folder 'Biometric' di Postman workspace internal kita."
+        ]
+    },
+    {
+        "id_data": "02",
+        "issue_title": "[FEAT] Sinkronisasi Data Pelanggan CRM Lama",
+        "issue_description": "Aplikasi harus bisa menarik data profil pelanggan dari sistem CRM legacy (SAP Z-Module) yang dibuat tahun 2010.",
+        "issue_comments": [
+            "Tech Lead: Dokumentasi sistem SAP ini sudah hilang terbakar saat insiden server lama. Gunakan saja endpoint bridge yang ada di `/api/legacy/crm/sync`. Parameter request-nya ikuti saja persis seperti contoh payload XML di history Postman saya."
+        ]
+    },
+    {
+        "id_data": "03",
+        "issue_title": "[FEAT] Kalkulasi Pajak Regional Otomatis",
+        "issue_description": "Saat checkout, sistem harus menghitung pajak PPN dan PB1 sesuai regulasi daerah pengguna masing-masing.",
+        "issue_comments": [
+            "Product Owner: Ambil rate pajak dari endpoint `/api/tax/v2` di Postman workspace 'Finance API'. Jangan lupa ganti environment-nya ke 'Staging-RegionB' agar kalkulasinya tidak masuk ke laporan pajak beneran."
+        ]
+    },
+    {
+        "id_data": "04",
+        "issue_title": "[FEAT] Integrasi Mesin EDC Lokal",
+        "issue_description": "Sistem Point of Sales (POS) kita harus bisa mengirim jumlah tagihan langsung ke mesin EDC kasir.",
+        "issue_comments": [
+            "Developer: Harus implementasikan protokol ISO 8583 untuk koneksi ke EDC lewat TCP socket. Spesifikasi field datanya menggunakan standar vendor lokal (custom MTI) yang dokumentasinya tidak ada di internet. Tolong minta PDF manualnya ke Pak Budi."
+        ]
+    },
+    {
+        "id_data": "05",
+        "issue_title": "[FEAT] Algoritma Pencocokan Nama Rekening",
+        "issue_description": "Validasi nama pemilik rekening bank dengan nama akun di aplikasi menggunakan Fuzzy Logic agar toleran terhadap typo kecil.",
+        "issue_comments": [
+            "Data Engineer: Gunakan algoritma 'Levenshtein-Jaro' custom buatan internal kita tahun 2018. Library public-nya tidak ada, tapi endpoint microservice-nya bisa dipanggil di `/v1/match/name`. Coba jalankan request di Postman untuk tahu struktur response-nya."
+        ]
+    },
+    {
+        "id_data": "06",
+        "issue_title": "[FEAT] Sistem Rekomendasi Machine Learning",
+        "issue_description": "Tampilkan bagian 'Produk Pilihan Untukmu' berdasarkan riwayat belanja pengguna menggunakan model Machine Learning.",
+        "issue_comments": [
+            "AI Engineer: Panggil endpoint `/predict/matrix-factorization-v3`. Format request body-nya wajib menggunakan vector array dimensi 128. Cara generate vector-nya silakan lihat di Pre-request script pada Postman collection 'Data Science Ops' yang baru saya share kemarin."
+        ]
+    },
+    {
+        "id_data": "07",
+        "issue_title": "[FEAT] Pengaturan Pengiriman Ekspedisi Cargo Laut",
+        "issue_description": "Tambahkan opsi pengiriman khusus menggunakan kapal laut untuk barang berat (>50kg).",
+        "issue_comments": [
+            "Backend Dev: Kita integrasi via SOAP API milik vendor kapal laut lokal di endpoint `/cargo/shipment`. WSDL file mereka rusak dan tidak bisa diakses, jadi tolong copy-paste saja format raw XML-nya dari saved request di Postman."
+        ]
+    },
+    {
+        "id_data": "08",
+        "issue_title": "[FEAT] Fitur Absensi Karyawan Selfie (Face Recognition)",
+        "issue_description": "Karyawan harus absen dengan mengambil foto selfie. Sistem akan mencocokkan wajah mereka dengan foto KTP di database.",
+        "issue_comments": [
+            "Mobile Dev: Gunakan face recognition API internal di endpoint `/v1/attendance/face`. Ada parameter `vector_embedding` yang wajib dikirim. Cara mengekstrak embedding dari gambar kamera HP ada di dokumentasi lokal (PDF internal), tolong pelajari sendiri ya."
+        ]
+    },
+    {
+        "id_data": "09",
+        "issue_title": "[FEAT] Proses Transaksi QRIS Dinamis",
+        "issue_description": "Tampilkan kode QRIS dinamis di layar untuk pembayaran, dan tunggu notifikasi sukses dari Switcher.",
+        "issue_comments": [
+            "Developer: Endpoint callback dari Switcher adalah `/qris/notify`. Header otentikasi mereka menggunakan algoritma HMAC-SHA512 dengan salt dinamis gabungan ClientID dan Timestamp. Cara hitung signature-nya cuma ada di skrip 'Tests' Postman, jadi jadikan itu referensi codingannya."
+        ]
+    },
+    {
+        "id_data": "10",
+        "issue_title": "[FEAT] Otorisasi Khusus Level Direktur (Override)",
+        "issue_description": "Direktur dapat memberikan persetujuan (approval) secara paksa pada transaksi yang melebihi limit maksimal sistem.",
+        "issue_comments": [
+            "Tech Lead: Buat fitur override approval. Gunakan role ID '999'. Role ini tidak ada di tabel database kita karena di-hardcode di legacy core banking system. Panggil otorisasi ini via endpoint `/core/legacy/auth`."
+        ]
+    },
+    {
+        "id_data": "11",
+        "issue_title": "[FEAT] Penjualan Layanan Asuransi Mikro",
+        "issue_description": "Tambahkan opsi proteksi asuransi layar retak saat pengguna membeli produk Handphone.",
+        "issue_comments": [
+            "Developer A: Panggil API asuransi di `/insure/v2/micro`. Di dalam body request ada parameter `coverage_code`. Kodenya dinamis dan tabel mapping-nya belum ada di Wiki, tapi kalian bisa lihat daftarnya di Postman Environment Variables bernama 'Insurance-Prod'."
+        ]
+    },
+    {
+        "id_data": "12",
+        "issue_title": "[FEAT] Manajemen Diskon Kupon Kompleks (Stackable)",
+        "issue_description": "User bisa menggabungkan 3 jenis voucher sekaligus: Diskon Ongkir, Diskon Produk, dan Cashback Poin.",
+        "issue_comments": [
+            "Backend Dev: Endpoint `/promo/calculate` untuk hitung diskon bertingkat ini cukup unik, ia meminta input AST (Abstract Syntax Tree) berformat JSON. Contoh format struktur pohon AST-nya agak rumit, jadi silakan copy saja dari body request contoh di Postman."
+        ]
+    },
+    {
+        "id_data": "13",
+        "issue_title": "[FEAT] Fitur Cek Saldo E-Money via NFC",
+        "issue_description": "Pengguna dapat menempelkan kartu e-Money ke bagian belakang HP untuk membaca sisa saldo.",
+        "issue_comments": [
+            "Mobile Dev: Implementasikan pembacaan saldo kartu NFC (Mifare DESFire). Protokol command APDU-nya menggunakan standar lokal yang dirahasiakan konsorsium bank dan tidak dipublikasikan. Tolong minta library binary `.aar`-nya ke tim arsitek."
+        ]
+    },
+    {
+        "id_data": "14",
+        "issue_title": "[FEAT] Notifikasi Pager / SMS Darurat ke DevOps",
+        "issue_description": "Jika sistem pembayaran down, trigger pengiriman SMS darurat ke nomor HP tim DevOps yang sedang piket.",
+        "issue_comments": [
+            "SysAdmin: Notifikasi critical error ini jangan dikirim ke Slack. Kirim ke SMS gateway legacy. Endpoint `/sms/v1/send`. Autentikasinya pakai API Key terenkripsi yang cara decrypt-nya cuma jalan di Pre-request Script Postman."
+        ]
+    },
+    {
+        "id_data": "15",
+        "issue_title": "[FEAT] Konversi Mata Uang Kripto Lokal (IndoCoin)",
+        "issue_description": "Tampilkan saldo pengguna dalam estimasi nilai mata uang kripto lokal IndoCoin (IDC).",
+        "issue_comments": [
+            "Developer: Gunakan endpoint `/crypto/exchange-rate` untuk IDC. Koin ini tidak terdaftar di CoinMarketCap / public API manapun, jadi nilainya harus ditarik dari API node internal kita. Alamat IP node-nya tanya langsung ke tim Blockchain ya."
+        ]
+    },
+    {
+        "id_data": "16",
+        "issue_title": "[FEAT] Pelaporan Pajak E-Faktur via Barcode",
+        "issue_description": "Sistem dapat men-generate QR Code E-Faktur yang valid untuk discan oleh aplikasi DJP.",
+        "issue_comments": [
+            "Backend Dev: Generate QR code E-Faktur menggunakan endpoint proxy pajak lokal `/efaktur/qr`. Hati-hati, response dari API ini bukan JSON, melainkan binary gzip yang di-enkripsi dengan AES-256-ECB. Key-nya pakai NPWP perusahaan."
+        ]
+    },
+    {
+        "id_data": "17",
+        "issue_title": "[FEAT] Export Laporan Pengiriman ke Format EDIFACT",
+        "issue_description": "Generate laporan manifest harian dalam standar format internasional UN/EDIFACT untuk bea cukai.",
+        "issue_comments": [
+            "Product Manager: Tolong pakai endpoint `/export/edifact` yang baru dibuat anak magang bulan lalu. Dokumentasinya sama sekali belum ada dan anaknya sudah resign. Test aja parameter inputnya pakai Postman sampai berhasil."
+        ]
+    },
+    {
+        "id_data": "18",
+        "issue_title": "[FEAT] Integrasi Sistem Antrean Rumah Sakit (Protokol HL7)",
+        "issue_description": "Saat pasien memesan jadwal dokter, kirimkan data rekam medis dasar ke Sistem Informasi Manajemen RS (SIMRS).",
+        "issue_comments": [
+            "Tech Lead: Kirim data pasien pakai format HL7 v2.3 via TCP socket. Kalau bingung struktur message MLLP-nya, pakai API wrapper buatan internal di endpoint `/hl7/send`. Detail URL-nya ada di Postman workspace 'Hospital API'."
+        ]
+    },
+    {
+        "id_data": "19",
+        "issue_title": "[FEAT] Logistik Rute Pengiriman Drone",
+        "issue_description": "Sistem otomatis membuatkan rute udara untuk drone logistik mengirim paket ke pulau terpencil.",
+        "issue_comments": [
+            "Developer: Panggil endpoint `/drone/dispatch`. Body parameter `nav_waypoints` isinya bukan array biasa, tapi array of GeoJSON yang memperhitungkan No-Fly Zone. Script cara kalkulasi GeoJSON-nya silakan cek di tab Pre-request script pada Postman collection 'Drone Delivery'."
+        ]
+    },
+    {
+        "id_data": "20",
+        "issue_title": "[FEAT] Verifikasi Identitas (e-KYC) via Dukcapil",
+        "issue_description": "Pastikan NIK dan Foto KTP pengguna sesuai dengan data kependudukan nasional.",
+        "issue_comments": [
+            "Security: Integrasi dengan API Dukcapil langsung ditolak karena kita belum whitelist IP. Sebagai gantinya, kita pakai proxy internal `/proxy/dukcapil/nik`. Parameter `mac_address` di header harus dipalsukan secara statis seperti contoh yang di-set di environment Postman."
+        ]
+    },
+    {
+        "id_data": "21",
+        "issue_title": "[FEAT] Ticker Harga Saham Realtime",
+        "issue_description": "Halaman portofolio harus mengupdate harga saham berjalan secara live tanpa refresh halaman.",
+        "issue_comments": [
+            "Frontend Dev: Gunakan endpoint `/stock/feed` berbasis Server-Sent Events (SSE). Perhatian: Library SSE standard bawaan browser mungkin gagal karena protokol internal kita dimodifikasi untuk menumpang di atas UDP. Tolong lihat referensi parsing stream-nya di skrip Postman."
+        ]
+    },
+    {
+        "id_data": "22",
+        "issue_title": "[FEAT] Fitur Gamifikasi (Spin the Wheel)",
+        "issue_description": "User yang check-in harian bisa memutar roda keberuntungan untuk mendapatkan diskon acak.",
+        "issue_comments": [
+            "Backend Dev: Logika peluang kemenangannya (RNG) diatur ketat di backend `/game/spin`. Agar algoritmanya bisa dieksekusi, kamu wajib mengirim HTTP Header `X-Random-Seed` hasil hashing waktu lokal device client. Algoritma hash-nya ada di dokumentasi internal."
+        ]
+    },
+    {
+        "id_data": "23",
+        "issue_title": "[FEAT] Validasi Tanda Tangan Dokumen Kontrak (PDF)",
+        "issue_description": "User harus bisa mengunggah file surat kontrak untuk dicek keaslian tanda tangan digitalnya (e-Sign).",
+        "issue_comments": [
+            "QA Engineer: Gunakan endpoint `/pdf/verify-signature`. Format file-nya dikirim via `multipart/form-data`. Untuk testing environment staging, file sertifikat root `.p12` beserta password-nya bisa dicek di environment Postman bernama 'Vault-Staging'."
+        ]
+    },
+    {
+        "id_data": "24",
+        "issue_title": "[FEAT] Sinkronisasi Ticker Harga Emas",
+        "issue_description": "Tarik data harga beli dan harga jual emas per gram hari ini dari provider pihak ketiga.",
+        "issue_comments": [
+            "Developer: Tarik data dari `/gold/vendor/ticker`. Hati-hati, parsing response XML-nya agak aneh karena ada tag CDATA yang di dalamnya memuat JSON string ter-escape. Struktur response aneh ini tidak didokumentasikan di manual mereka."
+        ]
+    },
+    {
+        "id_data": "25",
+        "issue_title": "[FEAT] Fitur Kalkulator KPR Syariah",
+        "issue_description": "Buat simulasi cicilan rumah bulanan berdasarkan prinsip margin murabahah syariah.",
+        "issue_comments": [
+            "Product Owner: Hitung angsuran pakai endpoint internal `/kpr/syariah/calculate`. Rumus perhitungan matematis backend ini menggunakan konvensi margin anuitas menurun yang aturannya cuma ada di buku tebal manual operasional Bank (tidak pernah dimasukkan ke Wiki)."
+        ]
+    },
+    {
+        "id_data": "26",
+        "issue_title": "[FEAT] Cetak Struk ke Printer Bluetooth Kasir",
+        "issue_description": "Aplikasi tablet kasir (POS) harus bisa mem-print struk pembayaran otomatis ke thermal printer via Bluetooth.",
+        "issue_comments": [
+            "Mobile Dev: Kirim raw command ESC/POS ke endpoint IoT gateway `/printer/thermal/print`. Untuk mencetak logo toko di struk kasir, kode hex (bytecode) gambar logo tersebut bisa disalin dari variabel `STORE_LOGO_BYTES` di Postman environment."
+        ]
+    },
+    {
+        "id_data": "27",
+        "issue_title": "[FEAT] IoT Smart Home Device Control",
+        "issue_description": "Aplikasi mobile bisa dipakai untuk menyalakan/mematikan lampu pintar dan AC dari jarak jauh.",
+        "issue_comments": [
+            "IoT Engineer: Panggil endpoint cloud `/iot/device/turn_on`. Protocolnya bukan HTTP, melainkan MQTT over WebSockets. Detail MQTT broker URL, credential pub/sub, dan topic-nya tidak dipublish demi keamanan, silakan cek langsung di Postman workspace 'IoT Devices'."
+        ]
+    },
+    {
+        "id_data": "28",
+        "issue_title": "[FEAT] Otomatisasi Generate Akta Notaris (OpenXML)",
+        "issue_description": "Saat lelang properti ditutup, sistem otomatis men-generate file Microsoft Word (.docx) berisi akta jual beli.",
+        "issue_comments": [
+            "Backend Dev: Endpoint `/notaris/generate_akta`. Variabel template dokumen Word-nya menggunakan syntax templating custom lama. Karena tidak ada dokumentasi parameter apa saja yang harus dikirim, kalian bisa dump variabelnya pakai script yang ada di Postman."
+        ]
+    },
+    {
+        "id_data": "29",
+        "issue_title": "[FEAT] Analisis Emosi Suara Pelanggan (Voice Analysis)",
+        "issue_description": "Merekam suara panggilan pelanggan ke CS dan menganalisis sentimen emosi (marah/senang) dengan AI.",
+        "issue_comments": [
+            "AI Engineer: Gunakan endpoint `/voice/analyze-sentiment`. Endpoint ini tidak menerima MP3/WAV, tapi minta input raw PCM audio 16kHz 16-bit. Format buffer array dan ukuran framing data byte-nya ada di dokumentasi Postman (folder Speech-to-Text)."
+        ]
+    },
+    {
+        "id_data": "30",
+        "issue_title": "[FEAT] Sistem Input Timbangan Truk Logistik Otomatis",
+        "issue_description": "Membaca data berat muatan barang langsung dari sensor timbangan truk (Weighbridge) di gudang.",
+        "issue_comments": [
+            "Tech Lead: Baca berat metrik dari endpoint middleware lokal `/weighbridge/status`. Endpoint ini meneruskan komunikasi port Serial RS-232. Parameter COM port dan Baud rate-nya tidak di-set di backend, melainkan harus dikirim via HTTP header khusus `X-Serial-Config` dari klien."
+        ]
+    }
+]

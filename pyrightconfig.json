@@ -1,0 +1,24 @@
+{
+  "pythonVersion": "3.10",
+  "venvPath": "d:/RAG/Membuat MCP Server",
+  "venv": ".venv",
+  "pythonPlatform": "Windows",
+  "include": [
+    "src"
+  ],
+  "extraPaths": [
+    "d:/RAG/Membuat MCP Server"
+  ],
+  "reportMissingImports": true,
+  "reportMissingModuleSource": false,
+  "useLibraryCodeForTypes": true,
+  "executionEnvironments": [
+    {
+      "root": "d:/RAG/Membuat MCP Server",
+      "pythonVersion": "3.10",
+      "extraPaths": [
+        "d:/RAG/Membuat MCP Server"
+      ]
+    }
+  ]
+}

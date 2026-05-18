@@ -1,0 +1,767 @@
+[
+    {
+        "id_test_case": "US01",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Tambahkan filter pencarian",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 4,
+                "probability": 0.8
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.5,
+        "normalized_uncertainty_score": 0.311
+    },
+    {
+        "id_test_case": "US02",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Opsi E-Wallet",
+        "total_clusters": 3,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 3,
+                "probability": 0.6
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.95,
+        "normalized_uncertainty_score": 0.59
+    },
+    {
+        "id_test_case": "US03",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Penghapusan Permanen Entitas",
+        "total_clusters": 3,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 3,
+                "probability": 0.6
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.95,
+        "normalized_uncertainty_score": 0.59
+    },
+    {
+        "id_test_case": "US04",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Export Laporan",
+        "total_clusters": 3,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 3,
+                "probability": 0.6
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.95,
+        "normalized_uncertainty_score": 0.59
+    },
+    {
+        "id_test_case": "US05",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Sistem Poin",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 4,
+                "probability": 0.8
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.5,
+        "normalized_uncertainty_score": 0.311
+    },
+    {
+        "id_test_case": "US06",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Validasi Password",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 4,
+                "probability": 0.8
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.5,
+        "normalized_uncertainty_score": 0.311
+    },
+    {
+        "id_test_case": "US07",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Penyesuaian Bahasa",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 2,
+                "probability": 0.4
+            },
+            {
+                "cluster_id": 2,
+                "count": 3,
+                "probability": 0.6
+            }
+        ],
+        "discrete_semantic_entropy": 0.673,
+        "normalized_uncertainty_score": 0.418
+    },
+    {
+        "id_test_case": "US08",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Promo Harbolnas",
+        "total_clusters": 3,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 2,
+                "probability": 0.4
+            },
+            {
+                "cluster_id": 2,
+                "count": 2,
+                "probability": 0.4
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 1.055,
+        "normalized_uncertainty_score": 0.655
+    },
+    {
+        "id_test_case": "US09",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Batasan Pengunggahan",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 4,
+                "probability": 0.8
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.5,
+        "normalized_uncertainty_score": 0.311
+    },
+    {
+        "id_test_case": "US10",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Blokir Pengguna",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 3,
+                "probability": 0.6
+            },
+            {
+                "cluster_id": 2,
+                "count": 2,
+                "probability": 0.4
+            }
+        ],
+        "discrete_semantic_entropy": 0.673,
+        "normalized_uncertainty_score": 0.418
+    },
+    {
+        "id_test_case": "US11",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Notifikasi Email Pengingat Keranjang",
+        "total_clusters": 3,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 2,
+                "probability": 0.4
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 2,
+                "probability": 0.4
+            }
+        ],
+        "discrete_semantic_entropy": 1.055,
+        "normalized_uncertainty_score": 0.655
+    },
+    {
+        "id_test_case": "US12",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Keranjang Belanja Kedaluwarsa",
+        "total_clusters": 4,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 2,
+                "probability": 0.4
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 4,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 1.332,
+        "normalized_uncertainty_score": 0.828
+    },
+    {
+        "id_test_case": "US13",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Integrasi Jasa Ekspedisi Baru",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 2,
+                "probability": 0.4
+            },
+            {
+                "cluster_id": 2,
+                "count": 3,
+                "probability": 0.6
+            }
+        ],
+        "discrete_semantic_entropy": 0.673,
+        "normalized_uncertainty_score": 0.418
+    },
+    {
+        "id_test_case": "US14",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Otorisasi Super Admin",
+        "total_clusters": 3,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 3,
+                "probability": 0.6
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.95,
+        "normalized_uncertainty_score": 0.59
+    },
+    {
+        "id_test_case": "US15",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Tampilan Dark Mode",
+        "total_clusters": 5,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 4,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 5,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 1.609,
+        "normalized_uncertainty_score": 1.0
+    },
+    {
+        "id_test_case": "US16",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Mekanisme Refund Otomatis",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 2,
+                "probability": 0.4
+            },
+            {
+                "cluster_id": 2,
+                "count": 3,
+                "probability": 0.6
+            }
+        ],
+        "discrete_semantic_entropy": 0.673,
+        "normalized_uncertainty_score": 0.418
+    },
+    {
+        "id_test_case": "US17",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Urutan Beranda",
+        "total_clusters": 5,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 4,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 5,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 1.609,
+        "normalized_uncertainty_score": 1.0
+    },
+    {
+        "id_test_case": "US18",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Pengelolaan Sesi Tidak Aktif",
+        "total_clusters": 4,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 2,
+                "count": 2,
+                "probability": 0.4
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 4,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 1.332,
+        "normalized_uncertainty_score": 0.828
+    },
+    {
+        "id_test_case": "US19",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Pembagian Daftar Riwayat",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 4,
+                "probability": 0.8
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.5,
+        "normalized_uncertainty_score": 0.311
+    },
+    {
+        "id_test_case": "US20",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Fitur Rating Produk",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 3,
+                "probability": 0.6
+            },
+            {
+                "cluster_id": 2,
+                "count": 2,
+                "probability": 0.4
+            }
+        ],
+        "discrete_semantic_entropy": 0.673,
+        "normalized_uncertainty_score": 0.418
+    },
+    {
+        "id_test_case": "US21",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Penanganan Input Tidak Tepat",
+        "total_clusters": 5,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 4,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 5,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 1.609,
+        "normalized_uncertainty_score": 1.0
+    },
+    {
+        "id_test_case": "US22",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Tampilan Tabel Laporan",
+        "total_clusters": 3,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 2,
+                "count": 2,
+                "probability": 0.4
+            },
+            {
+                "cluster_id": 3,
+                "count": 2,
+                "probability": 0.4
+            }
+        ],
+        "discrete_semantic_entropy": 1.055,
+        "normalized_uncertainty_score": 0.655
+    },
+    {
+        "id_test_case": "US23",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Flash Sale Countdown Timer",
+        "total_clusters": 5,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 4,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 5,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 1.609,
+        "normalized_uncertainty_score": 1.0
+    },
+    {
+        "id_test_case": "US24",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Fitur Upload Video Ulasan",
+        "total_clusters": 5,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 4,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 5,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 1.609,
+        "normalized_uncertainty_score": 1.0
+    },
+    {
+        "id_test_case": "US25",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Estimasi Waktu Pengiriman",
+        "total_clusters": 3,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 2,
+                "probability": 0.4
+            },
+            {
+                "cluster_id": 2,
+                "count": 2,
+                "probability": 0.4
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 1.055,
+        "normalized_uncertainty_score": 0.655
+    },
+    {
+        "id_test_case": "US26",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Badge Verifikasi Toko Official",
+        "total_clusters": 4,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 2,
+                "probability": 0.4
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 4,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 1.332,
+        "normalized_uncertainty_score": 0.828
+    },
+    {
+        "id_test_case": "US27",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Fitur Tambah Wishlist",
+        "total_clusters": 4,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 4,
+                "count": 2,
+                "probability": 0.4
+            }
+        ],
+        "discrete_semantic_entropy": 1.332,
+        "normalized_uncertainty_score": 0.828
+    },
+    {
+        "id_test_case": "US28",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Autentikasi Pihak Ketiga",
+        "total_clusters": 3,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 3,
+                "probability": 0.6
+            },
+            {
+                "cluster_id": 2,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 0.95,
+        "normalized_uncertainty_score": 0.59
+    },
+    {
+        "id_test_case": "US29",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Sinkronisasi Kontak Pengguna",
+        "total_clusters": 2,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 2,
+                "probability": 0.4
+            },
+            {
+                "cluster_id": 2,
+                "count": 3,
+                "probability": 0.6
+            }
+        ],
+        "discrete_semantic_entropy": 0.673,
+        "normalized_uncertainty_score": 0.418
+    },
+    {
+        "id_test_case": "US30",
+        "uncertainty_type": "Aleatoric Uncertainty",
+        "original_issue_title": "[FEAT] Sistem Notifikasi Status Transaksi",
+        "total_clusters": 3,
+        "clusters_distribution": [
+            {
+                "cluster_id": 1,
+                "count": 2,
+                "probability": 0.4
+            },
+            {
+                "cluster_id": 2,
+                "count": 2,
+                "probability": 0.4
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            }
+        ],
+        "discrete_semantic_entropy": 1.055,
+        "normalized_uncertainty_score": 0.655
+    }
+]
