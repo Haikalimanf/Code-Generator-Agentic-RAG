@@ -3,21 +3,36 @@
         "id_test_case": "US01",
         "uncertainty_type": "Aleatoric Uncertainty",
         "original_issue_title": "[FEAT] Tambahkan filter pencarian",
-        "total_clusters": 2,
+        "total_clusters": 5,
         "clusters_distribution": [
             {
                 "cluster_id": 1,
-                "count": 4,
-                "probability": 0.8
+                "count": 1,
+                "probability": 0.2
             },
             {
                 "cluster_id": 2,
                 "count": 1,
                 "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 4,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 5,
+                "count": 1,
+                "probability": 0.2
             }
         ],
-        "discrete_semantic_entropy": 0.5,
-        "normalized_uncertainty_score": 0.311
+        "discrete_semantic_entropy": 1.609,
+        "normalized_uncertainty_score": 1.0
     },
     {
         "id_test_case": "US02",
@@ -98,41 +113,71 @@
         "id_test_case": "US05",
         "uncertainty_type": "Aleatoric Uncertainty",
         "original_issue_title": "[FEAT] Sistem Poin",
-        "total_clusters": 2,
+        "total_clusters": 5,
         "clusters_distribution": [
             {
                 "cluster_id": 1,
-                "count": 4,
-                "probability": 0.8
+                "count": 1,
+                "probability": 0.2
             },
             {
                 "cluster_id": 2,
                 "count": 1,
                 "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 4,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 5,
+                "count": 1,
+                "probability": 0.2
             }
         ],
-        "discrete_semantic_entropy": 0.5,
-        "normalized_uncertainty_score": 0.311
+        "discrete_semantic_entropy": 1.609,
+        "normalized_uncertainty_score": 1.0
     },
     {
         "id_test_case": "US06",
         "uncertainty_type": "Aleatoric Uncertainty",
         "original_issue_title": "[FEAT] Validasi Password",
-        "total_clusters": 2,
+        "total_clusters": 5,
         "clusters_distribution": [
             {
                 "cluster_id": 1,
-                "count": 4,
-                "probability": 0.8
+                "count": 1,
+                "probability": 0.2
             },
             {
                 "cluster_id": 2,
                 "count": 1,
                 "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 4,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 5,
+                "count": 1,
+                "probability": 0.2
             }
         ],
-        "discrete_semantic_entropy": 0.5,
-        "normalized_uncertainty_score": 0.311
+        "discrete_semantic_entropy": 1.609,
+        "normalized_uncertainty_score": 1.0
     },
     {
         "id_test_case": "US07",
@@ -183,21 +228,36 @@
         "id_test_case": "US09",
         "uncertainty_type": "Aleatoric Uncertainty",
         "original_issue_title": "[FEAT] Batasan Pengunggahan",
-        "total_clusters": 2,
+        "total_clusters": 5,
         "clusters_distribution": [
             {
                 "cluster_id": 1,
-                "count": 4,
-                "probability": 0.8
+                "count": 1,
+                "probability": 0.2
             },
             {
                 "cluster_id": 2,
                 "count": 1,
                 "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 4,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 5,
+                "count": 1,
+                "probability": 0.2
             }
         ],
-        "discrete_semantic_entropy": 0.5,
-        "normalized_uncertainty_score": 0.311
+        "discrete_semantic_entropy": 1.609,
+        "normalized_uncertainty_score": 1.0
     },
     {
         "id_test_case": "US10",
@@ -443,21 +503,36 @@
         "id_test_case": "US19",
         "uncertainty_type": "Aleatoric Uncertainty",
         "original_issue_title": "[FEAT] Pembagian Daftar Riwayat",
-        "total_clusters": 2,
+        "total_clusters": 5,
         "clusters_distribution": [
             {
                 "cluster_id": 1,
-                "count": 4,
-                "probability": 0.8
+                "count": 1,
+                "probability": 0.2
             },
             {
                 "cluster_id": 2,
                 "count": 1,
                 "probability": 0.2
+            },
+            {
+                "cluster_id": 3,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 4,
+                "count": 1,
+                "probability": 0.2
+            },
+            {
+                "cluster_id": 5,
+                "count": 1,
+                "probability": 0.2
             }
         ],
-        "discrete_semantic_entropy": 0.5,
-        "normalized_uncertainty_score": 0.311
+        "discrete_semantic_entropy": 1.609,
+        "normalized_uncertainty_score": 1.0
     },
     {
         "id_test_case": "US20",

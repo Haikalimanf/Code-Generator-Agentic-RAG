@@ -81,9 +81,9 @@ PALETTE = {
     "Aleatoric Data": "#e67e22",
 }
 
-THRESHOLD = 0.300
-# Jumlah bin histogram untuk menempatkan setiap batang tepat di tengah-tengah nilai 0.0, 0.1, ..., 1.0
-CUSTOM_BINS = [-0.05 + i * 0.1 for i in range(12)]
+THRESHOLD = 0.400
+# Jumlah bin histogram untuk menempatkan setiap batang di antara nilai (misal 0.0 - 0.1)
+CUSTOM_BINS = [i * 0.1 for i in range(12)]
 
 sns.set_theme(style="whitegrid", font_scale=1.1)
 fig, ax = plt.subplots(figsize=(14, 7))
@@ -159,11 +159,11 @@ ax.set_title(
 ax.set_xlabel("Uncertainty Score (Normalized)", fontsize=13)
 ax.set_ylabel("Jumlah Data (Count)", fontsize=13)
 
-# Tambahkan label tick X yang informatif dengan 1 nilai tepat (0.0, 0.1, dst)
-bin_centers = [i * 0.1 for i in range(11)]
-bin_labels = [f"{x:.1f}" for x in bin_centers]
-ax.set_xticks(bin_centers)
-ax.set_xticklabels(bin_labels, rotation=0, fontsize=11)
+# Tambahkan label tick X yang informatif dengan batas-batas (0.0, 0.1, dst)
+tick_positions = [i * 0.1 for i in range(11)]
+tick_labels = [f"{x:.1f}" for x in tick_positions]
+ax.set_xticks(tick_positions)
+ax.set_xticklabels(tick_labels, rotation=0, fontsize=11)
 
 # ─── Legend ───
 legend = ax.get_legend()

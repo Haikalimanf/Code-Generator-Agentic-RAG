@@ -4,11 +4,11 @@
         "uncertainty_type": "Aleatoric Uncertainty",
         "original_issue_title": "[FEAT] Tambahkan filter pencarian",
         "sampled_responses": [
-            "As a mobile developer, I want to implement a search filter feature, so that users can easily find specific items within the application.",
-            "As a mobile developer, I want to implement a search filter feature, so that users can easily find the content they are looking for.",
-            "As a mobile developer, I want to implement a search filter feature, so that users can easily find relevant content within the application.",
-            "As a mobile developer, I want to implement a search filter feature, so that users can easily find specific content within the application.",
-            "As a mobile developer, I want to implement a search filter feature, so that users can easily find specific content within the application."
+            "As a mobile developer, I want to implement a search filter feature, so that users can narrow down large catalogs based on specific criteria like price, rating, or category.",
+            "As a mobile developer, I want to implement a search filter feature, so that users can save time by skipping irrelevant results and finding their desired items instantly.",
+            "As a mobile developer, I want to implement a search filter feature, so that users can discover items that precisely match their personal budget and preferences.",
+            "As a mobile developer, I want to implement a search filter feature, so that users don't feel overwhelmed by massive amounts of data and can browse comfortably.",
+            "As a mobile developer, I want to implement a search filter feature, so that users can apply multiple parameters simultaneously to pinpoint the exact content they need."
         ]
     },
     {
@@ -52,11 +52,11 @@
         "uncertainty_type": "Aleatoric Uncertainty",
         "original_issue_title": "[FEAT] Sistem Poin",
         "sampled_responses": [
-            "As a mobile developer, I want to implement a point system, so that users can earn and track points as they engage with the app.",
-            "As a mobile developer, I want to implement a points system in the application, so that users can earn and track their points for engaging with the app.",
-            "As a mobile developer, I want to implement a point system that tracks user achievements, so that users can be rewarded for their activities and enhance engagement.",
-            "As a mobile developer, I want to implement a point system feature, so that users can earn and track points within the app for their activities.",
-            "As a mobile developer, I want to implement a point system feature, so that users can earn and track their points within the application."
+            "As a mobile developer, I want to implement a point system, so that users can redeem their accumulated points for exciting rewards, discounts, or shopping vouchers.",
+            "As a mobile developer, I want to implement a points system in the application, so that users feel motivated to complete daily challenges and maintain a consistent active streak.",
+            "As a mobile developer, I want to implement a point system that tracks user achievements, so that users can unlock exclusive profile badges and level up their membership tier.",
+            "As a mobile developer, I want to implement a point system feature, so that users see a tangible value and direct return on the time they invest while interacting with the app.",
+            "As a mobile developer, I want to implement a point system feature, so that users can compare their scores on a community leaderboard, driving a friendly sense of competition."
         ]
     },
     {
@@ -64,11 +64,11 @@
         "uncertainty_type": "Aleatoric Uncertainty",
         "original_issue_title": "[FEAT] Validasi Password",
         "sampled_responses": [
-            "As a mobile developer, I want to implement password validation feature, so that users can create secure accounts and prevent unauthorized access.",
-            "As a mobile developer, I want to implement password validation, so that users can create secure accounts and protect their personal information.",
-            "As a mobile developer, I want to implement password validation on the mobile app, so that users can create secure accounts and protect their personal information.",
-            "As a mobile developer, I want to implement password validation to enhance security during user authentication, so that users can safely access their accounts without compromising their personal information.",
-            "As a mobile developer, I want to implement password validation functionality, so that users can ensure their passwords meet security requirements before account creation."
+            "As a mobile developer, I want to implement password validation feature, so that users can safeguard their personal and sensitive data against potential data breaches.",
+            "As a mobile developer, I want to implement password validation, so that users are steered away from using weak, easily guessable phrases during the registration process.",
+            "As a mobile developer, I want to implement password validation on the mobile app, so that users feel completely confident that their accounts are protected by modern security standards.",
+            "As a mobile developer, I want to implement password validation to enhance security during user authentication, so that users receive instant clarity on which mandatory criteria (like symbols or numbers) are still missing.",
+            "As a mobile developer, I want to implement password validation functionality, so that users can prevent future account compromises caused by using reused or weak credentials."
         ]
     },
     {
@@ -100,11 +100,11 @@
         "uncertainty_type": "Aleatoric Uncertainty",
         "original_issue_title": "[FEAT] Batasan Pengunggahan",
         "sampled_responses": [
-            "As a mobile developer, I want to implement upload limits for users, so that we can maintain system performance and prevent misuse.",
-            "As a mobile developer, I want to implement upload limits for users, so that we can maintain server stability and improve performance.",
-            "As a mobile developer, I want to implement an upload limit feature, so that users can maintain better control and avoid overload during file uploads.",
-            "As a mobile developer, I want to implement upload limits for users, so that we can ensure fair usage and maintain server performance.",
-            "As a mobile developer, I want to implement upload limits for users, so that we can maintain performance and prevent misuse of the system."
+            "As a mobile developer, I want to implement upload limits for users, so that users don't experience application crashes or sluggish performance caused by server congestion.",
+            "As a mobile developer, I want to implement upload limits for users, so that users receive clear, real-time warnings before wasting mobile data on oversized files.",
+            "As a mobile developer, I want to implement an upload limit feature, so that users enjoy a fair distribution of bandwidth and equal access to system resources.",
+            "As a mobile developer, I want to implement upload limits for users, so that users can efficiently manage their personal storage allocations within the app.",
+            "As a mobile developer, I want to implement upload limits for users, so that users benefit from highly stable backend processing and faster overall file-handling queues."
         ]
     },
     {
@@ -220,11 +220,11 @@
         "uncertainty_type": "Aleatoric Uncertainty",
         "original_issue_title": "[FEAT] Pembagian Daftar Riwayat",
         "sampled_responses": [
-            "As a mobile developer, I want to implement a feature that divides the history list into several sections, so that users can view their history more organized and easily.",
-            "As a mobile developer, I want to implement the feature to paginate the history list, so that users can easily navigate and view their history without overwhelming them with too much information at once.",
-            "As a mobile developer, I want to implement a feature that divides the history list into sections, so that users can easily navigate and manage their history.",
-            "As a mobile developer, I want to implement a segmented view for the history list, so that users can easily navigate and find specific entries.",
-            "As a mobile developer, I want to implement functionality to divide the history list into several sections, so that users can easily navigate and manage their history."
+            "As a mobile developer, I want to implement a feature that divides the history list into several sections, so that users can instantly view their past activities categorized by clear timeframes like today, yesterday, or earlier this month.",
+            "As a mobile developer, I want to implement the feature to paginate the history list, so that users experience faster initial screen loading times and consume less mobile data by fetching records incrementally.",
+            "As a mobile developer, I want to implement a feature that divides the history list into sections, so that users can perform bulk management actions, such as clearing an entire section's history in a single tap.",
+            "As a mobile developer, I want to implement a segmented view for the history list, so that users can seamlessly toggle between different activity categories to isolate specific logs without scrolling endlessly.",
+            "As a mobile developer, I want to implement functionality to divide the history list into several sections, so that users benefit from a cleaner visual structure that reduces cognitive fatigue when scanning through massive logs."
         ]
     },
     {
