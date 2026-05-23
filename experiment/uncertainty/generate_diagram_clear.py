@@ -36,7 +36,7 @@ print(df["score"].describe().to_string())
 print()
 
 PALETTE = {"Clear Data": "#2ecc71"}
-CUSTOM_BINS = [i * 0.1 for i in range(12)]
+CUSTOM_BINS = [i * 0.1 for i in range(11)]
 
 sns.set_theme(style="whitegrid", font_scale=1.1)
 fig, ax = plt.subplots(figsize=(14, 7))

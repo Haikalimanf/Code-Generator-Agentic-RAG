@@ -83,7 +83,7 @@ PALETTE = {
 
 THRESHOLD = 0.400
 # Jumlah bin histogram untuk menempatkan setiap batang di antara nilai (misal 0.0 - 0.1)
-CUSTOM_BINS = [i * 0.1 for i in range(12)]
+CUSTOM_BINS = [i * 0.1 for i in range(11)]
 
 sns.set_theme(style="whitegrid", font_scale=1.1)
 fig, ax = plt.subplots(figsize=(14, 7))
@@ -136,7 +136,7 @@ ax.text(
 # ─── Bayangan latar "SYSTEM IS UNCERTAIN" (kanan threshold) ───
 ax.axvspan(THRESHOLD, 1.0, color="#e74c3c", alpha=0.07)
 ax.text(
-    (1.0 + THRESHOLD) / 2, y_max * 0.93,
+    (1.0 + THRESHOLD) / 2, y_max * 0.99,
     "SYSTEM IS UNCERTAIN",
     color="#c0392b", fontsize=13, fontweight="bold",
     ha="center", va="top", alpha=0.85
