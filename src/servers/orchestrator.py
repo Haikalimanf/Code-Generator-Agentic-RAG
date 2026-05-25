@@ -1,9 +1,16 @@
 """
-Integration Orchestrator -- Predefined Workflow
+Integration Orchestrator -- Planner-Executor Architecture (LangGraph)
 
-Arsitektur: ZERO LLM di layer orchestrator.
-Setiap task memanggil satu tool spesifik secara langsung (direct tool call).
-LLM hanya ada di dalam masing-masing specialist MCP server.
+Arsitektur: LLM Planner di layer orchestrator dengan Context Engineering.
+Planner menganalisis requirement, melakukan dekomposisi tugas, dan membuat
+PLAN UNIK untuk setiap agen spesialis — bukan meneruskan user story mentah.
+
+Prinsip Context Engineering:
+- Setiap agen (Executor) hanya menerima instruksi dan konteks yang relevan
+  untuk domainnya, memaksimalkan akurasi dan efisiensi token.
+
+Migrasi dari: Zero-LLM hardcoded asyncio.gather()
+Migrasi ke:   LangGraph StateGraph + Planner Node + Dynamic Routing + Context Engineering
 """
 
 import os
@@ -11,19 +18,26 @@ import sys
 import asyncio
 import json
 import logging
-from typing import Dict, Any
+import operator
+from typing import Dict, Any, List, Optional, Annotated, TypedDict
 from pathlib import Path
 
 from dotenv import load_dotenv
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from fastmcp import FastMCP
+from langgraph.graph import StateGraph, START, END
 
 from src.config.settings import settings
+from src.utils.llm_factory import create_llm
+from src.models.schemas import PlannerDecision
 
 load_dotenv()
 
 logger = logging.getLogger("orchestrator")
 
+# ---------------------------------------------------------------------------
+# RAG Import (direct, bukan MCP subprocess)
+# ---------------------------------------------------------------------------
 try:
     from src.servers.pdf_rag import run_compliance_expert_agent
     RAG_AVAILABLE = True
@@ -32,6 +46,9 @@ except Exception as e:
     RAG_AVAILABLE = False
     RAG_ERROR_DETAIL = str(e)
 
+# ---------------------------------------------------------------------------
+# Constants & Config Diagnostics
+# ---------------------------------------------------------------------------
 PYTHON_CMD = sys.executable
 PROJECT_ROOT = settings.project_root
 
@@ -46,6 +63,9 @@ if not RAG_AVAILABLE:
 
 logger.info("Environment config: %s", CONFIG_DIAGNOSTICS)
 
+# ---------------------------------------------------------------------------
+# MCP Servers Config (conditional registration)
+# ---------------------------------------------------------------------------
 MCP_SERVERS_CONFIG: Dict[str, Any] = {}
 
 if settings.android_project_root and Path(settings.android_project_root).exists():
@@ -79,15 +99,69 @@ MCP_SERVERS_CONFIG["figma"] = {
     "env": {**os.environ},
 }
 
+# RAG is called directly in-process via asyncio.to_thread rather than as an MCP subprocess.
+
+
 logger.info("MCP servers aktif: %s", list(MCP_SERVERS_CONFIG.keys()))
+
+# ---------------------------------------------------------------------------
+# Figma Node Map (keyword → Figma node ID)
+# ---------------------------------------------------------------------------
+FIGMA_NODE_MAP = {
+    "login": "2335:6376",
+    "register": "2335:6404",
+    "chat": "2335:5716",
+    "home": "2335:5799",
+}
+
+
+# ---------------------------------------------------------------------------
+# _call_tool helper (preserved from original)
+# ---------------------------------------------------------------------------
+def _clean_tool_output(result: Any) -> str:
+    if result is None:
+        return ""
+    
+    if isinstance(result, list):
+        texts = []
+        for item in result:
+            if hasattr(item, "text"):
+                texts.append(item.text)
+            elif isinstance(item, dict) and "text" in item:
+                texts.append(item["text"])
+            elif isinstance(item, str):
+                texts.append(item)
+            else:
+                texts.append(str(item))
+        return "\n".join(texts)
+    
+    if hasattr(result, "text"):
+        return result.text
+    if isinstance(result, dict) and "text" in result:
+        return result["text"]
+        
+    return str(result)
+
+
+def _extract_story(requirement: str) -> str:
+    if not requirement:
+        return ""
+    try:
+        data = json.loads(requirement)
+        if isinstance(data, dict) and "story" in data:
+            return data["story"]
+    except Exception:
+        pass
+    return requirement
 
 
 async def _call_tool(server_key: str, tool_name: str, tool_args: Dict) -> str | None:
+    """Memanggil satu tool dari satu MCP server secara dinamis."""
     config = MCP_SERVERS_CONFIG.get(server_key)
     if not config:
         return None
 
-    try:
+    async def _execute():
         client = MultiServerMCPClient({server_key: config})
         tools = await client.get_tools()
 
@@ -99,28 +173,512 @@ async def _call_tool(server_key: str, tool_name: str, tool_args: Dict) -> str | 
 
         logger.info("Calling %s/%s ...", server_key, target.name)
         result = await target.ainvoke(tool_args)
-        return str(result)
+        return _clean_tool_output(result)
 
+    try:
+        # Maksimal 120 detik per panggilan tool sub-agent agar tidak hang selamanya
+        return await asyncio.wait_for(_execute(), timeout=120.0)
+    except asyncio.TimeoutError:
+        logger.error("Timeout memanggil %s/%s (>120 detik)", server_key, tool_name)
+        return None
     except Exception as e:
         logger.error("Error calling %s/%s: %s", server_key, tool_name, e)
         return None
 
 
+
+# ============================================================
+class OrchestratorState(TypedDict):
+    """State global untuk orchestrator graph.
+
+    Arsitektur Planner-Executor:
+    - Planner (Supervisor): Melakukan dekomposisi tugas dan Context Engineering,
+      memastikan setiap agen hanya menerima instruksi yang relevan.
+    - Executor (Specialist Nodes): Menjalankan instruksi spesifik dari Planner.
+
+    Fields:
+        requirement:         Input user story / GitLab requirement.
+        agent_plan:          Mapping dari nama agen ke plan terstruktur (SpecialistTask).
+                             Setiap agen menerima INSTRUKSI UNIK, bukan user story mentah.
+        code_structure:      Output dari Android Studio specialist.
+        api_contracts:       Output dari Postman specialist.
+        design_context:      Output dari Figma specialist.
+        company_guidelines:  Output dari RAG specialist.
+        errors:              Akumulasi error dari seluruh specialist (reducer: add).
+        consolidated_output: Output JSON akhir dari Consolidation Node.
+    """
+    requirement: str
+    agent_plan: Dict[str, dict]
+    code_structure: Optional[str]
+    api_contracts: Optional[str]
+    design_context: Optional[str]
+    company_guidelines: Optional[str]
+    errors: Annotated[List[str], operator.add]
+    consolidated_output: Optional[str]
+
+
+# ============================================================
+# LangGraph: Supervisor Node (LLM-Driven Decision)
+# ============================================================
+
+SUPERVISOR_PROMPT = """\
+Anda adalah Planner untuk sistem Android Development Automation.
+
+Tugas Anda: Menganalisis requirement/user story, melakukan dekomposisi tugas (task decomposition),
+dan membuat PLAN yang UNIK dan TERFOKUS untuk setiap agen spesialis yang relevan.
+
+## PRINSIP CONTEXT ENGINEERING
+
+1. PRINSIP KONTEKS MINIMUM: Setiap agen HANYA menerima konteks yang relevan dengan domainnya.
+   JANGAN meneruskan seluruh User Story secara mentah ke setiap agen.
+
+2. DEKOMPOSISI FOKUS: Pecah requirement menjadi sub-tugas yang spesifik per domain.
+   Setiap sub-tugas harus jelas: apa yang harus dikerjakan, area fokus, dan output yang diharapkan.
+
+3. ISOLASI KONTEKS: Agen A tidak perlu tahu tentang hal yang hanya relevan untuk Agen B.
+   Misalnya, agen Postman tidak perlu tahu tentang pedoman coding RAG, dan sebaliknya.
+
+4. INSTRUKSI YANG BERBEDA: Setiap agen harus menerima instruksi yang BERBEDA, bukan
+   copy-paste dari user story. Sesuaikan bahasa dan detail instruksi dengan domain agen.
+
+## Spesialis yang Tersedia
+
+- "android_studio": Menganalisis struktur kode proyek Android, file krusial, dan pola arsitektur.
+  Saat membuat plan untuk agen ini, fokus pada:
+  - File/modul mana yang perlu diperiksa
+  - Pola arsitektur apa yang harus ditemukan (MVVM, Clean Architecture, dll)
+  - Navigasi kode apa yang diperlukan untuk memahami implementasi fitur
+
+- "postman": Menganalisis API contracts dan endpoint dari koleksi Postman.
+  Saat membuat plan untuk agen ini, fokus pada:
+  - Endpoint/API mana yang relevan dengan fitur
+  - Method, request body, dan response schema apa yang dibutuhkan
+  - Alur API yang harus diikuti untuk implementasi fitur
+
+- "figma": Menganalisis desain UI/UX dari Figma (XML metadata).
+  Saat membuat plan untuk agen ini, fokus pada:
+  - Layar/komponen UI mana yang perlu dianalisis
+  - Elemen desain apa yang harus diekstrak (layout, style, komponen)
+  - Bagian mana dari requirement yang terkait UI/UX
+
+- "rag": Mengambil pedoman coding dan standar perusahaan dari dokumen internal.
+  Saat membuat plan untuk agen ini, fokus pada:
+  - Standar coding apa yang perlu dicek untuk fitur ini
+  - Naming convention dan arsitektur yang relevan
+  - Best practice spesifik untuk jenis implementasi yang dibutuhkan
+
+## Constraint
+
+Server yang AKTIF saat ini: {active_servers}
+RAG status: {rag_status}
+Jika sebuah server atau RAG tidak aktif, JANGAN buat plan untuk agen tersebut.
+
+## Requirement
+
+{requirement}
+
+Buat PLAN yang UNIK untuk setiap agen. Setiap plan WAJIB mengandung:
+- task: Instruksi spesifik yang hanya berisi konteks relevan untuk domain agen tersebut (BUKAN copy-paste User Story!)
+- focus_areas: Daftar aspek spesifik yang harus difokuskan (misal: ["naming convention untuk ViewModel", "pola Repository pattern"])
+- context_scope: HANYA bagian dari requirement yang relevan untuk agen ini (bukan seluruh story)
+- expected_output: Jenis output yang diharapkan dari agen ini
+
+PENTING: Setiap agen harus menerima instruksi yang BERBEDA dan TERFOKUS pada domainnya masing-masing.
+JANGAN mengulang seluruh User Story di setiap plan."""
+
+
+async def supervisor_node(state: OrchestratorState) -> dict:
+    """Planner Node: menganalisis requirement, melakukan dekomposisi tugas dengan Context Engineering.
+
+    Setiap agen spesialis menerima PLAN yang UNIK dan TERFOKUS, bukan user story mentah.
+    Ini memastikan efisiensi token dan akurasi output per agen.
+    """
+    requirement = state["requirement"]
+    story = _extract_story(requirement)
+    logger.info("🧠 [Planner] Menganalisis requirement dan membuat plan unik per agen...")
+
+    available_agents = list(MCP_SERVERS_CONFIG.keys())
+    if RAG_AVAILABLE:
+        available_agents.append("rag")
+
+    try:
+        llm = create_llm(temperature=0.0)
+        llm_structured = llm.with_structured_output(PlannerDecision)
+
+        prompt = SUPERVISOR_PROMPT.format(
+            active_servers=", ".join(available_agents),
+            rag_status="AVAILABLE" if RAG_AVAILABLE else f"UNAVAILABLE ({RAG_ERROR_DETAIL})",
+            requirement=story,
+        )
+
+        result: PlannerDecision = await llm_structured.ainvoke(prompt)
+
+        # Filter: hanya agen yang benar-benar aktif/tersedia
+        filtered_plan = {}
+        for agent in ["android_studio", "postman", "figma", "rag"]:
+            if agent in available_agents:
+                task_data = getattr(result, agent, None)
+                if task_data and task_data.task:
+                    filtered_plan[agent] = task_data.model_dump()
+
+        logger.info("[Planner] Routing decision: %s", list(filtered_plan.keys()))
+        logger.info("[Planner] Reasoning: %s", result.reasoning)
+        for agent, plan in filtered_plan.items():
+            logger.info("[Planner] Plan for '%s': task='%s'", agent, plan.get("task", "")[:80])
+
+        return {"agent_plan": filtered_plan}
+
+    except Exception as e:
+        logger.error("[Planner] LLM Error: %s. Fallback: membuat plan generik per agen.", e)
+        fallback_plan = {}
+        for agent in available_agents:
+            fallback_plan[agent] = {
+                "task": f"Menganalisis implementasi terkait: {story[:200]}",
+                "focus_areas": ["implementasi fitur"],
+                "context_scope": story[:300],
+                "expected_output": "Analisis konteks teknis untuk fitur yang diminta",
+            }
+        return {
+            "agent_plan": fallback_plan,
+            "errors": [f"Planner LLM error (fallback to generic plans): {e}"],
+        }
+
+
+# ============================================================
+# LangGraph: Dynamic Routing Function
+# ============================================================
+
+AGENT_TO_NODE = {
+    "android_studio": "android_studio_node",
+    "postman": "postman_node",
+    "figma": "figma_node",
+    "rag": "rag_node",
+}
+
+
+def route_to_specialists(state: OrchestratorState) -> list[str]:
+    """Dynamic routing berdasarkan keputusan Planner.
+
+    Mengembalikan list nama node (str) untuk fan-out paralel.
+    Jika tidak ada agen yang memiliki plan, langsung ke consolidation.
+    """
+    plan = state.get("agent_plan", {})
+
+    if not plan:
+        logger.warning("Tidak ada agen yang memiliki plan. Langsung ke konsolidasi.")
+        return ["consolidation_node"]
+
+    targets = []
+    for agent in plan.keys():
+        node_name = AGENT_TO_NODE.get(agent)
+        if node_name:
+            targets.append(node_name)
+        else:
+            logger.warning("Unknown agent '%s', skipping.", agent)
+
+    return targets if targets else ["consolidation_node"]
+
+
+
+# ============================================================
+# LangGraph: Specialist Nodes
+# ============================================================
+
+async def android_studio_node(state: OrchestratorState) -> dict:
+    """Specialist Node: Android Studio — project structure & architecture.
+
+    Menerima plan terstruktur dari Planner (Context Engineering), bukan user story mentah.
+    """
+    plan = state.get("agent_plan", {}).get("android_studio", {})
+    task = plan.get("task", "")
+    focus_areas = plan.get("focus_areas", [])
+    context_scope = plan.get("context_scope", "")
+    expected_output = plan.get("expected_output", "")
+    logger.info("[Android Studio] Dry Run - menjalankan plan terstruktur...")
+    output = (
+        f"MOCK EXECUTION (DRY RUN)\n"
+        f"Server: android_studio\n"
+        f"Tool: run_android_architect_agent\n"
+        f"--- Planner Plan (Context Engineering) ---\n"
+        f"  task: {task}\n"
+        f"  focus_areas: {focus_areas}\n"
+        f"  context_scope: {context_scope}\n"
+        f"  expected_output: {expected_output}\n"
+        f"--- End Plan ---\n"
+        f"Arguments:\n"
+        f"  user_query: {task}"
+    )
+    return {"code_structure": output}
+
+
+async def postman_node(state: OrchestratorState) -> dict:
+    """Specialist Node: Postman — API contracts & endpoints.
+
+    Menerima plan terstruktur dari Planner (Context Engineering), bukan user story mentah.
+    """
+    plan = state.get("agent_plan", {}).get("postman", {})
+    task = plan.get("task", "")
+    focus_areas = plan.get("focus_areas", [])
+    context_scope = plan.get("context_scope", "")
+    expected_output = plan.get("expected_output", "")
+    logger.info("[Postman] Dry Run - menjalankan plan terstruktur...")
+    output = (
+        f"MOCK EXECUTION (DRY RUN)\n"
+        f"Server: postman\n"
+        f"Tool: run_postman_analyst_agent\n"
+        f"--- Planner Plan (Context Engineering) ---\n"
+        f"  task: {task}\n"
+        f"  focus_areas: {focus_areas}\n"
+        f"  context_scope: {context_scope}\n"
+        f"  expected_output: {expected_output}\n"
+        f"--- End Plan ---\n"
+        f"Arguments:\n"
+        f"  user_query: {task}"
+    )
+    return {"api_contracts": output}
+
+
+async def figma_node(state: OrchestratorState) -> dict:
+    """Specialist Node: Figma — UI design XML metadata.
+
+    Menerima plan terstruktur dari Planner (Context Engineering), bukan user story mentah.
+    """
+    plan = state.get("agent_plan", {}).get("figma", {})
+    task = plan.get("task", "")
+    focus_areas = plan.get("focus_areas", [])
+    context_scope = plan.get("context_scope", "")
+    expected_output = plan.get("expected_output", "")
+    logger.info("[Figma] Dry Run - menjalankan plan terstruktur...")
+
+    search_text = f"{task} {context_scope}".lower()
+    node_id = next(
+        (nid for kw, nid in FIGMA_NODE_MAP.items() if kw in search_text),
+        "2335:6376",
+    )
+
+    output = (
+        f"MOCK EXECUTION (DRY RUN)\n"
+        f"Server: figma\n"
+        f"Tool: get_figma_xml_metadata\n"
+        f"--- Planner Plan (Context Engineering) ---\n"
+        f"  task: {task}\n"
+        f"  focus_areas: {focus_areas}\n"
+        f"  context_scope: {context_scope}\n"
+        f"  expected_output: {expected_output}\n"
+        f"--- End Plan ---\n"
+        f"Arguments:\n"
+        f"  node_id: {node_id}\n"
+        f"  instruction: {task}"
+    )
+    return {"design_context": output}
+
+
+async def rag_node(state: OrchestratorState) -> dict:
+    """Specialist Node: RAG — company guidelines & coding standards.
+
+    Menerima plan terstruktur dari Planner (Context Engineering), bukan user story mentah.
+    """
+    plan = state.get("agent_plan", {}).get("rag", {})
+    task = plan.get("task", "")
+    focus_areas = plan.get("focus_areas", [])
+    context_scope = plan.get("context_scope", "")
+    expected_output = plan.get("expected_output", "")
+    logger.info("[RAG] Dry Run - menjalankan plan terstruktur...")
+    output = (
+        f"MOCK EXECUTION (DRY RUN)\n"
+        f"Server: RAG (Direct Import)\n"
+        f"Tool: run_compliance_expert_agent\n"
+        f"--- Planner Plan (Context Engineering) ---\n"
+        f"  task: {task}\n"
+        f"  focus_areas: {focus_areas}\n"
+        f"  context_scope: {context_scope}\n"
+        f"  expected_output: {expected_output}\n"
+        f"--- End Plan ---\n"
+        f"Arguments:\n"
+        f"  user_query: {task}"
+    )
+    return {"company_guidelines": output}
+
+
+
+# ============================================================
+# LangGraph: Consolidation Node
+# ============================================================
+
+async def consolidation_node(state: OrchestratorState) -> dict:
+    """Consolidation Node: menyusun output akhir dari semua specialist dalam bentuk Markdown.
+
+    Menampilkan juga rincian plan hasil dekomposisi Planner (Context Engineering)
+    agar transparan bagaimana setiap agen menerima instruksi terfokus.
+    """
+    logger.info("📋 [Consolidation] Menyusun output akhir ke format Markdown...")
+
+    # Helper untuk merapikan JSON strings jika ada
+    def format_json_field(val: Any) -> str:
+        if not val:
+            return ""
+        if isinstance(val, str):
+            try:
+                parsed_val = json.loads(val)
+                return json.dumps(parsed_val, indent=2, ensure_ascii=False)
+            except Exception:
+                return val
+        try:
+            return json.dumps(val, indent=2, ensure_ascii=False)
+        except Exception:
+            return str(val)
+
+    sections = []
+    sections.append("# Technical Integration Context Blueprint\n")
+    
+    # Bagian Requirement
+    req = state["requirement"]
+    try:
+        req_parsed = json.loads(req)
+        if isinstance(req_parsed, dict):
+            req_md = ""
+            if "role" in req_parsed:
+                req_md += f"- **Role**: {req_parsed['role']}\n"
+            if "goal" in req_parsed:
+                req_md += f"- **Goal**: {req_parsed['goal']}\n"
+            if "benefit" in req_parsed:
+                req_md += f"- **Benefit**: {req_parsed['benefit']}\n"
+            if "story" in req_parsed:
+                req_md += f"- **User Story**: {req_parsed['story']}\n"
+            if req_md:
+                sections.append(f"## Kebutuhan Sistem / Requirement\n\n{req_md}")
+            else:
+                sections.append(f"## Kebutuhan Sistem / Requirement\n\n```json\n{json.dumps(req_parsed, indent=2, ensure_ascii=False)}\n```")
+        else:
+            sections.append(f"## Kebutuhan Sistem / Requirement\n\n{req}")
+    except Exception:
+        sections.append(f"## Kebutuhan Sistem / Requirement\n\n{req}")
+
+    # Bagian Planner Decision & Detail Tugas (Context Engineering)
+    agent_plan = state.get("agent_plan", {})
+    if agent_plan:
+        agent_list = ", ".join([f"`{a}`" for a in agent_plan.keys()])
+        sections.append(f"**Specialist Agents Terlibat**: {agent_list}\n")
+
+        sections.append("### Rincian Plan Hasil Dekomposisi (Planner -> Context Engineering)")
+        sections.append("")
+        for agent, plan_data in agent_plan.items():
+            task = plan_data.get("task", "-")
+            focus = plan_data.get("focus_areas", [])
+            scope = plan_data.get("context_scope", "-")
+            expected = plan_data.get("expected_output", "-")
+            sections.append(f"#### `{agent}`")
+            sections.append(f"- **Task**: {task}")
+            sections.append(f"- **Focus Areas**: {', '.join(focus) if isinstance(focus, list) else focus}")
+            sections.append(f"- **Context Scope**: {scope}")
+            sections.append(f"- **Expected Output**: {expected}")
+            sections.append("")
+
+    # Bagian 1: Android Studio (Code Structure)
+    if state.get("code_structure"):
+        code_struct = format_json_field(state["code_structure"])
+        sections.append(f"## 1. Struktur & File Project (Android Studio)\n\n```json\n{code_struct}\n```")
+
+    # Bagian 2: API Contracts (Postman)
+    if state.get("api_contracts"):
+        api_contracts = format_json_field(state["api_contracts"])
+        sections.append(f"## 2. API Contracts (Postman)\n\n```json\n{api_contracts}\n```")
+
+    # Bagian 3: Desain UI & XML (Figma)
+    if state.get("design_context"):
+        design_context = format_json_field(state["design_context"])
+        sections.append(f"## 3. Desain UI & XML (Figma)\n\n```json\n{design_context}\n```")
+
+    # Bagian 4: Pedoman Coding & Best Practices (RAG)
+    if state.get("company_guidelines"):
+        company_guidelines = format_json_field(state["company_guidelines"])
+        sections.append(f"## 4. Pedoman Coding & Best Practices (RAG)\n\n```json\n{company_guidelines}\n```")
+
+    # Bagian Errors & Peringatan
+    errors = state.get("errors", [])
+    if errors:
+        error_list = "\n".join(f"- {e}" for e in errors)
+        sections.append(f"## Errors & Peringatan Selama Proses\n\n{error_list}")
+
+    markdown_output = "\n\n---\n\n".join(sections)
+    
+    filled = sum(
+        1 for k in ["code_structure", "api_contracts", "design_context", "company_guidelines"]
+        if state.get(k) is not None
+    )
+    logger.info(
+        "📋 [Consolidation] DONE (%d/4 sources compiled to Markdown, %d errors)",
+        filled, len(errors),
+    )
+
+    return {"consolidated_output": markdown_output}
+
+
+# ============================================================
+# LangGraph: Build & Compile Graph
+# ============================================================
+
+def _build_orchestrator_graph():
+    """Membangun dan mengkompilasi orchestrator StateGraph.
+
+    Flow:
+        START → supervisor_node → [dynamic routing] → specialist nodes → consolidation_node → END
+    """
+    graph = StateGraph(OrchestratorState)
+
+    # -- Nodes --
+    graph.add_node("supervisor_node", supervisor_node)
+    graph.add_node("android_studio_node", android_studio_node)
+    graph.add_node("postman_node", postman_node)
+    graph.add_node("figma_node", figma_node)
+    graph.add_node("rag_node", rag_node)
+    graph.add_node("consolidation_node", consolidation_node)
+
+    # -- Edges --
+    graph.add_edge(START, "supervisor_node")
+
+    # Fan-out: Supervisor → dynamic routing ke specialist nodes (paralel)
+    graph.add_conditional_edges(
+        "supervisor_node",
+        route_to_specialists,
+        path_map={
+            "android_studio_node": "android_studio_node",
+            "postman_node": "postman_node",
+            "figma_node": "figma_node",
+            "rag_node": "rag_node",
+            "consolidation_node": "consolidation_node",
+        }
+    )
+
+    # Fan-in: Semua specialist → consolidation (LangGraph menunggu semua selesai)
+    graph.add_edge("android_studio_node", "consolidation_node")
+    graph.add_edge("postman_node", "consolidation_node")
+    graph.add_edge("figma_node", "consolidation_node")
+    graph.add_edge("rag_node", "consolidation_node")
+
+    graph.add_edge("consolidation_node", END)
+
+    return graph.compile()
+
+
+orchestrator_graph = _build_orchestrator_graph()
+logger.info("LangGraph orchestrator compiled successfully.")
+
+
+# ============================================================
+# FastMCP Server (Backward Compatible Interface)
+# ============================================================
+
 mcp = FastMCP(
     name="IntegrationOrchestrator",
     instructions=(
-        "Predefined workflow orchestrator. "
-        "Koordinasi Android Studio, Postman, Figma, dan RAG "
-        "dengan direct tool calls -- tanpa LLM reasoning di layer ini."
+        "AI-Driven Autonomous Orchestrator (Planner-Executor Architecture). "
+        "Planner LLM menganalisis requirement, melakukan dekomposisi tugas dengan Context Engineering, "
+        "dan membuat plan unik per specialist. Setiap specialist (Executor) hanya menerima "
+        "konteks yang relevan untuk domainnya, bukan user story mentah. "
+        "Specialists: Android Studio, Postman, Figma, RAG."
     ),
 )
-
-FIGMA_NODE_MAP = {
-    "login": "2335:6376",
-    "register": "2335:6404",
-    "chat": "2335:5716",
-    "home": "2335:5799",
-}
 
 
 @mcp.tool()
@@ -132,120 +690,48 @@ async def get_complete_integration_context(
     include_company_guidelines: bool = True,
 ) -> str:
     """
-    [PREDEFINED WORKFLOW] Mengambil konteks teknis lengkap secara paralel.
+    [PLANNER-EXECUTOR WORKFLOW] Mengambil konteks teknis lengkap secara otonom.
+
+    Planner LLM menganalisis requirement, melakukan dekomposisi tugas (Context Engineering),
+    dan membuat PLAN UNIK untuk setiap specialist. Setiap specialist (Executor) hanya
+    menerima konteks yang relevan untuk domainnya, bukan user story mentah.
+
+    Note: Parameter include_* dipertahankan untuk backward compatibility
+    dengan caller yang sudah ada (integration.py). Keputusan routing
+    dan dekomposisi tugas sekarang dilakukan oleh Planner LLM.
 
     Args:
-        requirement: Requirement dari GitLab issue
-        include_api: Query Postman untuk API contracts
-        include_design: Query Figma untuk design XML
-        include_kotlin_docs: Dinonaktifkan (gunakan Context7 langsung)
-        include_company_guidelines: Query RAG untuk pedoman coding perusahaan
+        requirement: Requirement dari GitLab issue atau user story
+        include_api: (Deprecated) Digantikan oleh Planner LLM routing
+        include_design: (Deprecated) Digantikan oleh Planner LLM routing
+        include_kotlin_docs: (Deprecated) Tidak digunakan
+        include_company_guidelines: (Deprecated) Digantikan oleh Planner LLM routing
     """
-    logger.info("===== START PREDEFINED WORKFLOW =====")
+    logger.info("===== START AI-DRIVEN WORKFLOW =====")
     logger.info("Requirement (first 100 chars): %s", requirement[:100])
 
-    results: Dict[str, Any] = {
+    # Log deprecation notice untuk boolean params
+    if any([not include_api, include_design, not include_company_guidelines]):
+        logger.warning(
+            "Boolean params (include_api, include_design, dll) sekarang di-bypass. "
+            "Supervisor LLM yang menentukan routing."
+        )
+
+    initial_state: OrchestratorState = {
         "requirement": requirement,
+        "agent_plan": {},
         "code_structure": None,
         "api_contracts": None,
         "design_context": None,
         "company_guidelines": None,
         "errors": [],
+        "consolidated_output": None,
     }
 
-    async def fetch_android_studio_context():
-        if "android_studio" not in MCP_SERVERS_CONFIG:
-            results["errors"].append("Android Studio tidak dikonfigurasi (ANDROID_PROJECT_ROOT tidak valid)")
-            return
-        logger.info("[1/4] Android Studio context ...")
-        output = await _call_tool(
-            server_key="android_studio",
-            tool_name="run_android_architect_agent",
-            tool_args={"user_query": requirement},
-        )
-        if output:
-            results["code_structure"] = output
-            logger.info("[1/4] Android Studio DONE.")
-        else:
-            results["errors"].append("Android Studio: tidak ada data yang dikembalikan.")
+    result = await orchestrator_graph.ainvoke(initial_state)
 
-    async def fetch_postman_api():
-        if not include_api:
-            logger.info("[2/4] Postman SKIPPED (include_api=False).")
-            return
-        if "postman" not in MCP_SERVERS_CONFIG:
-            results["errors"].append("Postman tidak dikonfigurasi (POSTMAN_API_KEY tidak ada)")
-            return
-        logger.info("[2/4] Postman API contracts ...")
-        output = await _call_tool(
-            server_key="postman",
-            tool_name="run_postman_analyst_agent",
-            tool_args={"user_query": requirement},
-        )
-        if output:
-            results["api_contracts"] = output
-            logger.info("[2/4] Postman DONE.")
-        else:
-            results["errors"].append("Postman: tidak ada data yang dikembalikan.")
-
-    async def fetch_figma_context():
-        if not include_design:
-            logger.info("[3/4] Figma SKIPPED (include_design=False).")
-            return
-        if "figma" not in MCP_SERVERS_CONFIG:
-            results["errors"].append("Figma tidak dikonfigurasi")
-            return
-
-        req_lower = requirement.lower()
-        node_id = next(
-            (nid for kw, nid in FIGMA_NODE_MAP.items() if kw in req_lower),
-            "2335:6376",
-        )
-
-        logger.info("[3/4] Figma XML untuk node %s ...", node_id)
-        output = await _call_tool(
-            server_key="figma",
-            tool_name="get_figma_xml_metadata",
-            tool_args={"node_id": node_id},
-        )
-        if output:
-            results["design_context"] = output
-            logger.info("[3/4] Figma DONE.")
-        else:
-            results["errors"].append(f"Figma: tidak ada data untuk node {node_id}.")
-
-    async def fetch_company_guidelines():
-        if not include_company_guidelines:
-            logger.info("[4/4] RAG SKIPPED (include_company_guidelines=False).")
-            return
-        if not RAG_AVAILABLE:
-            results["errors"].append(f"RAG tidak tersedia: {RAG_ERROR_DETAIL}")
-            logger.error("[4/4] RAG UNAVAILABLE: %s", RAG_ERROR_DETAIL)
-            return
-
-        logger.info("[4/4] Company guidelines via RAG (thread) ...")
-        try:
-            result = await asyncio.to_thread(run_compliance_expert_agent, requirement)
-            results["company_guidelines"] = result.model_dump_json(indent=2)
-            logger.info("[4/4] RAG DONE.")
-        except Exception as e:
-            error_msg = f"RAG error: {e}"
-            results["errors"].append(error_msg)
-            logger.error("[4/4] %s", error_msg)
-
-    await asyncio.gather(
-        fetch_android_studio_context(),
-        fetch_postman_api(),
-        fetch_figma_context(),
-        fetch_company_guidelines(),
-        return_exceptions=True,
-    )
-
-    filled = sum(1 for k in ["code_structure", "api_contracts", "design_context", "company_guidelines"]
-                 if results[k] is not None)
-    logger.info("===== DONE (%d/4 sources filled, %d errors) =====", filled, len(results["errors"]))
-
-    return json.dumps(results, indent=2, ensure_ascii=False)
+    logger.info("===== AI-DRIVEN WORKFLOW DONE =====")
+    return result.get("consolidated_output", json.dumps({"error": "No output produced"}, indent=2))
 
 
 @mcp.tool()
@@ -302,16 +788,22 @@ async def health_check_all_servers() -> str:
         },
     }
 
+    results["orchestrator_mode"] = "AI-Driven Autonomous (LangGraph)"
+
     return json.dumps(results, indent=2, ensure_ascii=False)
 
 
+# ============================================================
+# Entry Point
+# ============================================================
+
 if __name__ == "__main__":
     logger.info(
-        "\nINTEGRATION ORCHESTRATOR -- Predefined Workflow\n"
-        "Mode: ZERO LLM di layer orchestrator\n"
-        "Direct tool calls ke specialist MCP servers\n\n"
+        "\nINTEGRATION ORCHESTRATOR -- Planner-Executor Architecture\n"
+        "Mode: Planner LLM (Context Engineering) + LangGraph dynamic routing\n"
+        "Setiap specialist menerima plan unik, bukan user story mentah\n\n"
         "Tools:\n"
-        "  - get_complete_integration_context() -- main flow\n"
+        "  - get_complete_integration_context() -- main flow (AI-driven)\n"
         "  - query_rag_directly()              -- RAG query\n"
         "  - health_check_all_servers()         -- status check\n"
     )

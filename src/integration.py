@@ -13,6 +13,7 @@ import os
 import sys
 import logging
 from pathlib import Path
+from typing import Any
 
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
@@ -44,9 +45,13 @@ async def run_full_integration_flow(project_id: str, issue_iid: int):
             "command": sys.executable,
             "args": [ORCHESTRATOR_PATH],
             "transport": "stdio",
-            "env": {**os.environ},
+            "env": {
+                **os.environ,
+                "PYTHONPATH": str(settings.project_root),
+            },
         }
     }
+
 
     try:
         logger.info("Menginisialisasi koneksi ke Orchestrator...")
@@ -71,34 +76,72 @@ async def run_full_integration_flow(project_id: str, issue_iid: int):
         logger.info("Android Studio + Postman + RAG berjalan paralel, harap tunggu...")
 
         try:
-            async with asyncio.timeout(600):
-                raw_result = await integration_tool.ainvoke({
+            raw_result = await asyncio.wait_for(
+                integration_tool.ainvoke({
                     "requirement": requirement_spec,
                     "include_api": True,
                     "include_design": False,
                     "include_kotlin_docs": False,
                     "include_company_guidelines": True,
-                })
+                }),
+                timeout=600
+            )
         except asyncio.TimeoutError:
             logger.error("Orchestrator timeout (>10 menit). Periksa koneksi ke sub-agents.")
             return
 
+
+        # Extract clean text if raw_result is a list of LangChain message content blocks
+        raw_result_str = raw_result
+        if isinstance(raw_result, list):
+            texts = []
+            for item in raw_result:
+                if hasattr(item, "text"):
+                    texts.append(item.text)
+                elif isinstance(item, dict) and "text" in item:
+                    texts.append(item["text"])
+                elif isinstance(item, str):
+                    texts.append(item)
+                else:
+                    texts.append(str(item))
+            raw_result_str = "\n".join(texts)
+
+        def _format_json_field(val: Any) -> str:
+            if not val:
+                return ""
+            if isinstance(val, str):
+                try:
+                    parsed_val = json.loads(val)
+                    return json.dumps(parsed_val, indent=2, ensure_ascii=False)
+                except Exception:
+                    return val
+            try:
+                return json.dumps(val, indent=2, ensure_ascii=False)
+            except Exception:
+                return str(val)
+
         try:
-            parsed = json.loads(raw_result) if isinstance(raw_result, str) else raw_result
-            sections = []
-            if parsed.get("code_structure"):
-                sections.append(f"## 1. Struktur & File Project (Android Studio)\n\n{parsed['code_structure']}")
-            if parsed.get("api_contracts"):
-                sections.append(f"## 2. API Contracts (Postman)\n\n{parsed['api_contracts']}")
-            if parsed.get("design_context"):
-                sections.append(f"## 3. Desain UI & XML (Figma)\n\n{parsed['design_context']}")
-            if parsed.get("company_guidelines"):
-                sections.append(f"## 4. Pedoman Coding & Best Practices (RAG)\n\n{parsed['company_guidelines']}")
-            if parsed.get("errors"):
-                sections.append(f"## Errors & Peringatan\n\n" + "\n".join(f"- {e}" for e in parsed["errors"]))
-            final_context = "\n\n---\n\n".join(sections) if sections else str(raw_result)
-        except (json.JSONDecodeError, AttributeError):
-            final_context = str(raw_result)
+            # Check if raw_result_str is a JSON string (for backward compatibility / fallback)
+            if isinstance(raw_result_str, str) and raw_result_str.strip().startswith(("{", "[")):
+                parsed = json.loads(raw_result_str)
+                sections = []
+                if parsed.get("code_structure"):
+                    sections.append(f"## 1. Struktur & File Project (Android Studio)\n\n```json\n{_format_json_field(parsed['code_structure'])}\n```")
+                if parsed.get("api_contracts"):
+                    sections.append(f"## 2. API Contracts (Postman)\n\n```json\n{_format_json_field(parsed['api_contracts'])}\n```")
+                if parsed.get("design_context"):
+                    sections.append(f"## 3. Desain UI & XML (Figma)\n\n```json\n{_format_json_field(parsed['design_context'])}\n```")
+                if parsed.get("company_guidelines"):
+                    sections.append(f"## 4. Pedoman Coding & Best Practices (RAG)\n\n```json\n{_format_json_field(parsed['company_guidelines'])}\n```")
+                if parsed.get("errors"):
+                    sections.append(f"## Errors & Peringatan\n\n" + "\n".join(f"- {e}" for e in parsed["errors"]))
+                final_context = "\n\n---\n\n".join(sections) if sections else raw_result_str
+            else:
+                # Already in Markdown format from Orchestrator
+                final_context = raw_result_str
+        except Exception as e:
+            logger.warning("Gagal men-parse output: %s. Menggunakan raw string.", e)
+            final_context = raw_result_str
 
         output_dir = settings.project_root / "outputs"
         output_dir.mkdir(exist_ok=True)
@@ -111,11 +154,17 @@ async def run_full_integration_flow(project_id: str, issue_iid: int):
             f.write(final_context)
 
         logger.info("====== FINAL TECHNICAL CONTEXT ======")
-        print(final_context)
+        try:
+            print(final_context)
+        except UnicodeEncodeError:
+            # Fallback untuk console Windows dengan encoding non-UTF-8
+            encoding = sys.stdout.encoding or "utf-8"
+            print(final_context.encode(encoding, errors="replace").decode(encoding))
         logger.info("SUCCESS: Result saved to %s", filepath)
 
     except Exception as e:
-        logger.error("Orchestration Stage Error: %s", e)
+        logger.exception("Orchestration Stage Error:")
+
 
 
 if __name__ == "__main__":

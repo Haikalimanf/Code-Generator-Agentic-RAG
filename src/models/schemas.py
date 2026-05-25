@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Dict
 from pydantic import BaseModel, Field, ConfigDict
 
 
@@ -44,3 +44,54 @@ class ComplianceAnalysis(BaseModel):
     naming_conventions: List[str] = Field(description="Aturan penamaan yang disebutkan dalam dokumen.")
     relevant_sections: List[str] = Field(description="Bagian atau halaman dokumen yang menjadi referensi.")
     recommendations: Optional[str] = Field(default=None, description="Saran perbaikan agar sesuai dengan standar perusahaan.")
+
+
+class SpecialistTask(BaseModel):
+    """Sub-tugas terstruktur untuk satu agen spesialis (hasil dekomposisi Planner).
+
+    Mengimplementasikan prinsip Context Engineering: setiap agen hanya menerima
+    instruksi dan konteks yang paling relevan untuk tugasnya, BUKAN seluruh User Story.
+    """
+    task: str = Field(
+        description="Instruksi spesifik dan terfokus untuk agen ini. BUKAN user story mentah, "
+        "melainkan perintah yang sudah di-engineer khusus untuk domain agen ini. "
+        "Hanya berisi konteks yang relevan bagi agen ini."
+    )
+    focus_areas: List[str] = Field(
+        description="Aspek-aspek spesifik yang harus difokuskan oleh agen ini."
+    )
+    context_scope: str = Field(
+        description="Cakupan konteks dari User Story yang perlu agen ini ketahui. "
+        "Hanya bagian yang relevan dengan domain agen ini."
+    )
+    expected_output: str = Field(
+        description="Jenis output yang diharapkan dari agen ini untuk mendukung integrasi keseluruhan."
+    )
+
+
+class PlannerDecision(BaseModel):
+    """Keputusan Planner: dekomposisi tugas dengan Context Engineering.
+
+    Setiap agen menerima PLAN yang UNIK dan TERFOKUS, bukan user story mentah.
+    Ini memastikan setiap executor hanya memproses konteks yang relevan untuk domainnya.
+    """
+    android_studio: Optional[SpecialistTask] = Field(
+        default=None,
+        description="Plan/tugas khusus untuk agen Android Studio. None jika tidak diperlukan."
+    )
+    postman: Optional[SpecialistTask] = Field(
+        default=None,
+        description="Plan/tugas khusus untuk agen Postman. None jika tidak diperlukan."
+    )
+    figma: Optional[SpecialistTask] = Field(
+        default=None,
+        description="Plan/tugas khusus untuk agen Figma. None jika tidak diperlukan."
+    )
+    rag: Optional[SpecialistTask] = Field(
+        default=None,
+        description="Plan/tugas khusus untuk agen RAG. None jika tidak diperlukan."
+    )
+    reasoning: str = Field(
+        description="Penalaran Planner mengenai mengapa tugas dipecah dengan cara ini, "
+        "konteks apa yang dilewatkan ke agen mana, dan mengapa agen tertentu tidak diikutsertakan."
+    )
