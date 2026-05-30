@@ -1,5 +1,6 @@
 import logging
 from typing import Optional, TypeVar, Type
+from pathlib import Path
 
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import BaseTool
@@ -77,3 +78,18 @@ def execute_agent_and_structure(
             f"[{agent_label}] Expected {output_schema.__name__}, got {type(result).__name__}"
         )
     return result
+
+def load_stage_prompt(stage_name: str) -> str:
+    """
+    Membaca instruksi kognitif (Layer 2) dari folder direktori ICM workspace.
+    """
+    # Menargetkan file CONTEXT.md di dalam folder stage yang aktif
+    prompt_path = Path("workspace") / "stages" / stage_name / "CONTEXT.md"
+    if not prompt_path.exists():
+        prompt_path = Path("workspace") / "stages" / stage_name / "CONTEXT.MD"
+    
+    if not prompt_path.exists():
+        raise FileNotFoundError(f"Prompt kognitif untuk {stage_name} tidak ditemukan di {prompt_path}")
+        
+    with open(prompt_path, "r", encoding="utf-8") as file:
+        return file.read()

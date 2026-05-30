@@ -266,7 +266,6 @@ def run_gitlab_analyst_agent(project_id: str, issue_iid: int) -> GitLabAnalysis:
         # KONDISI B: Reject / System is Uncertain
         escalation_msg = (
             f"Halo tim, saya sebagai AI GitLab Analyst menemukan adanya instruksi yang kontradiktif atau ambigu "
-            f"pada Issue ini (Uncertainty Score: {normalized_score:.3f}). "
             f"Mohon klarifikasi lebih lanjut mengenai requirement fitur atau deskripsi dari fitur ini sebelum saya memprosesnya."
         )
         post_gitlab_comment(project_id, issue_iid, escalation_msg)

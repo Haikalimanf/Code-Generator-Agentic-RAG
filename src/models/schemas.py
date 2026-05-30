@@ -1,4 +1,4 @@
-from typing import List, Optional, Dict
+from typing import List, Optional
 from pydantic import BaseModel, Field, ConfigDict
 
 
@@ -52,6 +52,8 @@ class SpecialistTask(BaseModel):
     Mengimplementasikan prinsip Context Engineering: setiap agen hanya menerima
     instruksi dan konteks yang paling relevan untuk tugasnya, BUKAN seluruh User Story.
     """
+    model_config = ConfigDict(extra="forbid")
+
     task: str = Field(
         description="Instruksi spesifik dan terfokus untuk agen ini. BUKAN user story mentah, "
         "melainkan perintah yang sudah di-engineer khusus untuk domain agen ini. "
@@ -72,21 +74,27 @@ class SpecialistTask(BaseModel):
 class PlannerDecision(BaseModel):
     """Keputusan Planner: dekomposisi tugas dengan Context Engineering.
 
+    Menggunakan field eksplisis per-agen (bukan Dict) agar kompatibel dengan
+    OpenAI Structured Outputs yang tidak mendukung additionalProperties Dict[str, T].
     Setiap agen menerima PLAN yang UNIK dan TERFOKUS, bukan user story mentah.
-    Ini memastikan setiap executor hanya memproses konteks yang relevan untuk domainnya.
     """
-    android_studio: Optional[SpecialistTask] = Field(
-        default=None,
-        description="Plan/tugas khusus untuk agen Android Studio. None jika tidak diperlukan."
-    )
-    postman: Optional[SpecialistTask] = Field(
-        default=None,
-        description="Plan/tugas khusus untuk agen Postman. None jika tidak diperlukan."
-    )
-    figma: Optional[SpecialistTask] = Field(
-        default=None,
-        description="Plan/tugas khusus untuk agen Figma. None jika tidak diperlukan."
-    )
+    model_config = ConfigDict(extra="forbid")
+
+    # <-- UNCOMMENT saat ingin mengaktifkan agen Android Studio:
+    # android_studio: Optional[SpecialistTask] = Field(
+    #     default=None,
+    #     description="Plan/tugas khusus untuk agen Android Studio. None jika tidak diperlukan."
+    # )
+    # <-- UNCOMMENT saat ingin mengaktifkan agen Postman:
+    # postman: Optional[SpecialistTask] = Field(
+    #     default=None,
+    #     description="Plan/tugas khusus untuk agen Postman. None jika tidak diperlukan."
+    # )
+    # <-- UNCOMMENT saat ingin mengaktifkan agen Figma:
+    # figma: Optional[SpecialistTask] = Field(
+    #     default=None,
+    #     description="Plan/tugas khusus untuk agen Figma. None jika tidak diperlukan."
+    # )
     rag: Optional[SpecialistTask] = Field(
         default=None,
         description="Plan/tugas khusus untuk agen RAG. None jika tidak diperlukan."
