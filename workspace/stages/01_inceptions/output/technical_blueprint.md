@@ -1,5 +1,3 @@
-# Technical Context for Issue #1
-
 # Technical Integration Context Blueprint
 
 

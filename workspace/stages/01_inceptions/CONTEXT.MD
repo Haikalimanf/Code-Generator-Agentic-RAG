@@ -157,7 +157,7 @@ class GitLabAnalysis(BaseModel):
 | **JSON string untuk Orchestrator** | Di-serialize dengan `.model_dump_json(indent=2)` | JSON string → field `requirement` di `OrchestratorState` |
 | **Log proses** | `stderr` (via `logging`) | Tidak disimpan ke file |
 | **Komentar eskalasi** | GitLab Issue (via API `issue.notes.create()`) | Markdown comment di GitLab |
-| **File output akhir (ICM)** | `workspace/stages/inceptions/output/technical_blueprint.md` | Dihasilkan di akhir Step 3 oleh `integration.py` sebagai *edit surface* |
+| **File output akhir (ICM)** | `workspace/stages/01_inceptions/output/technical_blueprint.md` | Dihasilkan di akhir Step 3 oleh `integration.py` sebagai *edit surface* |
 | **Copy output (Global Legacy)** | `outputs/technical_context_issue_<N>.md` | Salinan global untuk kemudahan akses |
 
 > **Catatan**: Secara ICM, output utama fase ini diletakkan di subfolder `output/` dari *stage* bersangkutan (`technical_blueprint.md`). Developer dapat langsung mengedit file ini sebagai *edit surface* sebelum lanjut ke *stage* berikutnya.
@@ -268,11 +268,14 @@ dan membuat PLAN yang UNIK dan TERFOKUS untuk setiap agen spesialis yang relevan
 #   - Elemen desain apa yang harus diekstrak (layout, style, komponen)
 #   - Bagian mana dari requirement yang terkait UI/UX
 
-- "rag": Mengambil pedoman coding dan standar perusahaan dari dokumen internal.
-  Saat membuat plan untuk agen ini, fokus pada:
-  - Standar coding apa yang perlu dicek untuk fitur ini
-  - Naming convention dan arsitektur yang relevan
-  - Best practice spesifik untuk jenis implementasi yang dibutuhkan
+- "rag": Mengambil pedoman coding dan standar perusahaan dari dokumen internal di Vector DB.
+  **Koleksi**: `company_guidelines`
+  **Dokumen yang tersedia**: `Suitcore Android MVVM Documentation V1`, `SuitMobile Code Style [Android] - Naming - Version 2`
+  Saat membuat plan untuk agen ini:
+  - WAJIB sebutkan nama dokumen spesifik yang harus dikueri
+  - WAJIB sebutkan topik spesifik yang harus diekstrak (misal: "aturan penamaan ViewModel", "struktur folder MVVM")
+  - JANGAN buat instruksi umum seperti "cari pedoman coding"
+  - Contoh task yang BENAR: "Kueri koleksi 'company_guidelines' untuk dokumen 'Suitcore Android MVVM Documentation V1'. Ekstrak aturan struktur folder dan pola ViewModel untuk fitur autentikasi."
 
 ### Constraint
 

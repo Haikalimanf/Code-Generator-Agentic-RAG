@@ -61,6 +61,7 @@ Membuat MCP Server/               ← Root project
 ├── uv.lock                       # Lock file uv
 ├── AGENTS.md                     # Panduan agent untuk AI coding assistant
 ├── README.md                     # Dokumentasi publik
+├── ICM_GUIDELINE.md              # Panduan Interpretable Context Methodology (ICM) untuk stages/
 │
 ├── src/                          # Source code utama
 │   ├── __init__.py
@@ -79,7 +80,7 @@ Membuat MCP Server/               ← Root project
 │   │   ├── __init__.py
 │   │   ├── logging_config.py     # Structured logging via modul logging
 │   │   ├── error_handler.py      # wrap_tool_call / wrap_async_tool_call
-│   │   └── llm_factory.py        # create_llm, create_agent_with_memory, execute_agent_and_structure
+│   │   └── llm_factory.py        # create_llm, create_agent_with_memory, execute_agent_and_structure, load_stage_prompt
 │   │
 │   ├── agents/                   # Agen standalone (bukan MCP server)
 │   │   ├── __init__.py
@@ -95,7 +96,7 @@ Membuat MCP Server/               ← Root project
 │       └── pdf_rag.py            # RAG chain untuk PDF perusahaan (direct import)
 │
 ├── data/                         # Dokumen PDF sumber untuk RAG
-├── outputs/                      # Output Markdown hasil generate
+├── outputs/                      # (Legacy) Output Markdown hasil generate
 ├── postman_cache/                # Cache response Postman API (TTL 1 jam)
 ├── experiment/                   # Modul eksperimental
 │   └── uncertainty/
@@ -105,10 +106,14 @@ Membuat MCP Server/               ← Root project
 │
 └── workspace/                    # Dokumentasi & konteks kerja
     ├── CLAUDE.md                 # ← File ini
-    ├── CONTEXT.MD                # Konteks tingkat tinggi project
+    ├── CONTEXT.MD                # Konteks tingkat tinggi project (Layer 1)
     └── stages/
-        └── inceptions/
-            └── CONTEXT.MD        # Konteks fase inception
+        └── 01_inceptions/
+            ├── CONTEXT.MD        # Konteks fase inception (Layer 2)
+            ├── reference/        # Panduan & template stabil (Layer 3)
+            │   └── blueprint_template.md
+            └── output/           # Artefak hasil kerja dinamis (Layer 4)
+                └── technical_blueprint.md
 ```
 
 ## Common Commands

@@ -262,7 +262,7 @@ async def supervisor_node(state: OrchestratorState) -> dict:
         llm = create_llm(temperature=0.0)
         llm_structured = llm.with_structured_output(PlannerDecision, method="function_calling")
 
-        supervisor_prompt_tmpl = load_stage_prompt("inceptions")
+        supervisor_prompt_tmpl = load_stage_prompt("01_inceptions")
         prompt = supervisor_prompt_tmpl.replace(
             "{active_servers}", ", ".join(available_agents)
         ).replace(
@@ -438,7 +438,35 @@ async def rag_node(state: OrchestratorState) -> dict:
         logger.info("[RAG] Task: %s", task[:100])
         result = await asyncio.to_thread(run_compliance_expert_agent, task)
         logger.info("[RAG] Compliance expert agent DONE.")
-        return {"company_guidelines": result.model_dump_json(indent=2)}
+
+        # Render ComplianceAnalysis sebagai plain Markdown agar mudah dibaca
+        # dan diedit manusia (prinsip ICM: plain text as the interface).
+        md_lines = []
+
+        if result.base_classes:
+            md_lines.append(f"#### 2. Base Class yang Wajib Digunakan\n\n{result.base_classes}")
+
+        if result.naming_kotlin:
+            md_lines.append(f"#### 3. Naming Conventions — File & Class (Kotlin)\n\n{result.naming_kotlin}")
+
+        if result.naming_xml:
+            md_lines.append(f"#### 4. Naming Conventions — Layout & Resource XML\n\n{result.naming_xml}")
+
+        if result.naming_view_id:
+            md_lines.append(f"#### 5. Naming Conventions — ID Komponen UI (View ID)\n\n{result.naming_view_id}")
+
+        if result.naming_method_variable:
+            md_lines.append(f"#### 6. Naming Conventions — Method & Variabel (Kotlin)\n\n{result.naming_method_variable}")
+
+        if result.recommendations:
+            md_lines.append(f"#### 7. Rekomendasi Implementasi\n\n{result.recommendations}")
+
+        if result.relevant_sections:
+            items = "\n".join(f"- {rs}" for rs in result.relevant_sections)
+            md_lines.append(f"#### Referensi Dokumen Internal\n\n{items}")
+
+        guidelines_markdown = "\n\n".join(md_lines) if md_lines else "Tidak ada pedoman yang ditemukan."
+        return {"company_guidelines": guidelines_markdown}
     except Exception as e:
         logger.exception("[RAG] Error memanggil agent RAG:")
         return {
@@ -537,9 +565,13 @@ async def consolidation_node(state: OrchestratorState) -> dict:
     #     sections.append(f"## 3. Desain UI & XML (Figma)\n\n```json\n{design_context}\n```")
 
     # Bagian: Pedoman Coding & Best Practices (RAG) — AKTIF
+    # Output RAG sudah berupa plain Markdown (prinsip ICM: plain text as the interface).
+    # Tidak perlu format_json_field() — cukup embed langsung sebagai teks biasa.
     if state.get("company_guidelines"):
-        company_guidelines = format_json_field(state["company_guidelines"])
-        sections.append(f"## Pedoman Coding & Best Practices (RAG)\n\n```json\n{company_guidelines}\n```")
+        sections.append(
+            f"## Pedoman Coding & Best Practices (RAG)\n\n"
+            f"{state['company_guidelines']}"
+        )
 
     # Bagian Errors & Peringatan
     errors = state.get("errors", [])
@@ -705,7 +737,25 @@ async def query_rag_directly(query: str) -> str:
     try:
         logger.info("Direct RAG query: %s", query[:80])
         result = await asyncio.to_thread(run_compliance_expert_agent, query)
-        return result.model_dump_json(indent=2)
+
+        # Render sebagai plain Markdown (prinsip ICM: plain text as the interface)
+        md_lines = []
+        if result.base_classes:
+            md_lines.append(f"#### 2. Base Class yang Wajib Digunakan\n\n{result.base_classes}")
+        if result.naming_kotlin:
+            md_lines.append(f"#### 3. Naming Conventions — File & Class (Kotlin)\n\n{result.naming_kotlin}")
+        if result.naming_xml:
+            md_lines.append(f"#### 4. Naming Conventions — Layout & Resource XML\n\n{result.naming_xml}")
+        if result.naming_view_id:
+            md_lines.append(f"#### 5. Naming Conventions — ID Komponen UI (View ID)\n\n{result.naming_view_id}")
+        if result.naming_method_variable:
+            md_lines.append(f"#### 6. Naming Conventions — Method & Variabel (Kotlin)\n\n{result.naming_method_variable}")
+        if result.recommendations:
+            md_lines.append(f"#### 7. Rekomendasi Implementasi\n\n{result.recommendations}")
+        if result.relevant_sections:
+            items = "\n".join(f"- {rs}" for rs in result.relevant_sections)
+            md_lines.append(f"#### Referensi Dokumen Internal\n\n{items}")
+        return "\n\n".join(md_lines) if md_lines else "Tidak ada pedoman yang ditemukan."
     except Exception as e:
         return f"RAG Query error: {e}"
 

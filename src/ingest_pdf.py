@@ -7,7 +7,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_postgres import PGVector
 
-from config.settings import settings
+from src.config.settings import settings
 
 logger = logging.getLogger("ingest_pdf")
 
@@ -26,6 +26,7 @@ PDF_FILES = [
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size=1000,
     chunk_overlap=200,
+    separators=["\n\n\n", "\n\n", "\n", ". ", " ", ""],
 )
 
 all_splits = []
@@ -43,7 +44,12 @@ for pdf_name in PDF_FILES:
         logger.info("Berhasil memuat %d halaman dari %s", len(docs), pdf_name)
 
         splits = text_splitter.split_documents(docs)
-        logger.info("Dipecah menjadi %d potongan (chunks)", len(splits))
+
+        # Injeksi metadata source agar RAG agent bisa menyebutkan nama dokumen asal
+        for split in splits:
+            split.metadata["source"] = pdf_name
+
+        logger.info("Dipecah menjadi %d potongan (chunks) dengan metadata source", len(splits))
         all_splits.extend(splits)
     except Exception as e:
         logger.error("Gagal memproses %s: %s", pdf_name, e)

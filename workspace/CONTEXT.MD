@@ -16,7 +16,7 @@ workspace/
 ├── CONTEXT.MD              ← Anda di sini (Layer 1: Task Router)
 ├── CLAUDE.md               ← Identitas sistem & panduan global untuk Claude Code
 └── stages/
-    └── inceptions/
+    └── 01_inceptions/
         └── CONTEXT.MD      ← Layer 2: Detail konteks fase inception (desain awal, scope)
 ```
 

@@ -161,7 +161,7 @@ async def run_full_integration_flow(project_id: str, issue_iid: int):
         f.write(final_context)
 
     # Write to stage-specific ICM output folder as the "edit surface"
-    icm_output_dir = settings.project_root / "workspace" / "stages" / "inceptions" / "output"
+    icm_output_dir = settings.project_root / "workspace" / "stages" / "01_inceptions" / "output"
     icm_output_dir.mkdir(parents=True, exist_ok=True)
     icm_filepath = icm_output_dir / "technical_blueprint.md"
 

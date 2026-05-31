@@ -39,11 +39,14 @@ class FigmaDesignAnalysis(BaseModel):
 
 
 class ComplianceAnalysis(BaseModel):
-    guideline_summary: str = Field(description="Ringkasan pedoman perusahaan yang relevan dengan tugas.")
-    standards_applied: List[str] = Field(description="Daftar standar teknis atau arsitektur yang harus diikuti.")
-    naming_conventions: List[str] = Field(description="Aturan penamaan yang disebutkan dalam dokumen.")
-    relevant_sections: List[str] = Field(description="Bagian atau halaman dokumen yang menjadi referensi.")
-    recommendations: Optional[str] = Field(default=None, description="Saran perbaikan agar sesuai dengan standar perusahaan.")
+    model_config = ConfigDict(extra="forbid")
+    base_classes: str = Field(description="Daftar base class Kotlin yang wajib digunakan beserta penjelasan kapan menggunakannya.")
+    naming_kotlin: str = Field(description="Aturan konvensi penamaan file dan class Kotlin (Activity, Fragment, ViewModel, UseCase, Repository, dsb).")
+    naming_xml: str = Field(description="Aturan konvensi penamaan layout dan resource XML.")
+    naming_view_id: str = Field(description="Aturan konvensi penamaan ID komponen UI (View ID).")
+    naming_method_variable: str = Field(description="Aturan konvensi penamaan method, fungsi, variabel, package, dan konstanta Kotlin.")
+    recommendations: Optional[str] = Field(default=None, description="Saran atau rekomendasi implementasi khusus agar sesuai dengan standar perusahaan.")
+    relevant_sections: List[str] = Field(description="Daftar referensi bab atau halaman dokumen internal perusahaan yang dirujuk.")
 
 
 class SpecialistTask(BaseModel):
